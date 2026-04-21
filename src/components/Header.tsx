@@ -1,0 +1,54 @@
+import React from 'react';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { Language } from '../types/language';
+
+interface HeaderProps {
+  language: Language;
+  onLanguageChange: (language: Language) => void;
+  apiInfo?: {
+    title: string;
+    description: string;
+  };
+}
+
+export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange, apiInfo }) => {
+  return (
+    <header className="bg-white border-b border-paynet-gray-200 px-6 py-4 shadow-paynet-lg">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <a 
+            href="https://merchant.paynet.md" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200"
+          >
+            <img 
+              src="https://paynet.md/merchant/content/images/logo-paynet.svg" 
+              alt="PayNet Logo" 
+              className="h-12 w-auto"
+              onError={(e) => {
+                // Fallback if image fails to load
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            <div className="hidden w-12 h-12 bg-gradient-to-br from-paynet-primary to-paynet-secondary rounded-lg flex items-center justify-center shadow-paynet-lg">
+              <span className="text-white font-bold text-lg">PN</span>
+            </div>
+          </a>
+          <div>
+            <span className="text-xs bg-paynet-orange text-white px-2 py-1 rounded-full font-medium">API</span>
+            <p className="text-sm text-paynet-gray-500 font-normal">
+              {apiInfo?.title || 'API Documentation Portal'}
+            </p>
+          </div>
+        </div>
+        
+        <LanguageSwitcher
+          currentLanguage={language}
+          onLanguageChange={onLanguageChange}
+        />
+      </div>
+    </header>
+  );
+};

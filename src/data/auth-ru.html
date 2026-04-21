@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Информация об Аутентификации</title>
+</head>
+<body>
+    <div class="auth-info">
+        <p>Все запросы к API требуют двойной аутентификации с использованием следующих заголовков в header:</p>        
+        <div class="auth-keys-full">
+            <div class="auth-key">
+                <h3>Authorization</h3>
+                <p> Значение <b> Bearer {{token}} </b> ,  значение токена необходимо получить на методе Авторизации /auth</p>
+            </div>
+        </div>
+        
+        <div class="auth-example">
+            <h3>Пример Заголовков:</h3>
+            <pre><code>Заголовки:
+                <b> Authorization: </b>  Bearer MFL3Az5eYT9JFAxT .... L2iG20KPnDQw6Zhw5uW7QftBpATXdP_ ......
+                <b> Accept-Language: </b>  ru-RU
+                <b> Content-Type: </b>  application/json</code>
+            </pre>
+        </div>
+        
+        <div class="auth-note">
+            <p><strong>Примечание:</strong> Вы можете получить свои API-учетные данные на портале разработчиков PayNet после создания учетной записи. 
+            Вам необходимо получить username - название пользователя,  password - это будет пароль</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{
+	"name": "info",
+	"author": " Paynet Services SRL ",
+	"version": "2026.04.01",
+	"language": "en,ro,ru",
+	"items": [
+		{
+			"en": {
+				"title": "API Documentation Portal",
+				"description": "API for Transfer Payment System",
+				"contact": {
+					"name": "API Support",
+					"email": "support@paynet.md",
+					"url": "https://paynet.md/support"
+				},
+				"license": {
+					"name": "MIT",
+					"url": "https://paynet.md/licenses/MIT"
+				}
+			},
+			"ro": {
+				"title": "Portal de Documentație API",
+				"description": "API pentru Sistemul de Transfer de Plăți",
+				"contact": {
+					"name": "Suport API",
+					"email": "support@paynet.md",
+					"url": "https://paynet.md/support"
+				},
+				"license": {
+					"name": "MIT",
+					"url": "https://paynet.md/licenses/MIT"
+				}
+			},
+			"ru": {
+				"title": "Портал Документации API1",
+				"description": "API для Системы Переводов Платежей2",
+				"contact": {
+					"name": "Поддержка API",
+					"email": "support@paynet.md",
+					"url": "https://paynet.md/support"
+				},
+				"license": {
+					"name": "MIT",
+					"url": "https://paynet.md/licenses/MIT"
+				}
+			}
+		}
+	]
+}

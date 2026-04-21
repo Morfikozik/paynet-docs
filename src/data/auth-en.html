@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Authentication Information</title>
+</head>
+<body>
+    <div class="auth-info">
+        <p>All API requests require authentication using the following headers:</p>        
+        <div class="auth-keys-full">
+            <div class="auth-key">
+                <h3>Authorization</h3>
+                <p>Value: <b>Bearer {{token}}</b>. The token must be obtained via the <code>/auth</code> endpoint.</p>
+            </div>
+        </div>
+        
+        <div class="auth-example">
+            <h3>Example Headers:</h3>
+            <pre><code>Headers:
+Authorization: Bearer MFL3Az5eYT9JFAxT....L2iG20KPnDQw6Zhw5uW7QftBpATXdP_......
+Accept-Language: en-US
+Content-Type: application/json
+</code></pre>
+        </div>
+        
+        <div class="auth-note">
+            <p><strong>Note:</strong> You can obtain your API credentials from the PayNet Developer Portal after creating an account. 
+            You will need:
+            <ul>
+                <li><b>username</b> — your user identifier</li>
+                <li><b>password</b> — your account password</li>
+            </ul>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

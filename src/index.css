@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles matching Paynet brand */
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc;
+  color: #334155;
+}
+
+/* Paynet brand button styles */
+.btn-paynet-primary {
+  @apply bg-paynet-primary hover:bg-paynet-secondary text-white font-medium px-6 py-3 rounded-paynet transition-all duration-200 shadow-paynet hover:shadow-paynet-lg;
+}
+
+.btn-paynet-secondary {
+  @apply bg-white hover:bg-paynet-light text-paynet-primary border border-paynet-primary font-medium px-6 py-3 rounded-paynet transition-all duration-200;
+}
+
+.btn-paynet-orange {
+  @apply bg-paynet-orange hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-paynet transition-all duration-200 shadow-paynet hover:shadow-paynet-lg;
+}
+
+/* Project Info Content Styling */
+.project-info-content h1 {
+  @apply text-3xl font-bold text-paynet-primary mb-6 border-b border-paynet-gray-200 pb-4;
+}
+
+.project-info-content h2 {
+  @apply text-2xl font-semibold text-paynet-primary mb-4 mt-8;
+}
+
+.project-info-content h3 {
+  @apply text-xl font-medium text-paynet-gray-700 mb-3 mt-6;
+}
+
+.project-info-content p {
+  @apply text-paynet-gray-600 mb-4 leading-relaxed;
+}
+
+.project-info-content ul {
+  @apply list-disc list-inside mb-4 space-y-2;
+}
+
+.project-info-content ol {
+  @apply list-decimal list-inside mb-4 space-y-2;
+}
+
+.project-info-content li {
+  @apply text-paynet-gray-600 leading-relaxed;
+}
+
+.project-info-content strong {
+  @apply font-semibold text-paynet-primary;
+}
+
+.project-info-content a {
+  @apply text-paynet-primary hover:text-paynet-secondary underline transition-colors;
+}
+
+.project-info-content section {
+  @apply mb-8;
+}
+
+/* Custom scrollbar matching Paynet theme */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(106, 180, 184);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(85, 144, 148);
+}
+
+/* Authentication Block Content Styling */
+.auth-content h2 {
+  @apply text-xl font-semibold text-paynet-primary mb-4;
+}
+
+.auth-content h3 {
+  @apply text-lg font-medium text-paynet-gray-700 mb-2;
+}
+
+.auth-content p {
+  @apply text-paynet-gray-600 mb-4 leading-relaxed;
+}
+
+.auth-content .auth-keys {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4 mb-4;
+}
+
+.auth-content .auth-keys-full {
+  @apply grid grid-cols-1 gap-4 mb-4 w-full;
+}
+.auth-content .auth-key {
+  @apply bg-white p-4 rounded-paynet border border-paynet-gray-200;
+}
+
+.auth-content .auth-key h3 {
+  @apply font-mono text-sm font-semibold text-paynet-primary mb-2;
+}
+
+.auth-content .auth-key p {
+  @apply text-sm text-paynet-gray-600 mb-0;
+}
+
+.auth-content .auth-example {
+  @apply mb-4;
+}
+
+.auth-content .auth-example pre {
+  @apply bg-paynet-gray-100 p-4 rounded-paynet text-sm overflow-x-auto border border-paynet-gray-200;
+}
+
+.auth-content .auth-example code {
+  @apply text-paynet-gray-800;
+}
+
+.auth-content .auth-note {
+  @apply bg-blue-50 border border-blue-200 p-4 rounded-paynet;
+}
+
+.auth-content .auth-note p {
+  @apply text-blue-800 mb-0;
+}
+
+.auth-content strong {
+  @apply font-semibold text-paynet-primary;
+}

@@ -1,0 +1,40 @@
+{
+  "name": "tags",
+  "author": "Paynet V1",
+	"version": "2026.04.01",
+  "language": "en,ro,ru",
+  "items": [
+    {
+      "en": [
+        {
+          "name": "Users",
+          "description": "User management operations"
+        },
+        {
+          "name": "Auth",
+          "description": "Authorization and tokens"
+        }
+      ],
+      "ro": [
+        {
+          "name": "Users",
+          "description": "Utilizatori management operations"
+        },
+        {
+          "name": "Auth",
+          "description": "Authorization and tokens"
+        }
+      ],
+      "ru": [
+        {
+          "name": "Users",
+          "description": "Операции с пользователями"
+        },
+        {
+          "name": "Auth",
+          "description": "Авторизация и токены"
+        }
+      ]
+    }
+  ]
+}

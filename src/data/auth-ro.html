@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Informații despre Autentificare</title>
+</head>
+<body>
+    <div class="auth-info">
+        <p>Toate cererile către API necesită autentificare dublă utilizând următoarele antete (headers):</p>        
+        <div class="auth-keys-full">
+            <div class="auth-key">
+                <h3>Authorization</h3>
+                <p> Valoarea <b> Bearer {{token}} </b>, tokenul trebuie obținut prin metoda de autentificare /auth</p>
+            </div>
+        </div>
+        
+        <div class="auth-example">
+            <h3>Exemplu de Headere:</h3>
+            <pre><code>Headere:
+                <b> Authorization: </b>  Bearer MFL3Az5eYT9JFAxT .... L2iG20KPnDQw6Zhw5uW7QftBpATXdP_ ......
+                <b> Accept-Language: </b>  ro-RO
+                <b> Content-Type: </b>  application/json</code>
+            </pre>
+        </div>
+        
+        <div class="auth-note">
+            <p><strong>Notă:</strong> Puteți obține credențialele API în portalul pentru dezvoltatori PayNet după crearea unui cont. 
+            Este necesar să obțineți username (numele utilizatorului) și password (parola).</p>
+        </div>
+    </div>
+</body>
+</html>

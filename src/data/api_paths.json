@@ -1,0 +1,888 @@
+{
+	"name": "paths",
+	"autor": "Paynet V2",
+	"version": "2026.04.01",
+	"language": "en,ro,ru",
+	"paths": [
+		{
+			"/auth": [
+				{
+					"method": "POST",
+					"info": [
+						{
+							"language": "en",
+							"name": "Authentication and authorization.",
+							"description": "To access Paynet service and pass authorization, you need to get token authorization. You can get this token by calling the service method described below, specifying the parameters (username and password) received during partner registration."
+						},
+						{
+							"language": "ro",
+							"name": "Autentificare și autorizare.",
+							"description": "În esență, aceasta este o metodă de referință de bază, care permite obținerea informațiilor generale despre utilizatorii din sistem. rr"
+						},
+						{
+							"language": "ru",
+							"name": "Аутентификация и авторизация.",
+							"description": "Для доступа к сервису Paynet и прохождения авторизации необходимо получить токен авторизации. Получить токен можно, вызвав метод сервиса, описанный ниже, указав параметры (имя пользователя и пароль), полученные при регистрации партнёра."
+						}
+					],
+					"responses": {
+						"200": {
+							"description": "Success executed authentication.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"access_token": "Ccxl7QQiMEoakkrUoiUn8PIgcmSN2ouP3XNjSmgqUH-Dn8UDg0...........",
+									"token_type": "bearer",
+									"expires_in": 14399
+								},
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						},
+						"500": {
+							"description": "The wrong entred parametrs",
+							"content": {
+								"type": "application/json",
+								"object": [
+									{
+										"status": 500,
+										"message": "Wrong credentials",
+										"code": "AUTHENTICATION_FAILED",
+										"traceId": "ab2002e6-50e7-4cea-a112-eadbddf83505",
+										"details": null
+									}
+								],
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					}
+				}
+			],
+			"/api/order": [
+				{
+					"method": "POST",
+					"info": [
+						{
+							"language": "en",
+							"name": "Create an order",
+							"description": "In this model, identification and establishment of communication between the Partner’s servers and Paynet is required. Signing data is not required. The Partner’s system will transmit the payment information by contacting Payments. As a result, Partner will receive a payment ID, through which the Partner will be able to send the client to the Paynet payment form to confirm and pay the payment."
+						},
+						{
+							"language": "ro",
+							"name": "Creați o plată.",
+							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
+						},
+						{
+							"language": "ru",
+							"name": "Создание операции",
+							"description": "В этой модели требуется идентификация и установление связи между серверами Партнёра и Paynet. Подписание данных не требуется. Система Партнёра передаст информацию о платёже, обратившись в Payments. В результате Партнёр получит идентификатор платежа, по которому сможет перенаправить клиента на платёжную форму Paynet для подтверждения и оплаты."
+						}
+					],
+					"request": {},
+					"responses": {
+						"200": {
+							"description": "Success executed create order.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"paymentId": 317184,
+									"paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
+									"cardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
+									"status": 1,
+									"message": null,
+									"order": 18223,
+									"merchantCode": "111125",
+									"saleAreaCode": "makle",
+									"linkUrlSuccess": "http://localhost/home/success",
+									"linkUrlCancel": "https://shop-test.paynet.md",
+									"signature": "ea20bad9b2c464765542e000eb886057",
+									"amount": {
+										"requestAmount": 3,
+										"requestCurrency": 498,
+										"amount": 3,
+										"amountCurrency": 3
+									},
+									"customer": {
+										"code": null,
+										"nameFirst": null,
+										"nameLast": null,
+										"email": null,
+										"country": null,
+										"city": null,
+										"address": null,
+										"phoneNumber": null,
+										"cardLinkHash": null
+									},
+									"payer": null,
+									"expiryDate": "2026-04-03 12:01:12",
+									"registered": "2026-04-01 15:01:12",
+									"paidDate": null,
+									"services": [
+										{
+											"name": "Card of products",
+											"description": "Cart of products",
+											"amount": 3,
+											"products": [
+												{
+													"lineNo": 1,
+													"name": "Demo eShop",
+													"description": "Demo eShop online desc",
+													"unitPrice": 3,
+													"unitProduct": null,
+													"quantity": 100,
+													"amount": 3,
+													"totalAmount": 3
+												}
+											]
+										}
+									],
+									"moneyType": "All"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						},
+						"400": {
+							"description": "The wrong entred parametrs",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 400,
+									"message": "One or more entered parameters are incorrect.",
+									"code": "INVALID_PARAMETER",
+									"traceId": "9b9346f9-f83a-465d-ac8d-dc382c460c22",
+									"details": "The invalid parameter is: XXXX"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"401": {
+							"description": "Access denied due to invalid or missing authentication token.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"Status": 401,
+									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+									"Code": "UNAUTHORIZED",
+									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"500": {
+							"description": "Internal server error occurred while processing the request.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 500,
+									"message": "One or more errors occurred.",
+									"code": "TECHNICAL_ERROR",
+									"traceId": "c546f06c-3674-4b55-8e0f-ce8aac66f49f",
+									"details": "Please verify the transmitted data and try again, or contact support."
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						}
+					}
+				}
+			],
+			"/api/order/merchant/{id}": [
+				{
+					"method": "GET",
+					"info": [
+						{
+							"language": "en",
+							"name": "Get a payment info by merchant order id",
+							"description": "In this model, identification and establishment of communication between the Partner’s servers and Paynet is required. Signing data is not required. The Partner’s system will transmit the payment information by contacting Payments. As a result, Partner will receive a payment ID, through which the Partner will be able to send the client to the Paynet payment form to confirm and pay the payment."
+						},
+						{
+							"language": "ro",
+							"name": "Obține informații despre o operație folosind ID-ul comenzii comerciantului.",
+							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
+						},
+						{
+							"language": "ru",
+							"name": "Получить операцию по ИД заказа мерчанта.",
+							"description": "В этой модели требуется идентификация и установление связи между серверами Партнёра и Paynet. Подписание данных не требуется. Система Партнёра передаст информацию о платёже, обратившись в Payments. В результате Партнёр получит идентификатор платежа, по которому сможет перенаправить клиента на платёжную форму Paynet для подтверждения и оплаты."
+						}
+					],
+					"responses": {
+						"200": {
+							"description": "Success executed get order.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"paymentId": 317184,
+									"paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
+									"cardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
+									"status": 1,
+									"message": null,
+									"order": 18223,
+									"merchantCode": "111125",
+									"saleAreaCode": "makle",
+									"linkUrlSuccess": "http://localhost/home/success",
+									"linkUrlCancel": "https://shop-test.paynet.md",
+									"signature": "ea20bad9b2c464765542e000eb886057",
+									"amount": {
+										"requestAmount": 3,
+										"requestCurrency": 498,
+										"amount": 3,
+										"amountCurrency": 3
+									},
+									"customer": {
+										"code": null,
+										"nameFirst": null,
+										"nameLast": null,
+										"email": null,
+										"country": null,
+										"city": null,
+										"address": null,
+										"phoneNumber": null,
+										"cardLinkHash": null
+									},
+									"payer": null,
+									"expiryDate": "2026-04-03 12:01:12",
+									"registered": "2026-04-01 15:01:12",
+									"paidDate": null,
+									"services": [
+										{
+											"name": "Card of products",
+											"description": "Cart of products",
+											"amount": 3,
+											"products": [
+												{
+													"lineNo": 1,
+													"name": "Demo eShop",
+													"description": "Demo eShop online desc",
+													"unitPrice": 3,
+													"unitProduct": null,
+													"quantity": 100,
+													"amount": 3,
+													"totalAmount": 3
+												}
+											]
+										}
+									],
+									"moneyType": "All"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						},
+						"401": {
+							"description": "Access denied due to invalid or missing authentication token.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"Status": 401,
+									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+									"Code": "UNAUTHORIZED",
+									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"404": {
+							"description": "The wrong entred parametrs",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 404,
+									"message": "Record not found",
+									"code": "NOT_FOUND_RECORD",
+									"traceId": "e8e43475-84c2-405a-803f-eb68208f03be",
+									"details": "No records were found for the provided data"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"500": {
+							"description": "Internal server error occurred while processing the request.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 500,
+									"message": "One or more errors occurred.",
+									"code": "TECHNICAL_ERROR",
+									"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+									"details": "Please verify the transmitted data and try again, or contact support."
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						}
+					}
+				}
+			],
+			"/api/order/refund": [
+				{
+					"method": "POST",
+					"info": [
+						{
+							"language": "en",
+							"name": "Refund a payment",
+							"description": "In this model, identification and establishment of communication between the Partner’s servers and Paynet is required. Signing data is not required. The Partner’s system will transmit the payment information by contacting Payments. As a result, Partner will receive a payment ID, through which the Partner will be able to send the client to the Paynet payment form to confirm and pay the payment."
+						},
+						{
+							"language": "ro",
+							"name": "Returnarea  plații.",
+							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
+						},
+						{
+							"language": "ru",
+							"name": "Отмена операции",
+							"description": "В этой модели требуется идентификация и установление связи между серверами Партнёра и Paynet. Подписание данных не требуется. Система Партнёра передаст информацию о платёже, обратившись в Payments. В результате Партнёр получит идентификатор платежа, по которому сможет перенаправить клиента на платёжную форму Paynet для подтверждения и оплаты."
+						}
+					],
+					"responses": {
+						"200": {
+							"description": "Success executed refund.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"Invoice": 296901,
+									"SaleAreaCode": "makle",
+									"Customer": null,
+									"EventDate": "02.05.2025 15:01:07",
+									"RefundType": "full",
+									"Currency": 498,
+									"Amount": 50000,
+									"Merchant": "111125",
+									"CardMask": null,
+									"CardLinkHash": null,
+									"MoneyType": "MIA_QR"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						},
+						"401": {
+							"description": "Access denied due to invalid or missing authentication token.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"Status": 401,
+									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+									"Code": "UNAUTHORIZED",
+									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"500": {
+							"description": "Internal server error occurred while processing the request.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 500,
+									"message": "One or more errors occurred.",
+									"code": "TECHNICAL_ERROR",
+									"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+									"details": "Please verify the transmitted data and try again, or contact support."
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						}
+					}
+				}
+			],
+			"/api/linked-cards/unlink": [
+				{
+					"method": "POST",
+					"info": [
+						{
+							"language": "en",
+							"name": "Delete linken card",
+							"description": "The method performs deactivation and deletion of the card token in the system. As a result, the card is unlinked from the user account, and the token becomes invalid, preventing any further use in payment operations, including recurring charges."
+						},
+						{
+							"language": "ro",
+							"name": "Deconectați un card atașat",
+							"description": "Metoda realizează dezactivarea și ștergerea tokenului cardului în sistem. În urma acestei operațiuni, cardul este deconectat de la contul utilizatorului, iar tokenul își pierde valabilitatea, ceea ce exclude posibilitatea utilizării ulterioare a acestuia în operațiuni de plată, inclusiv plăți recurente."
+						},
+						{
+							"language": "ru",
+							"name": "Удаление токена карты",
+							"description": "Метод выполняет деактивацию и удаление токена карты в системе. В результате карта отвязывается от учетной записи пользователя, а токен утрачивает валидность, что исключает возможность его дальнейшего использования в платежных операциях, включая рекуррентные списания. "
+						}
+					],
+					"responses": {
+						"200": {
+							"description": "Success executed unlink card.",
+							"content": {
+								"type": "application/json",
+								"object": {								 
+									"responseCode": "SUCCESS"								 
+								},
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						},
+						"400": {
+							"description": "The wrong entred parametrs",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 400,
+									"message": "One or more entered parameters are incorrect.",
+									"code": "INVALID_PARAMETER",
+									"traceId": "9b9346f9-f83a-465d-ac8d-dc382c460c22",
+									"details": "The invalid parameter is: XXXX"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"401": {
+							"description": "Access denied due to invalid or missing authentication token.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"Status": 401,
+									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+									"Code": "UNAUTHORIZED",
+									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"404": {
+							"description": "Access denied due to invalid or missing authentication token.",
+							"content": {
+								"type": "application/json",
+								"object": {
+  "status": 404,
+  "message": "Record not found",
+  "code": "NOT_FOUND_RECORD",
+  "traceId": "16ce780d-2e89-47b8-9cd2-6d0d136d9816",
+  "details": "No records were found for the provided data"
+},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"500": {
+							"description": "Internal server error occurred while processing the request.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 500,
+									"message": "One or more errors occurred.",
+									"code": "TECHNICAL_ERROR",
+									"traceId": "c546f06c-3674-4b55-8e0f-ce8aac66f49f",
+									"details": "Please verify the transmitted data and try again, or contact support."
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						}
+					}
+				}
+			],
+			"/api/order/{id}": [
+				{
+					"method": "GET",
+					"info": [
+						{
+							"language": "en",
+							"name": "Get a payment info by payment id",
+							"description": "In this model, identification and establishment of communication between the Partner’s servers and Paynet is required. Signing data is not required. The Partner’s system will transmit the payment information by contacting Payments. As a result, Partner will receive a payment ID, through which the Partner will be able to send the client to the Paynet payment form to confirm and pay the payment."
+						},
+						{
+							"language": "ro",
+							"name": "obține o operație prin ID-ul de plată.",
+							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
+						},
+						{
+							"language": "ru",
+							"name": "Получить операцию по ID платежа.",
+							"description": "В этой модели требуется идентификация и установление связи между серверами Партнёра и Paynet. Подписание данных не требуется. Система Партнёра передаст информацию о платёже, обратившись в Payments. В результате Партнёр получит идентификатор платежа, по которому сможет перенаправить клиента на платёжную форму Paynet для подтверждения и оплаты."
+						}
+					],
+					"responses": {
+						"200": {
+							"description": "Success executed get order.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"paymentId": 317184,
+									"paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
+									"cardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
+									"status": 1,
+									"message": null,
+									"order": 18223,
+									"merchantCode": "111125",
+									"saleAreaCode": "makle",
+									"linkUrlSuccess": "http://localhost/home/success",
+									"linkUrlCancel": "https://shop-test.paynet.md",
+									"signature": "ea20bad9b2c464765542e000eb886057",
+									"amount": {
+										"requestAmount": 3,
+										"requestCurrency": 498,
+										"amount": 3,
+										"amountCurrency": 3
+									},
+									"customer": {
+										"code": null,
+										"nameFirst": null,
+										"nameLast": null,
+										"email": null,
+										"country": null,
+										"city": null,
+										"address": null,
+										"phoneNumber": null,
+										"cardLinkHash": null
+									},
+									"payer": null,
+									"expiryDate": "2026-04-03 12:01:12",
+									"registered": "2026-04-01 15:01:12",
+									"paidDate": null,
+									"services": [
+										{
+											"name": "Card of products",
+											"description": "Cart of products",
+											"amount": 3,
+											"products": [
+												{
+													"lineNo": 1,
+													"name": "Demo eShop",
+													"description": "Demo eShop online desc",
+													"unitPrice": 3,
+													"unitProduct": null,
+													"quantity": 100,
+													"amount": 3,
+													"totalAmount": 3
+												}
+											]
+										}
+									],
+									"moneyType": "All"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						},
+						"401": {
+							"description": "Access denied due to invalid or missing authentication token.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"Status": 401,
+									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+									"Code": "UNAUTHORIZED",
+									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"404": {
+							"description": "The wrong entred parametrs",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 404,
+									"message": "Record not found",
+									"code": "NOT_FOUND_RECORD",
+									"traceId": "e8e43475-84c2-405a-803f-eb68208f03be",
+									"details": "No records were found for the provided data"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"500": {
+							"description": "Internal server error occurred while processing the request.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 500,
+									"message": "One or more errors occurred.",
+									"code": "TECHNICAL_ERROR",
+									"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+									"details": "Please verify the transmitted data and try again, or contact support."
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						}
+					}
+				}
+			],
+			"/api/statement/download": [
+				{
+					"method": "GET",
+					"info": [
+						{
+							"language": "en",
+							"name": "Download statement",
+							"description": "In this model, identification and establishment of communication between the Partner’s servers and Paynet is required. Signing data is not required. The Partner’s system will transmit the payment information by contacting Payments. As a result, Partner will receive a payment ID, through which the Partner will be able to send the client to the Paynet payment form to confirm and pay the payment."
+						},
+						{
+							"language": "ro",
+							"name": "Descărcați declarația.",
+							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
+						},
+						{
+							"language": "ru",
+							"name": "Скачать выписку",
+							"description": "В этой модели требуется идентификация и установление связи между серверами Партнёра и Paynet. Подписание данных не требуется. Система Партнёра передаст информацию о платёже, обратившись в Payments. В результате Партнёр получит идентификатор платежа, по которому сможет перенаправить клиента на платёжную форму Paynet для подтверждения и оплаты."
+						}
+					],
+					"responses": {
+						"200": {
+							"description": "Success executed download statement.",
+							"content": {
+								"type": "application/vnd.ms-excel",
+								"object": {},
+								"schema": {
+									"$ref": " "
+								}
+							}
+						},
+						"401": {
+							"description": "Access denied due to invalid or missing authentication token.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"Status": 401,
+									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+									"Code": "UNAUTHORIZED",
+									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"400": {
+							"description": "The wrong entred parametrs",
+							"content": {
+								"type": "application/json",
+								"object": {
+  "status": 400,
+  "message": "One or more entered parameters are incorrect.",
+  "code": "INVALID_PARAMETER",
+  "traceId": "cf5573ee-4749-4190-8a1a-881ee53e7c0a",
+  "details": "The invalid parameter is: dateStart | dateFinish"
+},
+								"schema": {
+									"$ref": "#/components/schemas/ErrorObj"
+								}
+							}
+						},
+						"500": {
+							"description": "Internal server error occurred while processing the request.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 500,
+									"message": "One or more errors occurred.",
+									"code": "TECHNICAL_ERROR",
+									"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+									"details": "Please verify the transmitted data and try again, or contact support."
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						}
+					}
+				}
+			],
+			"/api/statement": [
+				{
+					"method": "GET",
+					"info": [
+						{
+							"language": "en",
+							"name": "Get transaction list",
+							"description": "Retrieves a list of payment transactions for a specified period based on the provided start and end dates. Used for generating statements and transaction reporting."
+						},
+						{
+							"language": "ro",
+							"name": "Obține lista tranzacțiilor",
+							"description": "Returnează lista tranzacțiilor de plată pentru o perioadă specificată, pe baza datelor de început și sfârșit. Este utilizat pentru generarea extraselor și rapoartelor de tranzacții."
+						},
+						{
+							"language": "ru",
+							"name": "Получить список операций",
+							"description": "Возвращает список платёжных операций за указанный период на основе даты начала и окончания. Используется для формирования выписок и отчётности по транзакциям."
+						}
+					],
+					"responses": {
+						"200": {
+							"description": "Success executed download statement file.",
+							"content": {
+								"type": "application/vnd.ms-excel",
+								"object": {},
+								"schema": {
+									"$ref": " "
+								}
+							}
+						},
+						"400": {
+							"description": "One or more entered parameters are incorrect.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 400,
+									"message": "One or more entered parameters are incorrect.",
+									"code": "INVALID_PARAMETER",
+									"traceId": "9697f2c8-b1c2-490a-84b3-8adda9bc22e9",
+									"details": "The invalid parameter is: dateStart | dateFinish"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"401": {
+							"description": "Access denied due to invalid or missing authentication token.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"Status": 401,
+									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+									"Code": "UNAUTHORIZED",
+									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"500": {
+							"description": "Internal server error occurred while processing the request.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 500,
+									"message": "One or more errors occurred.",
+									"code": "TECHNICAL_ERROR",
+									"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+									"details": "Please verify the transmitted data and try again, or contact support."
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						}
+					}
+				}
+			],
+			"/api/order/search": [
+				{
+					"method": "GET",
+					"info": [
+						{
+							"language": "en",
+							"name": "Download statement",
+							"description": "In this model, identification and establishment of communication between the Partner’s servers and Paynet is required. Signing data is not required. The Partner’s system will transmit the payment information by contacting Payments. As a result, Partner will receive a payment ID, through which the Partner will be able to send the client to the Paynet payment form to confirm and pay the payment."
+						},
+						{
+							"language": "ro",
+							"name": "Descărcați declarația.",
+							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
+						},
+						{
+							"language": "ru",
+							"name": "Скачать выписку",
+							"description": "В этой модели требуется идентификация и установление связи между серверами Партнёра и Paynet. Подписание данных не требуется. Система Партнёра передаст информацию о платёже, обратившись в Payments. В результате Партнёр получит идентификатор платежа, по которому сможет перенаправить клиента на платёжную форму Paynet для подтверждения и оплаты."
+						}
+					],
+					"responses": {
+						"200": {
+							"description": "Success executed download statement.",
+							"content": {
+								"type": "application/vnd.ms-excel",
+								"object": {},
+								"schema": {
+									"$ref": " "
+								}
+							}
+						},
+						"400": {
+							"description": "One or more entered parameters are incorrect.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 400,
+									"message": "One or more entered parameters are incorrect.",
+									"code": "INVALID_PARAMETER",
+									"traceId": "9697f2c8-b1c2-490a-84b3-8adda9bc22e9",
+									"details": "The invalid parameter is: dateStart | dateFinish"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"401": {
+							"description": "Access denied due to invalid or missing authentication token.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"Status": 401,
+									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+									"Code": "UNAUTHORIZED",
+									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						},
+						"500": {
+							"description": "Internal server error occurred while processing the request.",
+							"content": {
+								"type": "application/json",
+								"object": {
+									"status": 500,
+									"message": "One or more errors occurred.",
+									"code": "TECHNICAL_ERROR",
+									"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+									"details": "Please verify the transmitted data and try again, or contact support."
+								},
+								"schema": {
+									"$ref": "#/components/schemas/Payment"
+								}
+							}
+						}
+					}
+				}
+			]
+		}
+	]
+}
