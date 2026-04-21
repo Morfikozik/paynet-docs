@@ -2,6 +2,14 @@ import React from 'react';
 import { ChevronDown, ChevronRight, FileText } from 'lucide-react';
 import CryptoJS from 'crypto-js';
 
+type FieldRow = {
+  name: string;
+  type: string;
+  input: 'body';
+  required: 'Yes' | 'No';
+  description: string;
+};
+
 export const ClientServerOrderRequest: React.FC = () => {
   const defaultPayload = {
     ExternalID: 20160622010101,
@@ -61,6 +69,31 @@ export const ClientServerOrderRequest: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [errorText, setErrorText] = React.useState('');
   const [isExpanded, setIsExpanded] = React.useState(true);
+  const fieldRows: FieldRow[] = [
+    { name: 'ExternalID', type: 'long', input: 'body', required: 'Yes', description: 'Partner order identifier in your system.' },
+    { name: 'Currency', type: 'int', input: 'body', required: 'Yes', description: 'ISO 4217 numeric currency code (example: 498).' },
+    { name: 'Merchant', type: 'string', input: 'body', required: 'Yes', description: 'PartnerID / MerchantCode.' },
+    { name: 'SaleAreaCode', type: 'string', input: 'body', required: 'No', description: 'Partner sale area code; may be empty.' },
+    { name: 'Customer.Code', type: 'string', input: 'body', required: 'Yes', description: 'Customer code in partner system.' },
+    { name: 'Customer.NameFirst', type: 'string', input: 'body', required: 'No', description: 'Customer first name.' },
+    { name: 'Customer.NameLast', type: 'string', input: 'body', required: 'No', description: 'Customer last name.' },
+    { name: 'Customer.PhoneNumber', type: 'string', input: 'body', required: 'No', description: 'Customer phone number.' },
+    { name: 'Customer.email', type: 'string', input: 'body', required: 'No', description: 'Customer email address.' },
+    { name: 'Customer.Country', type: 'string', input: 'body', required: 'No', description: 'Customer country code/name.' },
+    { name: 'Customer.City', type: 'string', input: 'body', required: 'No', description: 'Customer city.' },
+    { name: 'Customer.Address', type: 'string', input: 'body', required: 'No', description: 'Customer street address.' },
+    { name: 'ExpiryDate', type: 'datetime', input: 'body', required: 'Yes', description: 'Payment expiration timestamp (ISO 8601).' },
+    { name: 'Services[].Name', type: 'string', input: 'body', required: 'Yes', description: 'Service name.' },
+    { name: 'Services[].Description', type: 'string', input: 'body', required: 'Yes', description: 'Service description.' },
+    { name: 'Services[].Amount', type: 'long', input: 'body', required: 'Yes', description: 'Service amount in integer format.' },
+    { name: 'Services[].Products[]', type: 'array', input: 'body', required: 'No', description: 'List of products included in service.' },
+    { name: 'MoneyType.Code', type: 'string', input: 'body', required: 'Yes', description: 'Payment instrument code (example: PAYNET).' },
+    { name: 'LinkUrlSuccess', type: 'string', input: 'body', required: 'Yes', description: 'Redirect URL after successful payment flow.' },
+    { name: 'LinkUrlCancel', type: 'string', input: 'body', required: 'Yes', description: 'Redirect URL when payment is canceled.' },
+    { name: 'Lang', type: 'string', input: 'body', required: 'No', description: 'UI language for payment page (example: en-US).' },
+    { name: 'SignVersion', type: 'string', input: 'body', required: 'Yes', description: 'Signature algorithm version, use v05.' },
+    { name: 'Signature', type: 'string', input: 'body', required: 'Yes', description: 'Base64(MD5(PreparedString + SecretKey)).' },
+  ];
 
   const normalize = (value: unknown) => (value === null || value === undefined ? '' : String(value));
 
@@ -189,6 +222,42 @@ export const ClientServerOrderRequest: React.FC = () => {
 
         {isExpanded && (
           <div className="p-4 sm:p-6 pt-0">
+            <div className="mb-6 bg-white p-4 rounded-lg border border-paynet-gray-200">
+              <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Method Description</h3>
+              <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed">
+                Creates a client-server payment request for Paynet `SetEcom` flow, generates a `v05` signature
+                from the payload and secret key, and allows you to send the signed request for integration testing.
+              </p>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-1">Parameters - Description</h3>
+              <div className="overflow-x-auto rounded-lg border border-paynet-gray-200 w-full">
+                <table className="w-full">
+                  <thead className="bg-paynet-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">Name</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">Type</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">In</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">Required</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-paynet-gray-200">
+                    {fieldRows.map((row) => (
+                      <tr key={row.name} className="hover:bg-paynet-gray-50 transition-colors duration-150">
+                        <td className="px-4 py-3 text-sm font-mono text-paynet-gray-900 break-all">{row.name}</td>
+                        <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.type}</td>
+                        <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.input}</td>
+                        <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.required}</td>
+                        <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Request URL</label>
