@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, FileText, AlertCircle, CheckCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, FileText, AlertCircle, CheckCircle, Copy, Check, Send, Loader2 } from 'lucide-react';
 import CryptoJS from 'crypto-js';
 
 type FieldRow = {
@@ -68,6 +68,8 @@ export const ClientServerOrderRequest: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [errorText, setErrorText] = React.useState('');
   const [isExpanded, setIsExpanded] = React.useState(true);
+  const [isCodeExamplesExpanded, setIsCodeExamplesExpanded] = React.useState(true);
+  const [copiedSignedPayload, setCopiedSignedPayload] = React.useState(false);
   const fieldRows: FieldRow[] = [
     { name: 'ExternalID', type: 'long', input: 'body', required: true, description: 'Partner order identifier in your system.' },
     { name: 'Currency', type: 'int', input: 'body', required: true, description: 'ISO 4217 numeric currency code (example: 498).' },
@@ -205,6 +207,13 @@ export const ClientServerOrderRequest: React.FC = () => {
     }
   };
 
+  const handleCopySignedPayload = async () => {
+    if (!signedPayloadText) return;
+    await navigator.clipboard.writeText(signedPayloadText);
+    setCopiedSignedPayload(true);
+    setTimeout(() => setCopiedSignedPayload(false), 2000);
+  };
+
   return (
     <div className="w-full max-w-none">
       <div className="mb-4 sm:mb-8">
@@ -232,6 +241,8 @@ export const ClientServerOrderRequest: React.FC = () => {
 
         {isExpanded && (
           <div className="p-4 sm:p-6 pt-0">
+            <div className="xl:flex xl:items-start xl:gap-6">
+              <div className="xl:flex-1 min-w-0">
             <div className="mb-6 bg-white p-4 rounded-lg border border-paynet-gray-200">
               <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Method Description</h3>
               <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed">
@@ -339,65 +350,116 @@ Product.GroupId + Product.GroupName + Product.LineNo + Product.Name + Product.Un
               </p>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Unsigned payload (JSON)</label>
-              <textarea
-                rows={14}
-                value={payloadText}
-                onChange={(e) => setPayloadText(e.target.value)}
-                className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm font-mono"
-              />
-            </div>
+              </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            <div className="xl:w-144 w-full mt-4 xl:mt-0">
+            <div className="bg-gradient-to-r from-paynet-light to-paynet-gray-50 rounded-paynet border border-paynet-gray-200 overflow-hidden w-full max-w-none">
               <button
-                onClick={generateSignature}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md"
+                onClick={() => setIsCodeExamplesExpanded(!isCodeExamplesExpanded)}
+                className="w-full p-4 sm:p-6 flex items-center justify-between hover:bg-paynet-gray-50 transition-colors"
               >
-                Generate Signature
+                <div className="flex items-center gap-3">
+                  <FileText className="w-5 h-5 text-paynet-primary" />
+                  <h3 className="text-base sm:text-lg font-semibold text-paynet-primary">Code Examples</h3>
+                </div>
+                {isCodeExamplesExpanded ? (
+                  <ChevronDown className="w-5 h-5 text-paynet-primary transition-transform" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-paynet-primary transition-transform" />
+                )}
               </button>
-              <button
-                onClick={sendSignedRequest}
-                disabled={isSubmitting}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white text-sm font-medium rounded-md"
-              >
-                {isSubmitting ? 'Sending...' : 'Send Test Request'}
-              </button>
+
+              {isCodeExamplesExpanded && (
+                <div className="p-4 sm:p-6 pt-0">
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Request Body (JSON)</label>
+                    <textarea
+                      rows={12}
+                      value={payloadText}
+                      onChange={(e) => setPayloadText(e.target.value)}
+                      className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm font-mono"
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                    <button
+                      onClick={generateSignature}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md"
+                    >
+                      Generate Signature
+                    </button>
+                    <button
+                      onClick={sendSignedRequest}
+                      disabled={isSubmitting}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white text-sm font-medium rounded-md flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4" />
+                          Send Test Request
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {signature && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Generated Signature</label>
+                      <code className="block bg-paynet-gray-50 border border-paynet-gray-200 px-3 py-2 rounded-md text-sm break-all">
+                        {signature}
+                      </code>
+                    </div>
+                  )}
+
+                  {signedPayloadText && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-sm font-medium text-paynet-gray-700">Signed payload (JSON)</label>
+                        <button
+                          onClick={handleCopySignedPayload}
+                          className="flex items-center gap-2 px-3 py-1.5 bg-paynet-primary hover:bg-paynet-secondary text-white text-xs font-medium rounded-paynet transition-all duration-200"
+                        >
+                          {copiedSignedPayload ? (
+                            <>
+                              <Check className="w-3 h-3" />
+                              Copied
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              Copy
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto whitespace-pre-wrap">
+                        {signedPayloadText}
+                      </pre>
+                    </div>
+                  )}
+
+                  {errorText && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">{errorText}</div>
+                  )}
+
+                  {responseText && (
+                    <div>
+                      <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Response</label>
+                      <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto whitespace-pre-wrap">
+                        {responseText}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-
-            {signature && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Generated Signature</label>
-                <code className="block bg-paynet-gray-50 border border-paynet-gray-200 px-3 py-2 rounded-md text-sm break-all">
-                  {signature}
-                </code>
-              </div>
-            )}
-
-            {signedPayloadText && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Signed payload (JSON)</label>
-                <textarea
-                  rows={14}
-                  value={signedPayloadText}
-                  readOnly
-                  className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm font-mono bg-paynet-gray-50"
-                />
-              </div>
-            )}
-
-            {errorText && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">{errorText}</div>
-            )}
-
-            {responseText && (
-              <div>
-                <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Response</label>
-                <pre className="bg-paynet-gray-900 text-paynet-gray-100 p-4 rounded-md text-xs sm:text-sm overflow-x-auto whitespace-pre-wrap">
-                  {responseText}
-                </pre>
-              </div>
-            )}
+            </div>
+            </div>
           </div>
         )}
       </div>
