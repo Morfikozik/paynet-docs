@@ -8,6 +8,7 @@ import { ProjectInfo } from './components/ProjectInfo';
 import { EcommerceOverview } from './components/EcommerceOverview';
 import { ServerServerOverview } from './components/ServerServerOverview';
 import { ClientServerOverview } from './components/ClientServerOverview';
+import { ClientServerOrderRequest } from './components/ClientServerOrderRequest';
 import { CodeExample } from './components/CodeExample';
 import { useLanguage } from './hooks/useLanguage';
 import { useOpenAPI } from './hooks/useOpenAPI';
@@ -27,7 +28,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeEndpoint, setActiveEndpoint] = useState<string>('');
   const [activeView, setActiveView] = useState<'endpoints' | 'project-info'>('project-info');
-  const [overviewMode, setOverviewMode] = useState<'ecommerce' | 'server-server' | 'client-server' | null>('ecommerce');
+  const [overviewMode, setOverviewMode] = useState<'ecommerce' | 'server-server' | 'client-server' | 'client-server-order-request' | null>('ecommerce');
 
   const allEndpoints = useMemo(() => categories.flatMap(cat => cat.endpoints), [categories]);
 
@@ -65,6 +66,11 @@ function App() {
     setActiveEndpoint('');
   };
 
+  const handleClientServerOrderRequestSelect = () => {
+    setOverviewMode('client-server-order-request');
+    setActiveEndpoint('');
+  };
+
   const currentEndpoint = allEndpoints.find(endpoint => endpoint.id === activeEndpoint);
 
   return (
@@ -85,9 +91,11 @@ function App() {
           onEcommerceOverviewSelect={handleEcommerceOverviewSelect}
           onServerServerOverviewSelect={handleServerServerOverviewSelect}
           onClientServerOverviewSelect={handleClientServerOverviewSelect}
+          onClientServerOrderRequestSelect={handleClientServerOrderRequestSelect}
           ecommerceOverviewActive={overviewMode === 'ecommerce'}
           serverServerOverviewActive={overviewMode === 'server-server'}
           clientServerOverviewActive={overviewMode === 'client-server'}
+          clientServerOrderRequestActive={overviewMode === 'client-server-order-request'}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           t={t}
@@ -118,6 +126,10 @@ function App() {
               ) : overviewMode === 'client-server' ? (
                 <div className="flex-1 w-full min-w-0">
                   <ClientServerOverview t={t} />
+                </div>
+              ) : overviewMode === 'client-server-order-request' ? (
+                <div className="flex-1 w-full min-w-0">
+                  <ClientServerOrderRequest />
                 </div>
               ) : currentEndpoint ? (
                 <div className="flex-1 w-full min-w-0">

@@ -12,9 +12,11 @@ interface SidebarProps {
   onEcommerceOverviewSelect: () => void;
   onServerServerOverviewSelect: () => void;
   onClientServerOverviewSelect: () => void;
+  onClientServerOrderRequestSelect: () => void;
   ecommerceOverviewActive: boolean;
   serverServerOverviewActive: boolean;
   clientServerOverviewActive: boolean;
+  clientServerOrderRequestActive: boolean;
   searchQuery: string;
   onSearchChange: (query: string) => void;
   t: TranslationResources;
@@ -29,9 +31,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onEcommerceOverviewSelect,
   onServerServerOverviewSelect,
   onClientServerOverviewSelect,
+  onClientServerOrderRequestSelect,
   ecommerceOverviewActive,
   serverServerOverviewActive,
   clientServerOverviewActive,
+  clientServerOrderRequestActive,
   searchQuery,
   onSearchChange,
   t,
@@ -224,6 +228,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               </button>
             </div>
+            {isClientModelOpen && (
+              <div className="space-y-1 pl-3 mb-3">
+                <button
+                  onClick={onClientServerOrderRequestSelect}
+                  className={`w-full text-left p-3 rounded-lg transition-all duration-200 group ${
+                    clientServerOrderRequestActive
+                      ? 'bg-white border-l-4 border-paynet-primary shadow-paynet-lg'
+                      : 'bg-white hover:bg-paynet-light hover:shadow-paynet'
+                  }`}
+                >
+                  <div className="text-sm font-medium text-paynet-gray-900">Order request</div>
+                </button>
+              </div>
+            )}
           </div>
         )}
 
