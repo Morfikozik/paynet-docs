@@ -125,5 +125,36 @@ export const en: TranslationResources = {
     benefit3: 'Clear security model — headers, TLS, and token usage aligned with API best practices',
     benefit4: 'Covers full lifecycle — create orders, query status, refunds, and reporting where applicable',
     benefit5: 'Same documentation as endpoints — use the methods listed under this section in the sidebar'
+  },
+  clientServer: {
+    pageTitle: 'Client-Server model',
+    mainTitle: 'Client-to-server integration with Paynet',
+    introParagraph1:
+      'In the Client-Server model, payment data is prepared on your side and sent to Paynet through the client flow. The customer is redirected to Paynet payment pages to complete authentication and payment.',
+    introParagraph2:
+      'This model is useful when checkout starts in the browser or mobile app. To protect request integrity, payment payloads are signed before redirect and validated by both systems.',
+    characteristicsTitle: 'Integration characteristics',
+    characteristicsIntro: 'Typical traits of a client-server integration:',
+    aspect1Title: '🔐 Signed payload instead of token auth',
+    aspect1Desc:
+      'Core protection is based on request signing using a shared secret key. Keep the key private and generate signatures on trusted backend only.',
+    aspect2Title: '🧾 Structured payment payload',
+    aspect2Desc:
+      'You send order, customer, services, products, currency, expiry date, and merchant metadata in a strictly defined structure.',
+    aspect3Title: '↪️ Redirect-based customer journey',
+    aspect3Desc:
+      'After payload submission, the customer is redirected to Paynet pages to select method, confirm, and complete payment.',
+    aspect4Title: '🔁 Return URLs and status tracking',
+    aspect4Desc:
+      'Integration includes success/cancel URLs and follow-up status checks so your system can finalize order state reliably.',
+    aspect5Title: '📣 Notification verification',
+    aspect5Desc:
+      'Payment notifications are also signed. Your backend should verify signatures and handle duplicate callbacks idempotently.',
+    keyBenefitsTitle: 'Key benefits',
+    benefit1: 'Fast checkout adoption — works naturally with web and mobile payment journeys',
+    benefit2: 'Strong integrity controls — signatures protect sensitive payment fields',
+    benefit3: 'Flexible customer experience — keep your storefront flow and redirect only for payment step',
+    benefit4: 'Clear settlement flow — combine redirect result with API status and notifications',
+    benefit5: 'Operational safety — deterministic signing rules and callback validation'
   }
 };

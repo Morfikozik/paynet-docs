@@ -125,5 +125,36 @@ export const ro: TranslationResources = {
     benefit3: 'Model de securitate clar — anteturi, TLS și utilizarea token-urilor aliniată cu bunele practici API',
     benefit4: 'Acoperă ciclul complet — creare comenzi, interogare status, rambursări și raportare unde se aplică',
     benefit5: 'Aceeași documentație ca endpoint-urile — folosiți metodele listate sub această secțiune în bara laterală'
+  },
+  clientServer: {
+    pageTitle: 'Model Client-Server',
+    mainTitle: 'Integrare client-server cu Paynet',
+    introParagraph1:
+      'În modelul Client-Server, datele de plată sunt pregătite de sistemul dvs. și transmise către Paynet prin fluxul clientului. Clientul este redirecționat către paginile Paynet pentru autentificare și finalizarea plății.',
+    introParagraph2:
+      'Modelul este potrivit pentru checkout web și mobil, unde fluxul începe în browser sau aplicație. Pentru protejarea integrității datelor, payload-ul de plată este semnat înainte de redirect și verificat de ambele sisteme.',
+    characteristicsTitle: 'Caracteristici de integrare',
+    characteristicsIntro: 'Trăsături tipice ale unei integrări client-server:',
+    aspect1Title: '🔐 Semnătură în loc de autentificare pe token',
+    aspect1Desc:
+      'Protecția principală se bazează pe semnarea cererii cu o cheie secretă comună. Cheia trebuie păstrată doar pe backend-ul de încredere.',
+    aspect2Title: '🧾 Payload de plată structurat',
+    aspect2Desc:
+      'Se transmit comanda, datele clientului, serviciile, produsele, moneda, data expirării și metadatele merchantului într-o structură strict definită.',
+    aspect3Title: '↪️ Flux redirect pentru client',
+    aspect3Desc:
+      'După trimiterea datelor, clientul este redirecționat pe paginile Paynet pentru alegerea metodei de plată, confirmare și finalizare.',
+    aspect4Title: '🔁 Return URL și urmărirea statusului',
+    aspect4Desc:
+      'Integrarea include URL-uri de succes/anulare și verificări ulterioare de status pentru finalizarea corectă a comenzii.',
+    aspect5Title: '📣 Validarea notificărilor',
+    aspect5Desc:
+      'Notificările de plată sunt, de asemenea, semnate. Backend-ul trebuie să valideze semnătura și să proceseze idempotent callback-urile duplicate.',
+    keyBenefitsTitle: 'Beneficii principale',
+    benefit1: 'Adoptare rapidă în checkout — potrivit natural pentru fluxuri web și mobile',
+    benefit2: 'Control puternic al integrității — semnăturile protejează câmpurile sensibile de plată',
+    benefit3: 'Experiență flexibilă pentru client — păstrați fluxul magazinului și redirecționați doar la pasul de plată',
+    benefit4: 'Flux de decontare clar — combinați rezultatul redirectului cu status API și notificări',
+    benefit5: 'Siguranță operațională — reguli deterministe de semnare și validare callback'
   }
 };

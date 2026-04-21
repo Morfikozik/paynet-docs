@@ -7,6 +7,7 @@ import { EndpointDetails } from './components/EndpointDetails';
 import { ProjectInfo } from './components/ProjectInfo';
 import { EcommerceOverview } from './components/EcommerceOverview';
 import { ServerServerOverview } from './components/ServerServerOverview';
+import { ClientServerOverview } from './components/ClientServerOverview';
 import { CodeExample } from './components/CodeExample';
 import { useLanguage } from './hooks/useLanguage';
 import { useOpenAPI } from './hooks/useOpenAPI';
@@ -26,7 +27,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeEndpoint, setActiveEndpoint] = useState<string>('');
   const [activeView, setActiveView] = useState<'endpoints' | 'project-info'>('project-info');
-  const [overviewMode, setOverviewMode] = useState<'ecommerce' | 'server-server' | null>('ecommerce');
+  const [overviewMode, setOverviewMode] = useState<'ecommerce' | 'server-server' | 'client-server' | null>('ecommerce');
 
   const allEndpoints = useMemo(() => categories.flatMap(cat => cat.endpoints), [categories]);
 
@@ -59,6 +60,11 @@ function App() {
     setActiveEndpoint('');
   };
 
+  const handleClientServerOverviewSelect = () => {
+    setOverviewMode('client-server');
+    setActiveEndpoint('');
+  };
+
   const currentEndpoint = allEndpoints.find(endpoint => endpoint.id === activeEndpoint);
 
   return (
@@ -78,8 +84,10 @@ function App() {
           onViewChange={handleViewChange}
           onEcommerceOverviewSelect={handleEcommerceOverviewSelect}
           onServerServerOverviewSelect={handleServerServerOverviewSelect}
+          onClientServerOverviewSelect={handleClientServerOverviewSelect}
           ecommerceOverviewActive={overviewMode === 'ecommerce'}
           serverServerOverviewActive={overviewMode === 'server-server'}
+          clientServerOverviewActive={overviewMode === 'client-server'}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           t={t}
@@ -106,6 +114,10 @@ function App() {
               ) : overviewMode === 'server-server' ? (
                 <div className="flex-1 w-full min-w-0">
                   <ServerServerOverview t={t} />
+                </div>
+              ) : overviewMode === 'client-server' ? (
+                <div className="flex-1 w-full min-w-0">
+                  <ClientServerOverview t={t} />
                 </div>
               ) : currentEndpoint ? (
                 <div className="flex-1 w-full min-w-0">

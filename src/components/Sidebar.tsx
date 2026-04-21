@@ -11,8 +11,10 @@ interface SidebarProps {
   onViewChange: (view: 'endpoints' | 'project-info') => void;
   onEcommerceOverviewSelect: () => void;
   onServerServerOverviewSelect: () => void;
+  onClientServerOverviewSelect: () => void;
   ecommerceOverviewActive: boolean;
   serverServerOverviewActive: boolean;
+  clientServerOverviewActive: boolean;
   searchQuery: string;
   onSearchChange: (query: string) => void;
   t: TranslationResources;
@@ -26,8 +28,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onViewChange,
   onEcommerceOverviewSelect,
   onServerServerOverviewSelect,
+  onClientServerOverviewSelect,
   ecommerceOverviewActive,
   serverServerOverviewActive,
+  clientServerOverviewActive,
   searchQuery,
   onSearchChange,
   t,
@@ -204,8 +208,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
             <div className="mb-3">
               <button
-                onClick={() => setIsClientModelOpen((prev) => !prev)}
-                className="w-full text-left p-3 rounded-lg transition-all duration-200 bg-white hover:bg-paynet-light hover:shadow-paynet group"
+                onClick={() => {
+                  setIsClientModelOpen((prev) => !prev);
+                  onClientServerOverviewSelect();
+                }}
+                className={`w-full text-left p-3 rounded-lg transition-all duration-200 group ${
+                  clientServerOverviewActive
+                    ? 'bg-white border-l-4 border-paynet-primary shadow-paynet-lg'
+                    : 'bg-white hover:bg-paynet-light hover:shadow-paynet'
+                }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-paynet-gray-900">Client-Server Model</span>

@@ -114,4 +114,28 @@ export interface TranslationResources {
     benefit4: string;
     benefit5: string;
   };
+  clientServer: {
+    pageTitle: string;
+    mainTitle: string;
+    introParagraph1: string;
+    introParagraph2: string;
+    characteristicsTitle: string;
+    characteristicsIntro: string;
+    aspect1Title: string;
+    aspect1Desc: string;
+    aspect2Title: string;
+    aspect2Desc: string;
+    aspect3Title: string;
+    aspect3Desc: string;
+    aspect4Title: string;
+    aspect4Desc: string;
+    aspect5Title: string;
+    aspect5Desc: string;
+    keyBenefitsTitle: string;
+    benefit1: string;
+    benefit2: string;
+    benefit3: string;
+    benefit4: string;
+    benefit5: string;
+  };
 }
