@@ -238,7 +238,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       : 'bg-white hover:bg-paynet-light hover:shadow-paynet'
                   }`}
                 >
-                  <div className="text-sm font-medium text-paynet-gray-900">Order request</div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono px-2 py-1 rounded-md font-semibold bg-blue-100 text-blue-700">
+                      POST
+                    </span>
+                    <div className="text-sm font-medium text-paynet-gray-900">Order request</div>
+                  </div>
                 </button>
               </div>
             )}

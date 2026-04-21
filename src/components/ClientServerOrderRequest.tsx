@@ -1,30 +1,34 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, FileText } from 'lucide-react';
+import { ChevronDown, ChevronRight, FileText, AlertCircle, CheckCircle } from 'lucide-react';
 import CryptoJS from 'crypto-js';
 
 type FieldRow = {
   name: string;
   type: string;
   input: 'body';
-  required: 'Yes' | 'No';
+  required: boolean;
   description: string;
 };
 
 export const ClientServerOrderRequest: React.FC = () => {
+  const requestUrl = 'https://test.paynet.md/acquiring/SetEcom';
+  const liveRequestUrl = 'https://paynet.md/acquiring/SetEcom';
+  const merchantCode = '265505';
+  const userLogin = '771064';
+  const password = 'sLgMnGWJ';
+  const secretKey = 'F90D6485-9CCC-458B-96A3-8958AF9B4458';
+  const saleAreaCode = 'onlidocumentation_md';
   const defaultPayload = {
     ExternalID: 20160622010101,
     Currency: 498,
-    Merchant: '265505',
-    SaleAreaCode: '',
+    Merchant: merchantCode,
+    SaleAreaCode: saleAreaCode,
     Customer: {
       Code: 'CUSTOMER001',
       NameFirst: 'Test',
       NameLast: 'Customer',
       PhoneNumber: '37360000000',
       email: 'test@example.com',
-      Country: 'MD',
-      City: 'Chisinau',
-      Address: 'Main street 1',
     },
     ExpiryDate: '2026-12-31T23:59:59',
     Services: [
@@ -57,11 +61,6 @@ export const ClientServerOrderRequest: React.FC = () => {
     SignVersion: 'v05',
   };
 
-  const [requestUrl, setRequestUrl] = React.useState('https://test.paynet.md/acquiring/SetEcom');
-  const [merchantCode, setMerchantCode] = React.useState('265505');
-  const [userLogin, setUserLogin] = React.useState('771064');
-  const [password, setPassword] = React.useState('sLgMnGWJ');
-  const [secretKey, setSecretKey] = React.useState('F90D6485-9CCC-458B-96A3-8958AF9B4458');
   const [payloadText, setPayloadText] = React.useState(JSON.stringify(defaultPayload, null, 2));
   const [signature, setSignature] = React.useState('');
   const [signedPayloadText, setSignedPayloadText] = React.useState('');
@@ -70,29 +69,36 @@ export const ClientServerOrderRequest: React.FC = () => {
   const [errorText, setErrorText] = React.useState('');
   const [isExpanded, setIsExpanded] = React.useState(true);
   const fieldRows: FieldRow[] = [
-    { name: 'ExternalID', type: 'long', input: 'body', required: 'Yes', description: 'Partner order identifier in your system.' },
-    { name: 'Currency', type: 'int', input: 'body', required: 'Yes', description: 'ISO 4217 numeric currency code (example: 498).' },
-    { name: 'Merchant', type: 'string', input: 'body', required: 'Yes', description: 'PartnerID / MerchantCode.' },
-    { name: 'SaleAreaCode', type: 'string', input: 'body', required: 'No', description: 'Partner sale area code; may be empty.' },
-    { name: 'Customer.Code', type: 'string', input: 'body', required: 'Yes', description: 'Customer code in partner system.' },
-    { name: 'Customer.NameFirst', type: 'string', input: 'body', required: 'No', description: 'Customer first name.' },
-    { name: 'Customer.NameLast', type: 'string', input: 'body', required: 'No', description: 'Customer last name.' },
-    { name: 'Customer.PhoneNumber', type: 'string', input: 'body', required: 'No', description: 'Customer phone number.' },
-    { name: 'Customer.email', type: 'string', input: 'body', required: 'No', description: 'Customer email address.' },
-    { name: 'Customer.Country', type: 'string', input: 'body', required: 'No', description: 'Customer country code/name.' },
-    { name: 'Customer.City', type: 'string', input: 'body', required: 'No', description: 'Customer city.' },
-    { name: 'Customer.Address', type: 'string', input: 'body', required: 'No', description: 'Customer street address.' },
-    { name: 'ExpiryDate', type: 'datetime', input: 'body', required: 'Yes', description: 'Payment expiration timestamp (ISO 8601).' },
-    { name: 'Services[].Name', type: 'string', input: 'body', required: 'Yes', description: 'Service name.' },
-    { name: 'Services[].Description', type: 'string', input: 'body', required: 'Yes', description: 'Service description.' },
-    { name: 'Services[].Amount', type: 'long', input: 'body', required: 'Yes', description: 'Service amount in integer format.' },
-    { name: 'Services[].Products[]', type: 'array', input: 'body', required: 'No', description: 'List of products included in service.' },
-    { name: 'MoneyType.Code', type: 'string', input: 'body', required: 'Yes', description: 'Payment instrument code (example: PAYNET).' },
-    { name: 'LinkUrlSuccess', type: 'string', input: 'body', required: 'Yes', description: 'Redirect URL after successful payment flow.' },
-    { name: 'LinkUrlCancel', type: 'string', input: 'body', required: 'Yes', description: 'Redirect URL when payment is canceled.' },
-    { name: 'Lang', type: 'string', input: 'body', required: 'No', description: 'UI language for payment page (example: en-US).' },
-    { name: 'SignVersion', type: 'string', input: 'body', required: 'Yes', description: 'Signature algorithm version, use v05.' },
-    { name: 'Signature', type: 'string', input: 'body', required: 'Yes', description: 'Base64(MD5(PreparedString + SecretKey)).' },
+    { name: 'ExternalID', type: 'long', input: 'body', required: true, description: 'Partner order identifier in your system.' },
+    { name: 'Currency', type: 'int', input: 'body', required: true, description: 'ISO 4217 numeric currency code (example: 498).' },
+    { name: 'Merchant', type: 'string', input: 'body', required: true, description: 'PartnerID / MerchantCode.' },
+    { name: 'SaleAreaCode', type: 'string', input: 'body', required: false, description: 'Partner sale area code; may be empty.' },
+    { name: 'Customer.Code', type: 'string', input: 'body', required: true, description: 'Customer code in partner system.' },
+    { name: 'Customer.NameFirst', type: 'string', input: 'body', required: false, description: 'Customer first name.' },
+    { name: 'Customer.NameLast', type: 'string', input: 'body', required: false, description: 'Customer last name.' },
+    { name: 'Customer.PhoneNumber', type: 'string', input: 'body', required: false, description: 'Customer phone number.' },
+    { name: 'Customer.email', type: 'string', input: 'body', required: false, description: 'Customer email address.' },
+    { name: 'ExpiryDate', type: 'datetime', input: 'body', required: true, description: 'Payment expiration timestamp (ISO 8601).' },
+    { name: 'Services[].Name', type: 'string', input: 'body', required: true, description: 'Service name.' },
+    { name: 'Services[].Description', type: 'string', input: 'body', required: true, description: 'Service description.' },
+    { name: 'Services[].Amount', type: 'long', input: 'body', required: true, description: 'Service amount in integer format.' },
+    { name: 'Services[].Products[]', type: 'array', input: 'body', required: false, description: 'List of products included in service.' },
+    { name: 'Services[].Products[].Amount', type: 'long', input: 'body', required: true, description: 'Product amount in integer format.' },
+    { name: 'Services[].Products[].Barcode', type: 'long', input: 'body', required: false, description: 'Product barcode.' },
+    { name: 'Services[].Products[].Code', type: 'string', input: 'body', required: false, description: 'Partner product code.' },
+    { name: 'Services[].Products[].Description', type: 'string', input: 'body', required: false, description: 'Extended product description.' },
+    { name: 'Services[].Products[].GroupId', type: 'string', input: 'body', required: false, description: 'Product group identifier.' },
+    { name: 'Services[].Products[].GroupName', type: 'string', input: 'body', required: false, description: 'Product group name.' },
+    { name: 'Services[].Products[].LineNo', type: 'int', input: 'body', required: true, description: 'Product line sequence number.' },
+    { name: 'Services[].Products[].Name', type: 'string', input: 'body', required: true, description: 'Product name.' },
+    { name: 'Services[].Products[].UnitPrice', type: 'long', input: 'body', required: true, description: 'Single unit price in integer format.' },
+    { name: 'Services[].Products[].UnitProduct', type: 'string', input: 'body', required: false, description: 'Product unit type / measure.' },
+    { name: 'MoneyType.Code', type: 'string', input: 'body', required: true, description: 'Payment instrument code (example: PAYNET).' },
+    { name: 'LinkUrlSuccess', type: 'string', input: 'body', required: true, description: 'Redirect URL after successful payment flow.' },
+    { name: 'LinkUrlCancel', type: 'string', input: 'body', required: true, description: 'Redirect URL when payment is canceled.' },
+    { name: 'Lang', type: 'string', input: 'body', required: false, description: 'UI language for payment page (example: en-US).' },
+    { name: 'SignVersion', type: 'string', input: 'body', required: true, description: 'Signature algorithm version, use v05.' },
+    { name: 'Signature', type: 'string', input: 'body', required: true, description: 'Base64(MD5(PreparedString + SecretKey)).' },
   ];
 
   const normalize = (value: unknown) => (value === null || value === undefined ? '' : String(value));
@@ -141,6 +147,7 @@ export const ClientServerOrderRequest: React.FC = () => {
       setErrorText('');
       const payload = JSON.parse(payloadText);
       payload.Merchant = merchantCode;
+      payload.SaleAreaCode = saleAreaCode;
       payload.SignVersion = 'v05';
 
       const preparedString = buildPreparedString(payload);
@@ -201,7 +208,10 @@ export const ClientServerOrderRequest: React.FC = () => {
   return (
     <div className="w-full max-w-none">
       <div className="mb-4 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Order request</h1>
+        <div className="flex items-center gap-3 mb-2 sm:mb-3">
+          <span className="text-xs font-mono px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">POST</span>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Order request</h1>
+        </div>
       </div>
 
       <div className="bg-gradient-to-r from-paynet-light to-paynet-gray-50 rounded-paynet border border-paynet-gray-200 overflow-hidden w-full max-w-none">
@@ -230,6 +240,40 @@ export const ClientServerOrderRequest: React.FC = () => {
               </p>
             </div>
 
+            <div className="mb-6 bg-white p-4 rounded-lg border border-paynet-gray-200">
+              <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Test credentials</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-2">
+                <div>
+                  <label className="block text-sm font-medium text-paynet-gray-700 mb-1">TEST Request URL</label>
+                  <input value={requestUrl} readOnly className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm bg-paynet-gray-50 font-mono" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Live Request URL</label>
+                  <input value={liveRequestUrl} readOnly className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm bg-paynet-gray-50 font-mono" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-paynet-gray-700 mb-1">MerchantCode</label>
+                  <input value={merchantCode} readOnly className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm bg-paynet-gray-50 font-mono" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-paynet-gray-700 mb-1">User login</label>
+                  <input value={userLogin} readOnly className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm bg-paynet-gray-50 font-mono" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Password</label>
+                  <input value={password} readOnly className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm bg-paynet-gray-50 font-mono" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-paynet-gray-700 mb-1">SaleAreaCode</label>
+                  <input value={saleAreaCode} readOnly className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm bg-paynet-gray-50 font-mono" />
+                </div>
+                <div className="lg:col-span-2">
+                  <label className="block text-sm font-medium text-paynet-gray-700 mb-1">SecretKey</label>
+                  <input value={secretKey} readOnly className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm bg-paynet-gray-50 font-mono" />
+                </div>
+              </div>
+            </div>
+
             <div className="mb-6">
               <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-1">Parameters - Description</h3>
               <div className="overflow-x-auto rounded-lg border border-paynet-gray-200 w-full">
@@ -249,7 +293,19 @@ export const ClientServerOrderRequest: React.FC = () => {
                         <td className="px-4 py-3 text-sm font-mono text-paynet-gray-900 break-all">{row.name}</td>
                         <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.type}</td>
                         <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.input}</td>
-                        <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.required}</td>
+                        <td className="px-4 py-3 text-sm">
+                          {row.required ? (
+                            <span className="flex items-center gap-1 text-paynet-error font-medium">
+                              <AlertCircle className="w-4 h-4" />
+                              Required
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1 text-paynet-success">
+                              <CheckCircle className="w-4 h-4" />
+                              Optional
+                            </span>
+                          )}
+                        </td>
                         <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.description}</td>
                       </tr>
                     ))}
@@ -258,47 +314,29 @@ export const ClientServerOrderRequest: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Request URL</label>
-                <input
-                  value={requestUrl}
-                  onChange={(e) => setRequestUrl(e.target.value)}
-                  className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-paynet-gray-700 mb-1">MerchantCode</label>
-                <input
-                  value={merchantCode}
-                  onChange={(e) => setMerchantCode(e.target.value)}
-                  className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-paynet-gray-700 mb-1">User login</label>
-                <input
-                  value={userLogin}
-                  onChange={(e) => setUserLogin(e.target.value)}
-                  className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Password</label>
-                <input
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm"
-                />
-              </div>
-              <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-paynet-gray-700 mb-1">SecretKey</label>
-                <input
-                  value={secretKey}
-                  onChange={(e) => setSecretKey(e.target.value)}
-                  className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm font-mono"
-                />
-              </div>
+            <div className="mb-6 bg-white p-4 rounded-lg border border-paynet-gray-200">
+              <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Signature generation</h3>
+              <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed mb-3">
+                Signature for `v05` is generated using formula:
+              </p>
+              <pre className="bg-paynet-gray-900 text-paynet-gray-100 p-3 rounded-md text-xs sm:text-sm overflow-x-auto mb-3">
+{`Signature = Base64(MD5(PreparedString + SecretKey))`}
+              </pre>
+              <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed mb-2">
+                `PreparedString` is formed in a strict order:
+              </p>
+              <pre className="bg-paynet-gray-900 text-paynet-gray-100 p-3 rounded-md text-xs sm:text-sm overflow-x-auto mb-3 whitespace-pre-wrap">
+{`Currency +
+Customer.Address + Customer.City + Customer.Code + Customer.Country +
+Customer.email + Customer.NameFirst + Customer.NameLast + Customer.PhoneNumber +
+ExpiryDate + ExternalID + Merchant + MoneyType.Code +
+for each Service: Service.Amount + Service.Description + Service.Name +
+for each Product: Product.Amount + Product.Barcode + Product.Code + Product.Description +
+Product.GroupId + Product.GroupName + Product.LineNo + Product.Name + Product.UnitPrice + Product.UnitProduct`}
+              </pre>
+              <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed">
+                Field order must not be changed. Empty fields are treated as empty strings.
+              </p>
             </div>
 
             <div className="mb-4">
