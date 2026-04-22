@@ -1,6 +1,6 @@
 import React from 'react';
 import { Bell, ChevronDown, ChevronRight, AlertCircle, CheckCircle } from 'lucide-react';
-import { getAuthToken } from '../utils/apiTester';
+import { getAuthToken, setAuthToken } from '../utils/apiTester';
 
 type NotificationFieldRow = {
   name: string;
@@ -11,6 +11,14 @@ type NotificationFieldRow = {
 };
 
 export const ClientServerNotification: React.FC = () => {
+  const authUrl = 'https://ecom-api-test.paynet.md/auth';
+  const paymentsApiBaseUrl = 'https://ecom-api-test.paynet.md';
+  const defaultAuthPayload = {
+    grantType: 'password',
+    username: '771064',
+    password: 'sLgMnGWJ',
+  };
+
   const [isExpanded, setIsExpanded] = React.useState(true);
   const [notificationCallbackUrl, setNotificationCallbackUrl] = React.useState('https://your-domain.com/paynet/notification');
   const [isSendingNotification, setIsSendingNotification] = React.useState(false);
@@ -130,20 +138,50 @@ export const ClientServerNotification: React.FC = () => {
     return 'fail';
   };
 
+  const requestAuthToken = async () => {
+    const response = await fetch(authUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(defaultAuthPayload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Auth failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    const token =
+      typeof data?.access_token === 'string'
+        ? data.access_token
+        : typeof data?.token === 'string'
+          ? data.token
+          : '';
+
+    if (!token) {
+      throw new Error('Auth response does not contain access token.');
+    }
+
+    setAuthToken(token);
+    return token;
+  };
+
+  const getOrCreateAuthToken = async () => {
+    const currentToken = getAuthToken();
+    if (currentToken) return currentToken;
+    return requestAuthToken();
+  };
+
   const getPaymentInfoById = async () => {
     if (!transactionId.trim()) {
       setPaymentStatusError('Transaction ID is required.');
       return;
     }
 
-    const token = getAuthToken();
-    if (!token) {
-      setPaymentStatusError('Bearer token not found. Authorize first in Server-Server methods.');
-      return;
-    }
-
     const trimmedTransactionId = transactionId.trim();
-    const requestUrl = `https://ecom-api-test.paynet.md/api/order/merchant/${encodeURIComponent(trimmedTransactionId)}`;
+    const requestUrl = `${paymentsApiBaseUrl}/api/order/merchant/${encodeURIComponent(trimmedTransactionId)}`;
 
     setIsGettingPaymentStatus(true);
     setPaymentStatusError('');
@@ -152,13 +190,27 @@ export const ClientServerNotification: React.FC = () => {
     setPaymentInfoForNotification(null);
 
     try {
-      const response = await fetch(requestUrl, {
+      let token = await getOrCreateAuthToken();
+
+      let response = await fetch(requestUrl, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
           Authorization: `Bearer ${token}`,
         },
       });
+
+      // If cached token is expired/invalid, refresh token once and retry automatically.
+      if (response.status === 401) {
+        token = await requestAuthToken();
+        response = await fetch(requestUrl, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
 
       const rawText = await response.text();
       let data: any = null;
