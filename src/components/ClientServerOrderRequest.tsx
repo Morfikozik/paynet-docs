@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, FileText, AlertCircle, CheckCircle, Copy, Check, Send, Loader2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, FileText, AlertCircle, CheckCircle, Copy, Check, Send } from 'lucide-react';
 import CryptoJS from 'crypto-js';
 
 type FieldRow = {
@@ -65,11 +65,11 @@ export const ClientServerOrderRequest: React.FC = () => {
   const [signature, setSignature] = React.useState('');
   const [signedPayloadText, setSignedPayloadText] = React.useState('');
   const [responseText, setResponseText] = React.useState('');
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [errorText, setErrorText] = React.useState('');
   const [isExpanded, setIsExpanded] = React.useState(true);
   const [isCodeExamplesExpanded, setIsCodeExamplesExpanded] = React.useState(true);
-  const [copiedSignedPayload, setCopiedSignedPayload] = React.useState(false);
+  const [activeCodeLanguage, setActiveCodeLanguage] = React.useState<'json' | 'html'>('html');
+  const [copiedCode, setCopiedCode] = React.useState(false);
   const fieldRows: FieldRow[] = [
     { name: 'ExternalID', type: 'long', input: 'body', required: true, description: 'Partner order identifier in your system.' },
     { name: 'Currency', type: 'int', input: 'body', required: true, description: 'ISO 4217 numeric currency code (example: 498).' },
@@ -98,7 +98,7 @@ export const ClientServerOrderRequest: React.FC = () => {
     { name: 'MoneyType.Code', type: 'string', input: 'body', required: true, description: 'Payment instrument code (example: PAYNET).' },
     { name: 'LinkUrlSuccess', type: 'string', input: 'body', required: true, description: 'Redirect URL after successful payment flow.' },
     { name: 'LinkUrlCancel', type: 'string', input: 'body', required: true, description: 'Redirect URL when payment is canceled.' },
-    { name: 'Lang', type: 'string', input: 'body', required: false, description: 'UI language for payment page (example: en-US).' },
+    { name: 'Lang', type: 'string', input: 'body', required: false, description: 'UI language for payment page (example: RO or RU or EN).' },
     { name: 'SignVersion', type: 'string', input: 'body', required: true, description: 'Signature algorithm version, use v05.' },
     { name: 'Signature', type: 'string', input: 'body', required: true, description: 'Base64(MD5(PreparedString + SecretKey)).' },
   ];
@@ -164,54 +164,135 @@ export const ClientServerOrderRequest: React.FC = () => {
     }
   };
 
-  const sendSignedRequest = async () => {
+  const sendSignedRequest = () => {
     if (!signedPayloadText) {
       setErrorText('Generate signature first.');
       return;
     }
 
-    setIsSubmitting(true);
     setErrorText('');
     setResponseText('');
 
     try {
-      const start = Date.now();
-      const response = await fetch(requestUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: signedPayloadText,
+      const payload = JSON.parse(signedPayloadText) as Record<string, any>;
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = requestUrl;
+      form.target = '_blank';
+      form.style.display = 'none';
+
+      buildHiddenInputs(payload).forEach(({ name, value }) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
       });
 
-      const elapsed = Date.now() - start;
-      const rawText = await response.text();
-      let formatted = rawText;
+      document.body.appendChild(form);
+      form.submit();
+      form.remove();
 
-      try {
-        formatted = JSON.stringify(JSON.parse(rawText), null, 2);
-      } catch {
-        // Keep raw when not JSON.
-      }
-
-      setResponseText(`Status: ${response.status} ${response.statusText}\nTime: ${elapsed}ms\n\n${formatted}`);
+      setResponseText('Payment form submitted in a new browser tab.');
     } catch (error) {
-      setErrorText(
-        `Request failed: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }. Browser CORS restrictions may block direct calls.`
-      );
-    } finally {
-      setIsSubmitting(false);
+      setErrorText(`Cannot open payment page: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
-  const handleCopySignedPayload = async () => {
-    if (!signedPayloadText) return;
-    await navigator.clipboard.writeText(signedPayloadText);
-    setCopiedSignedPayload(true);
-    setTimeout(() => setCopiedSignedPayload(false), 2000);
+  const getPayloadForExamples = () => {
+    const source = signedPayloadText || payloadText;
+    try {
+      return JSON.stringify(JSON.parse(source), null, 2);
+    } catch {
+      return source;
+    }
+  };
+
+  const escapeHtml = (value: string) =>
+    value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+
+  const buildHiddenInputs = (payload: Record<string, any>) => {
+    const rows: Array<{ name: string; value: string }> = [];
+
+    const walk = (value: unknown, path: string, parentType: 'root' | 'array' | 'object') => {
+      if (value === null || value === undefined) {
+        rows.push({ name: path, value: '' });
+        return;
+      }
+
+      if (Array.isArray(value)) {
+        value.forEach((item, index) => {
+          walk(item, `${path}[${index}]`, 'array');
+        });
+        return;
+      }
+
+      if (typeof value === 'object') {
+        Object.entries(value as Record<string, unknown>).forEach(([key, child]) => {
+          const nextPath =
+            parentType === 'array'
+              ? `${path}[${key}]`
+              : path
+                ? `${path}.${key}`
+                : key;
+          walk(child, nextPath, 'object');
+        });
+        return;
+      }
+
+      rows.push({ name: path, value: String(value) });
+    };
+
+    Object.entries(payload).forEach(([key, value]) => {
+      walk(value, key, 'root');
+    });
+
+    return rows;
+  };
+
+  const getHtmlExample = () => {
+    const source = signedPayloadText || payloadText;
+    let payload: Record<string, any>;
+
+    try {
+      payload = JSON.parse(source);
+    } catch {
+      return '<!-- Invalid JSON payload. Please fix Request Body first. -->';
+    }
+
+    const inputs = buildHiddenInputs(payload)
+      .map(
+        ({ name, value }) =>
+          `<input type="hidden" name="${escapeHtml(name)}" value="${escapeHtml(value)}" />`,
+      )
+      .join('\n');
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paynet SetEcom Form</title>
+</head>
+<body>
+  <form method="POST" action="${escapeHtml(requestUrl)}">
+${inputs}
+    <input type="submit" value="GO to a payment gateway of paynet" />
+  </form>
+</body>
+</html>`;
+  };
+
+  const handleCopyCode = async () => {
+    const code = activeCodeLanguage === 'html' ? getHtmlExample() : getPayloadForExamples();
+    await navigator.clipboard.writeText(code);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
   return (
@@ -390,20 +471,10 @@ Product.GroupId + Product.GroupName + Product.LineNo + Product.Name + Product.Un
                     </button>
                     <button
                       onClick={sendSignedRequest}
-                      disabled={isSubmitting}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white text-sm font-medium rounded-md flex items-center justify-center gap-2"
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md flex items-center justify-center gap-2"
                     >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Sending...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4" />
-                          Send Test Request
-                        </>
-                      )}
+                      <Send className="w-4 h-4" />
+                      Send Test Request
                     </button>
                   </div>
 
@@ -416,32 +487,51 @@ Product.GroupId + Product.GroupName + Product.LineNo + Product.Name + Product.Un
                     </div>
                   )}
 
-                  {signedPayloadText && (
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-sm font-medium text-paynet-gray-700">Signed payload (JSON)</label>
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex gap-2">
                         <button
-                          onClick={handleCopySignedPayload}
-                          className="flex items-center gap-2 px-3 py-1.5 bg-paynet-primary hover:bg-paynet-secondary text-white text-xs font-medium rounded-paynet transition-all duration-200"
+                          onClick={() => setActiveCodeLanguage('html')}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                            activeCodeLanguage === 'html'
+                              ? 'bg-paynet-primary text-white'
+                              : 'bg-paynet-gray-100 text-paynet-gray-700 hover:bg-paynet-gray-200'
+                          }`}
                         >
-                          {copiedSignedPayload ? (
-                            <>
-                              <Check className="w-3 h-3" />
-                              Copied
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3" />
-                              Copy
-                            </>
-                          )}
+                          HTML
+                        </button>
+                        <button
+                          onClick={() => setActiveCodeLanguage('json')}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                            activeCodeLanguage === 'json'
+                              ? 'bg-paynet-primary text-white'
+                              : 'bg-paynet-gray-100 text-paynet-gray-700 hover:bg-paynet-gray-200'
+                          }`}
+                        >
+                          JSON
                         </button>
                       </div>
-                      <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto whitespace-pre-wrap">
-                        {signedPayloadText}
-                      </pre>
+                      <button
+                        onClick={handleCopyCode}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-paynet-primary hover:bg-paynet-secondary text-white text-xs font-medium rounded-paynet transition-all duration-200"
+                      >
+                        {copiedCode ? (
+                          <>
+                            <Check className="w-3 h-3" />
+                            Copied
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            Copy
+                          </>
+                        )}
+                      </button>
                     </div>
-                  )}
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto whitespace-pre-wrap">
+                      {activeCodeLanguage === 'html' ? getHtmlExample() : getPayloadForExamples()}
+                    </pre>
+                  </div>
 
                   {errorText && (
                     <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">{errorText}</div>

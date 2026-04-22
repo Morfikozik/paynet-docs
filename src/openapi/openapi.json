@@ -64,7 +64,8 @@
                           "Products": null
                         }
                       ],
-                      "MoneyType": "all"
+                      "MoneyType": "all",
+                      "Lang": "EN"
                     }
 						}
           }
@@ -329,8 +330,8 @@
 	          "application/json": {
 							"example": {
               "grantType": "password",
-              "username": "MAKUSR01",
-              "password": "Makler001&"
+              "username": "771064",
+              "password": "sLgMnGWJ"
             }
 						}
           }
@@ -546,6 +547,11 @@
             ],
             "type": "string",
             "description": "The type of money or payment method used."
+          },
+          "lang": {
+            "type": "string",
+            "description": "UI language for payment page (example: RO or RU or EN).",
+            "nullable": true
           }
         },
         "additionalProperties": false,

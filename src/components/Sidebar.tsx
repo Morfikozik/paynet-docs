@@ -13,10 +13,12 @@ interface SidebarProps {
   onServerServerOverviewSelect: () => void;
   onClientServerOverviewSelect: () => void;
   onClientServerOrderRequestSelect: () => void;
+  onClientServerNotificationSelect: () => void;
   ecommerceOverviewActive: boolean;
   serverServerOverviewActive: boolean;
   clientServerOverviewActive: boolean;
   clientServerOrderRequestActive: boolean;
+  clientServerNotificationActive: boolean;
   searchQuery: string;
   onSearchChange: (query: string) => void;
   t: TranslationResources;
@@ -32,17 +34,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onServerServerOverviewSelect,
   onClientServerOverviewSelect,
   onClientServerOrderRequestSelect,
+  onClientServerNotificationSelect,
   ecommerceOverviewActive,
   serverServerOverviewActive,
   clientServerOverviewActive,
   clientServerOrderRequestActive,
+  clientServerNotificationActive,
   searchQuery,
   onSearchChange,
   t,
 }) => {
   const [isEcommerceOpen, setIsEcommerceOpen] = React.useState(true);
   const [isClientModelOpen, setIsClientModelOpen] = React.useState(false);
-  const [isServerModelOpen, setIsServerModelOpen] = React.useState(true);
+  const [isServerModelOpen, setIsServerModelOpen] = React.useState(false);
 
   const filteredEndpoints = categories
     .flatMap((category) => category.endpoints)
@@ -243,6 +247,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       POST
                     </span>
                     <div className="text-sm font-medium text-paynet-gray-900">Order request</div>
+                  </div>
+                </button>
+                <button
+                  onClick={onClientServerNotificationSelect}
+                  className={`w-full text-left p-3 rounded-lg transition-all duration-200 group ${
+                    clientServerNotificationActive
+                      ? 'bg-white border-l-4 border-paynet-primary shadow-paynet-lg'
+                      : 'bg-white hover:bg-paynet-light hover:shadow-paynet'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono px-2 py-1 rounded-md font-semibold bg-blue-100 text-blue-700">
+                      POST
+                    </span>
+                    <div className="text-sm font-medium text-paynet-gray-900">Notification</div>
                   </div>
                 </button>
               </div>
