@@ -8,6 +8,7 @@ import { ProjectInfo } from './components/ProjectInfo';
 import { EcommerceOverview } from './components/EcommerceOverview';
 import { ServerServerOverview } from './components/ServerServerOverview';
 import { ClientServerOverview } from './components/ClientServerOverview';
+import { PluginsOverview } from './components/PluginsOverview';
 import { ClientServerOrderRequest } from './components/ClientServerOrderRequest';
 import { ClientServerOrderRequestV06 } from './components/ClientServerOrderRequestV06';
 import { ClientServerNotification } from './components/ClientServerNotification';
@@ -29,8 +30,9 @@ function App() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [activeEndpoint, setActiveEndpoint] = useState<string>('');
-  const [activeView, setActiveView] = useState<'endpoints' | 'project-info'>('project-info');
-  const [overviewMode, setOverviewMode] = useState<'ecommerce' | 'server-server' | 'client-server' | 'client-server-order-request' | 'client-server-order-request-v06' | 'client-server-notification' | null>('ecommerce');
+  // Temporarily keep Project Info hidden from UI by defaulting to endpoints.
+  const [activeView, setActiveView] = useState<'endpoints' | 'project-info'>('endpoints');
+  const [overviewMode, setOverviewMode] = useState<'ecommerce' | 'server-server' | 'client-server' | 'plugins' | 'client-server-order-request' | 'client-server-order-request-v06' | 'client-server-notification' | null>('ecommerce');
 
   const allEndpoints = useMemo(() => categories.flatMap(cat => cat.endpoints), [categories]);
 
@@ -68,6 +70,11 @@ function App() {
     setActiveEndpoint('');
   };
 
+  const handlePluginsOverviewSelect = () => {
+    setOverviewMode('plugins');
+    setActiveEndpoint('');
+  };
+
   const handleClientServerOrderRequestSelect = () => {
     setOverviewMode('client-server-order-request');
     setActiveEndpoint('');
@@ -96,6 +103,7 @@ function App() {
       <div className="flex flex-1 min-h-0 min-w-0 flex-col md:flex-row">
         <Sidebar
           categories={categories}
+          currentSpec={currentSpec}
           activeEndpoint={activeEndpoint}
           activeView={activeView}
           onEndpointSelect={handleEndpointSelect}
@@ -103,12 +111,14 @@ function App() {
           onEcommerceOverviewSelect={handleEcommerceOverviewSelect}
           onServerServerOverviewSelect={handleServerServerOverviewSelect}
           onClientServerOverviewSelect={handleClientServerOverviewSelect}
+          onPluginsOverviewSelect={handlePluginsOverviewSelect}
           onClientServerOrderRequestSelect={handleClientServerOrderRequestSelect}
           onClientServerOrderRequestV06Select={handleClientServerOrderRequestV06Select}
           onClientServerNotificationSelect={handleClientServerNotificationSelect}
           ecommerceOverviewActive={overviewMode === 'ecommerce'}
           serverServerOverviewActive={overviewMode === 'server-server'}
           clientServerOverviewActive={overviewMode === 'client-server'}
+          pluginsOverviewActive={overviewMode === 'plugins'}
           clientServerOrderRequestActive={overviewMode === 'client-server-order-request'}
           clientServerOrderRequestV06Active={overviewMode === 'client-server-order-request-v06'}
           clientServerNotificationActive={overviewMode === 'client-server-notification'}
@@ -142,6 +152,10 @@ function App() {
               ) : overviewMode === 'client-server' ? (
                 <div className="flex-1 w-full min-w-0">
                   <ClientServerOverview t={t} />
+                </div>
+              ) : overviewMode === 'plugins' ? (
+                <div className="flex-1 w-full min-w-0">
+                  <PluginsOverview />
                 </div>
               ) : overviewMode === 'client-server-order-request' ? (
                 <div className="flex-1 w-full min-w-0">
