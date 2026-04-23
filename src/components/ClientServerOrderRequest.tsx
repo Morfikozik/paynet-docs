@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, FileText, AlertCircle, CheckCircle, Copy, Check, Send } from 'lucide-react';
+import { FileText, AlertCircle, CheckCircle, Copy, Check, Send } from 'lucide-react';
 import CryptoJS from 'crypto-js';
 
 type FieldRow = {
@@ -67,7 +67,6 @@ export const ClientServerOrderRequest: React.FC = () => {
   const [signedPayloadText, setSignedPayloadText] = React.useState('');
   const [responseText, setResponseText] = React.useState('');
   const [errorText, setErrorText] = React.useState('');
-  const [isExpanded, setIsExpanded] = React.useState(true);
   const [activeCodeLanguage, setActiveCodeLanguage] = React.useState<'json' | 'html'>('html');
   const [copiedCode, setCopiedCode] = React.useState(false);
   const fieldRows: FieldRow[] = [
@@ -306,23 +305,12 @@ ${inputs}
       </div>
 
       <div className="bg-gradient-to-r from-paynet-light to-paynet-gray-50 rounded-paynet border border-paynet-gray-200 overflow-hidden w-full max-w-none">
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full p-4 sm:p-6 flex items-center justify-between hover:bg-paynet-gray-50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <FileText className="w-5 h-5 text-paynet-primary" />
-            <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary">Order request v0.5</h2>
-          </div>
-          {isExpanded ? (
-            <ChevronDown className="w-5 h-5 text-paynet-primary transition-transform" />
-          ) : (
-            <ChevronRight className="w-5 h-5 text-paynet-primary transition-transform" />
-          )}
-        </button>
+        <div className="w-full p-4 sm:p-6 flex items-center gap-3">
+          <FileText className="w-5 h-5 text-paynet-primary" />
+          <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary">Order request v0.5</h2>
+        </div>
 
-        {isExpanded && (
-          <div className="p-4 sm:p-6 pt-0">
+        <div className="p-4 sm:p-6 pt-0">
             <div className="xl:flex xl:items-start xl:gap-6">
               <div className="xl:flex-1 min-w-0">
             <div className="mb-6 bg-white p-4 rounded-lg border border-paynet-gray-200">
@@ -542,7 +530,6 @@ Product.GroupId + Product.GroupName + Product.LineNo + Product.Name + Product.Un
             </div>
             </div>
           </div>
-        )}
       </div>
     </div>
   );

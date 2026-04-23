@@ -13,11 +13,13 @@ interface SidebarProps {
   onServerServerOverviewSelect: () => void;
   onClientServerOverviewSelect: () => void;
   onClientServerOrderRequestSelect: () => void;
+  onClientServerOrderRequestV06Select: () => void;
   onClientServerNotificationSelect: () => void;
   ecommerceOverviewActive: boolean;
   serverServerOverviewActive: boolean;
   clientServerOverviewActive: boolean;
   clientServerOrderRequestActive: boolean;
+  clientServerOrderRequestV06Active: boolean;
   clientServerNotificationActive: boolean;
   searchQuery: string;
   onSearchChange: (query: string) => void;
@@ -34,11 +36,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onServerServerOverviewSelect,
   onClientServerOverviewSelect,
   onClientServerOrderRequestSelect,
+  onClientServerOrderRequestV06Select,
   onClientServerNotificationSelect,
   ecommerceOverviewActive,
   serverServerOverviewActive,
   clientServerOverviewActive,
   clientServerOrderRequestActive,
+  clientServerOrderRequestV06Active,
   clientServerNotificationActive,
   searchQuery,
   onSearchChange,
@@ -247,6 +251,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       POST
                     </span>
                     <div className="text-sm font-medium text-paynet-gray-900">Order request v0.5</div>
+                  </div>
+                </button>
+                <button
+                  onClick={onClientServerOrderRequestV06Select}
+                  className={`w-full text-left p-3 rounded-lg transition-all duration-200 group ${
+                    clientServerOrderRequestV06Active
+                      ? 'bg-white border-l-4 border-paynet-primary shadow-paynet-lg'
+                      : 'bg-white hover:bg-paynet-light hover:shadow-paynet'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono px-2 py-1 rounded-md font-semibold bg-blue-100 text-blue-700">
+                      POST
+                    </span>
+                    <div className="text-sm font-medium text-paynet-gray-900">Order request v0.6</div>
                   </div>
                 </button>
                 <button

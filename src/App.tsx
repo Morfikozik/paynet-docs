@@ -9,6 +9,7 @@ import { EcommerceOverview } from './components/EcommerceOverview';
 import { ServerServerOverview } from './components/ServerServerOverview';
 import { ClientServerOverview } from './components/ClientServerOverview';
 import { ClientServerOrderRequest } from './components/ClientServerOrderRequest';
+import { ClientServerOrderRequestV06 } from './components/ClientServerOrderRequestV06';
 import { ClientServerNotification } from './components/ClientServerNotification';
 import { CodeExample } from './components/CodeExample';
 import { useLanguage } from './hooks/useLanguage';
@@ -29,7 +30,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeEndpoint, setActiveEndpoint] = useState<string>('');
   const [activeView, setActiveView] = useState<'endpoints' | 'project-info'>('project-info');
-  const [overviewMode, setOverviewMode] = useState<'ecommerce' | 'server-server' | 'client-server' | 'client-server-order-request' | 'client-server-notification' | null>('ecommerce');
+  const [overviewMode, setOverviewMode] = useState<'ecommerce' | 'server-server' | 'client-server' | 'client-server-order-request' | 'client-server-order-request-v06' | 'client-server-notification' | null>('ecommerce');
 
   const allEndpoints = useMemo(() => categories.flatMap(cat => cat.endpoints), [categories]);
 
@@ -72,6 +73,11 @@ function App() {
     setActiveEndpoint('');
   };
 
+  const handleClientServerOrderRequestV06Select = () => {
+    setOverviewMode('client-server-order-request-v06');
+    setActiveEndpoint('');
+  };
+
   const handleClientServerNotificationSelect = () => {
     setOverviewMode('client-server-notification');
     setActiveEndpoint('');
@@ -98,11 +104,13 @@ function App() {
           onServerServerOverviewSelect={handleServerServerOverviewSelect}
           onClientServerOverviewSelect={handleClientServerOverviewSelect}
           onClientServerOrderRequestSelect={handleClientServerOrderRequestSelect}
+          onClientServerOrderRequestV06Select={handleClientServerOrderRequestV06Select}
           onClientServerNotificationSelect={handleClientServerNotificationSelect}
           ecommerceOverviewActive={overviewMode === 'ecommerce'}
           serverServerOverviewActive={overviewMode === 'server-server'}
           clientServerOverviewActive={overviewMode === 'client-server'}
           clientServerOrderRequestActive={overviewMode === 'client-server-order-request'}
+          clientServerOrderRequestV06Active={overviewMode === 'client-server-order-request-v06'}
           clientServerNotificationActive={overviewMode === 'client-server-notification'}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -138,6 +146,10 @@ function App() {
               ) : overviewMode === 'client-server-order-request' ? (
                 <div className="flex-1 w-full min-w-0">
                   <ClientServerOrderRequest />
+                </div>
+              ) : overviewMode === 'client-server-order-request-v06' ? (
+                <div className="flex-1 w-full min-w-0">
+                  <ClientServerOrderRequestV06 />
                 </div>
               ) : overviewMode === 'client-server-notification' ? (
                 <div className="flex-1 w-full min-w-0">
