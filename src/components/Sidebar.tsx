@@ -246,7 +246,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span className="text-xs font-mono px-2 py-1 rounded-md font-semibold bg-blue-100 text-blue-700">
                       POST
                     </span>
-                    <div className="text-sm font-medium text-paynet-gray-900">Order request</div>
+                    <div className="text-sm font-medium text-paynet-gray-900">Order request v0.5</div>
                   </div>
                 </button>
                 <button

@@ -47,6 +47,7 @@ export const ClientServerOrderRequest: React.FC = () => {
             LineNo: 1,
             Name: 'Demo product',
             UnitPrice: 100,
+            Quantity: 1,
             UnitProduct: 1,
           },
         ],
@@ -67,7 +68,6 @@ export const ClientServerOrderRequest: React.FC = () => {
   const [responseText, setResponseText] = React.useState('');
   const [errorText, setErrorText] = React.useState('');
   const [isExpanded, setIsExpanded] = React.useState(true);
-  const [isCodeExamplesExpanded, setIsCodeExamplesExpanded] = React.useState(true);
   const [activeCodeLanguage, setActiveCodeLanguage] = React.useState<'json' | 'html'>('html');
   const [copiedCode, setCopiedCode] = React.useState(false);
   const fieldRows: FieldRow[] = [
@@ -94,6 +94,7 @@ export const ClientServerOrderRequest: React.FC = () => {
     { name: 'Services[].Products[].LineNo', type: 'int', input: 'body', required: true, description: 'Product line sequence number.' },
     { name: 'Services[].Products[].Name', type: 'string', input: 'body', required: true, description: 'Product name.' },
     { name: 'Services[].Products[].UnitPrice', type: 'long', input: 'body', required: true, description: 'Single unit price in integer format.' },
+    { name: 'Services[].Products[].Quantity', type: 'int', input: 'body', required: false, description: 'Quantity of product units.' },
     { name: 'Services[].Products[].UnitProduct', type: 'string', input: 'body', required: false, description: 'Product unit type / measure.' },
     { name: 'MoneyType.Code', type: 'string', input: 'body', required: true, description: 'Payment instrument code (example: PAYNET).' },
     { name: 'LinkUrlSuccess', type: 'string', input: 'body', required: true, description: 'Redirect URL after successful payment flow.' },
@@ -210,11 +211,11 @@ export const ClientServerOrderRequest: React.FC = () => {
 
   const escapeHtml = (value: string) =>
     value
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#39;');
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
 
   const buildHiddenInputs = (payload: Record<string, any>) => {
     const rows: Array<{ name: string; value: string }> = [];
@@ -300,7 +301,7 @@ ${inputs}
       <div className="mb-4 sm:mb-8">
         <div className="flex items-center gap-3 mb-2 sm:mb-3">
           <span className="text-xs font-mono px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">POST</span>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Order request</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Order request v0.5</h1>
         </div>
       </div>
 
@@ -311,7 +312,7 @@ ${inputs}
         >
           <div className="flex items-center gap-3">
             <FileText className="w-5 h-5 text-paynet-primary" />
-            <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary">Order request</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary">Order request v0.5</h2>
           </div>
           {isExpanded ? (
             <ChevronDown className="w-5 h-5 text-paynet-primary transition-transform" />
@@ -435,22 +436,13 @@ Product.GroupId + Product.GroupName + Product.LineNo + Product.Name + Product.Un
 
             <div className="xl:w-144 w-full mt-4 xl:mt-0">
             <div className="bg-gradient-to-r from-paynet-light to-paynet-gray-50 rounded-paynet border border-paynet-gray-200 overflow-hidden w-full max-w-none">
-              <button
-                onClick={() => setIsCodeExamplesExpanded(!isCodeExamplesExpanded)}
-                className="w-full p-4 sm:p-6 flex items-center justify-between hover:bg-paynet-gray-50 transition-colors"
-              >
+              <div className="w-full p-4 sm:p-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <FileText className="w-5 h-5 text-paynet-primary" />
                   <h3 className="text-base sm:text-lg font-semibold text-paynet-primary">Code Examples</h3>
                 </div>
-                {isCodeExamplesExpanded ? (
-                  <ChevronDown className="w-5 h-5 text-paynet-primary transition-transform" />
-                ) : (
-                  <ChevronRight className="w-5 h-5 text-paynet-primary transition-transform" />
-                )}
-              </button>
+              </div>
 
-              {isCodeExamplesExpanded && (
                 <div className="p-4 sm:p-6 pt-0">
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Request Body (JSON)</label>
@@ -546,7 +538,6 @@ Product.GroupId + Product.GroupName + Product.LineNo + Product.Name + Product.Un
                     </div>
                   )}
                 </div>
-              )}
             </div>
             </div>
             </div>
