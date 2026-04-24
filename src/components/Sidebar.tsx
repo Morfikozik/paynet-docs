@@ -132,7 +132,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       id: 'page-order-v05',
       group: 'Pages',
-      title: 'Order request v0.5',
+      title: 'Order request v0.5 (old)',
       keywords: ['order', 'request', 'v0.5', 'setecom'],
       onSelect: onClientServerOrderRequestSelect,
       active: clientServerOrderRequestActive,
@@ -200,7 +200,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'field-signature-v05',
       group: 'Fields',
       title: 'PreparedString signature',
-      subtitle: 'Order request v0.5',
+      subtitle: 'Order request v0.5 (old)',
       keywords: ['preparedstring', 'v05', 'signature'],
       onSelect: onClientServerOrderRequestSelect,
     },
@@ -290,18 +290,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           />
         </div>
         
-        {/* Download Postman Collection Link */}
-        <div className="mt-4">
-          <button
-            type="button"
-            onClick={handleDownloadPostmanCollection}
-            disabled={!currentSpec}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-paynet-primary hover:text-paynet-secondary hover:bg-paynet-light rounded-lg transition-all duration-200 border border-paynet-gray-200 hover:border-paynet-primary bg-white"
-          >
-            <Download className="w-4 h-4" />
-            {t.placeholders.downloadPostmanCollection}
-          </button>
-        </div>
+        {/* TEMPORARILY HIDDEN IN UI: Postman download button. Keep handleDownloadPostmanCollection for quick restore later. */}
         </>
         )}
       </div>
@@ -477,21 +466,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             </div>
 
-            <div className="mb-3">
-              <button
-                onClick={onPluginsOverviewSelect}
-                className={`w-full text-left p-3 rounded-lg transition-all duration-200 group ${
-                  pluginsOverviewActive
-                    ? 'bg-white border-l-4 border-paynet-primary shadow-paynet-lg'
-                    : 'bg-white hover:bg-paynet-light hover:shadow-paynet'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <div className="text-sm font-medium text-paynet-gray-900">Plugins</div>
-                </div>
-              </button>
-            </div>
-
             {isClientModelOpen && (
               <div className="space-y-1 pl-3 mb-3">
                 <button
@@ -506,7 +480,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span className="text-xs font-mono px-2 py-1 rounded-md font-semibold bg-blue-100 text-blue-700">
                       POST
                     </span>
-                    <div className="text-sm font-medium text-paynet-gray-900">Order request v0.5</div>
+                    <div className="text-sm font-medium text-paynet-gray-900">Order request v0.5 (old)</div>
                   </div>
                 </button>
                 <button
@@ -541,6 +515,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </button>
               </div>
             )}
+
+            <div className="mb-3">
+              <button
+                onClick={onPluginsOverviewSelect}
+                className={`w-full text-left p-3 rounded-lg transition-all duration-200 group ${
+                  pluginsOverviewActive
+                    ? 'bg-white border-l-4 border-paynet-primary shadow-paynet-lg'
+                    : 'bg-white hover:bg-paynet-light hover:shadow-paynet'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="text-sm font-medium text-paynet-gray-900">Plugins</div>
+                </div>
+              </button>
+            </div>
           </div>
         )}
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { Bell, ChevronDown, ChevronRight, AlertCircle, CheckCircle, Copy, Check, FileText } from 'lucide-react';
 import { getAuthToken, setAuthToken } from '../utils/apiTester';
 import CryptoJS from 'crypto-js';
+import { Language } from '../types/language';
 
 type NotificationFieldRow = {
   name: string;
@@ -11,7 +12,109 @@ type NotificationFieldRow = {
   description: string;
 };
 
-export const ClientServerNotification: React.FC = () => {
+interface ClientServerNotificationProps {
+  language: Language;
+}
+
+export const ClientServerNotification: React.FC<ClientServerNotificationProps> = ({ language }) => {
+  const isRu = language === 'ru';
+  const isRo = language === 'ro';
+  const tDesc = (en: string, ru: string, ro: string) => (isRu ? ru : isRo ? ro : en);
+  const parameterDescriptionTranslations: Record<string, { ru: string; ro: string }> = {
+    Eventid: {
+      ru: 'Уникальный идентификатор callback-события для трассировки и дедупликации.',
+      ro: 'Identificator unic al evenimentului callback pentru trasabilitate și deduplicare.',
+    },
+    EventType: {
+      ru: 'Тип бизнес-события (например: Paid, Fail).',
+      ro: 'Tipul evenimentului business (de exemplu: Paid, Fail).',
+    },
+    Message: {
+      ru: 'Текстовое сообщение о результате обработки в контексте callback.',
+      ro: 'Mesaj text despre rezultatul procesării în contextul callback-ului.',
+    },
+    EventDate: {
+      ru: 'Время создания уведомления в Paynet (ISO 8601).',
+      ro: 'Momentul creării notificării în Paynet (ISO 8601).',
+    },
+    'Payment.ID': {
+      ru: 'Идентификатор платежа в Paynet; используйте как idempotency key.',
+      ro: 'Identificatorul plății în Paynet; folosește-l ca cheie de idempotență.',
+    },
+    'Payment.ExternalID': {
+      ru: 'Идентификатор заказа мерчанта, изначально отправленный вашей системой.',
+      ro: 'Identificatorul comenzii merchantului trimis inițial de sistemul tău.',
+    },
+    'Payment.SaleAreaCode': {
+      ru: 'Код торговой зоны, связанной с платежом.',
+      ro: 'Codul zonei de vânzare asociate plății.',
+    },
+    'Payment.Merchant': {
+      ru: 'Код мерчанта, которому принадлежит платеж.',
+      ro: 'Codul merchantului care deține această operațiune de plată.',
+    },
+    'Payment.Customer': {
+      ru: 'Идентификатор клиента из вашей системы, если передавался при создании заказа.',
+      ro: 'Referința clientului din sistemul tău, dacă a fost transmisă la crearea comenzii.',
+    },
+    'Payment.StatusDate': {
+      ru: 'Время, когда платеж получил указанный статус.',
+      ro: 'Momentul în care plata a atins statusul raportat.',
+    },
+    'Payment.Amount': {
+      ru: 'Итоговая сумма платежа в минимальных единицах (целое число).',
+      ro: 'Suma finală a plății în unități minore (format întreg).',
+    },
+    'Payment.CardMask': {
+      ru: 'Маскированный PAN для карточных платежей.',
+      ro: 'PAN mascat returnat pentru plățile cu card.',
+    },
+    'Payment.CardExpireMonth': {
+      ru: 'Месяц срока действия карты (если доступен).',
+      ro: 'Luna expirării cardului (dacă este disponibilă).',
+    },
+    'Payment.CardExpireYear': {
+      ru: 'Год срока действия карты (если доступен).',
+      ro: 'Anul expirării cardului (dacă este disponibil).',
+    },
+    'Payment.CardIssuer': {
+      ru: 'Название или идентификатор эмитента карты.',
+      ro: 'Numele sau identificatorul emitentului cardului.',
+    },
+    'Payment.CardLinkHash': {
+      ru: 'Хеш связанной карты для сценариев linked-card.',
+      ro: 'Hash-ul cardului legat pentru scenarii linked-card.',
+    },
+    'Payment.MoneyType': {
+      ru: 'Тип/канал платежа (пример: CARD, All).',
+      ro: 'Tipul/canalul plății (exemplu: CARD, All).',
+    },
+    'Payment.PayerName': {
+      ru: 'Имя плательщика из данных карты/платежа.',
+      ro: 'Prenumele plătitorului din datele cardului/plății.',
+    },
+    'Payment.PayerSurname': {
+      ru: 'Фамилия плательщика из данных карты/платежа.',
+      ro: 'Numele de familie al plătitorului din datele cardului/plății.',
+    },
+    'Payment.PayerIDNP': {
+      ru: 'Персональный идентификатор плательщика, если передан.',
+      ro: 'Identificatorul personal al plătitorului, dacă este furnizat.',
+    },
+    'Payment.RRN': {
+      ru: 'RRN эквайера для отслеживания транзакции.',
+      ro: 'RRN-ul achizitorului pentru urmărirea tranzacției.',
+    },
+    'Header.Hash': {
+      ru: 'Подпись уведомления, передаваемая в HTTP-заголовке `Hash`.',
+      ro: 'Semnătura notificării transmisă în antetul HTTP `Hash`.',
+    },
+  };
+  const getLocalizedParameterDescription = (name: string, fallback: string) => {
+    const localized = parameterDescriptionTranslations[name];
+    if (!localized) return fallback;
+    return tDesc(fallback, localized.ru, localized.ro);
+  };
   const authUrl = 'https://ecom-api-test.paynet.md/auth';
   const paymentsApiBaseUrl = 'https://ecom-api-test.paynet.md';
   const defaultAuthPayload = {
@@ -547,25 +650,28 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
                 <div className="bg-white p-4 rounded-lg border border-paynet-gray-200">
                   <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Method Description</h3>
                   <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed mb-3">
-                    Paynet sends callbacks when payment state changes. Notifications are server-to-server requests to your
-                    backend callback URL and must be processed reliably.
+                    {tDesc(
+                      'Paynet sends callbacks when payment state changes. Notifications are server-to-server requests to your backend callback URL and must be processed reliably.',
+                      'Paynet отправляет callback при изменении статуса платежа. Уведомления приходят server-to-server на ваш callback URL и должны обрабатываться надежно.',
+                      'Paynet trimite callback-uri când statusul plății se schimbă. Notificările sunt cereri server-to-server către URL-ul tău de callback și trebuie procesate fiabil.',
+                    )}
                   </p>
                   <ul className="list-disc pl-5 space-y-2 text-sm sm:text-base text-paynet-gray-700">
-                    <li>Paynet sends callback after processing events (for example payment approved/failed).</li>
-                    <li>Flow is server-to-server, so callback endpoint must be implemented on backend side.</li>
-                    <li>Use `Payment.ID` as idempotency key to prevent duplicate business processing.</li>
-                    <li>Return HTTP `200` only after signature validation and successful internal processing.</li>
+                    <li>{tDesc('Paynet sends callback after processing events (for example payment approved/failed).', 'Paynet отправляет callback после обработки события (например, платеж успешен/неуспешен).', 'Paynet trimite callback după procesarea evenimentului (de exemplu plată aprobată/eșuată).')}</li>
+                    <li>{tDesc('Flow is server-to-server, so callback endpoint must be implemented on backend side.', 'Поток server-to-server, поэтому callback endpoint должен быть реализован на backend.', 'Fluxul este server-to-server, deci endpoint-ul de callback trebuie implementat pe backend.')}</li>
+                    <li>{tDesc('Use `Payment.ID` as idempotency key to prevent duplicate business processing.', 'Используйте `Payment.ID` как ключ идемпотентности, чтобы избежать повторной бизнес-обработки.', 'Folosește `Payment.ID` ca cheie de idempotență pentru a preveni procesarea dublă.')}</li>
+                    <li>{tDesc('Return HTTP `200` only after signature validation and successful internal processing.', 'Возвращайте HTTP `200` только после проверки подписи и успешной внутренней обработки.', 'Returnează HTTP `200` doar după validarea semnăturii și procesarea internă cu succes.')}</li>
                   </ul>
                 </div>
 
                 <div className="mt-6 bg-white p-4 rounded-lg border border-paynet-gray-200">
                   <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Merchant UX flow</h3>
                   <ol className="list-decimal pl-5 space-y-2 text-sm sm:text-base text-paynet-gray-700">
-                    <li>Paste your callback URL into `MerchantSystemUrl (callback URL)`.</li>
-                    <li>Enter a `Transaction ID` from your previous payment request.</li>
-                    <li>Click `Get` to load transaction state from `GET /api/order/merchant/{'{id}'}`.</li>
-                    <li>Check business status (`paid` / `fail` / `Fail - transaction doesen&apos;t exist`).</li>
-                    <li>Click `Send notification` to post callback payload to your URL and verify signature.</li>
+                    <li>{tDesc('Paste your callback URL into `MerchantSystemUrl (callback URL)`.', 'Вставьте ваш callback URL в `MerchantSystemUrl (callback URL)`.', 'Introdu URL-ul tău de callback în `MerchantSystemUrl (callback URL)`.')}</li>
+                    <li>{tDesc('Enter a `Transaction ID` from your previous payment request.', 'Введите `Transaction ID` из предыдущего платежного запроса.', 'Introdu `Transaction ID` din cererea ta anterioară de plată.')}</li>
+                    <li>{tDesc("Click `Get` to load transaction state from `GET /api/order/merchant/{'{id}'}`.", "Нажмите `Get`, чтобы загрузить состояние транзакции через `GET /api/order/merchant/{'{id}'}`.", "Apasă `Get` pentru a încărca starea tranzacției din `GET /api/order/merchant/{'{id}'}`.")}</li>
+                    <li>{tDesc("Check business status (`paid` / `fail` / `Fail - transaction doesen&apos;t exist`).", "Проверьте бизнес-статус (`paid` / `fail` / `Fail - transaction doesen&apos;t exist`).", "Verifică statusul business (`paid` / `fail` / `Fail - transaction doesen&apos;t exist`).")}</li>
+                    <li>{tDesc('Click `Send notification` to post callback payload to your URL and verify signature.', 'Нажмите `Send notification`, чтобы отправить callback payload на ваш URL и проверить подпись.', 'Apasă `Send notification` pentru a trimite payload-ul callback către URL-ul tău și a verifica semnătura.')}</li>
                   </ol>
                 </div>
 
@@ -601,7 +707,9 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
                                 </span>
                               )}
                             </td>
-                            <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.description}</td>
+                            <td className="px-4 py-3 text-sm text-paynet-gray-700">
+                              {getLocalizedParameterDescription(row.name, row.description)}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -612,8 +720,11 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
                 <div className="mt-6 bg-white p-4 rounded-lg border border-paynet-gray-200">
                   <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Signature validation</h3>
                   <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed mb-3">
-                    Verify every notification before trusting business status. Build `PreparedString` in strict order and
-                    compare expected hash with `Header.Hash`.
+                    {tDesc(
+                      'Verify every notification before trusting business status. Build `PreparedString` in strict order and compare expected hash with `Header.Hash`.',
+                      'Проверяйте каждое уведомление до принятия бизнес-статуса. Формируйте `PreparedString` в строгом порядке и сравнивайте ожидаемый hash с `Header.Hash`.',
+                      'Verifică fiecare notificare înainte de a accepta statusul business. Construiește `PreparedString` în ordine strictă și compară hash-ul așteptat cu `Header.Hash`.',
+                    )}
                   </p>
                   <pre className="bg-paynet-gray-900 text-paynet-gray-100 p-3 rounded-md text-xs sm:text-sm overflow-x-auto mb-3 whitespace-pre-wrap">
 {`ExpectedHash = Base64(MD5(PreparedString + SecretKey))
@@ -625,12 +736,16 @@ EventDate + Eventid + EventType + Payment.Amount + Payment.Customer +
 Payment.ExternalID + Payment.ID + Payment.Merchant + Payment.StatusDate`}
                   </pre>
                   <p className="text-xs sm:text-sm text-paynet-gray-600 mb-3">
-                    Order is strict. Empty fields must be treated as empty strings.
+                    {tDesc(
+                      'Order is strict. Empty fields must be treated as empty strings.',
+                      'Порядок строго фиксирован. Пустые поля нужно обрабатывать как пустые строки.',
+                      'Ordinea este strictă. Câmpurile goale trebuie tratate ca șiruri goale.',
+                    )}
                   </p>
                   <ol className="list-decimal pl-5 space-y-2 text-sm sm:text-base text-paynet-gray-700 mb-3">
-                    <li>Parse notification and normalize missing fields to empty strings.</li>
-                    <li>Build `PreparedString` in exact order and append `SecretKey`.</li>
-                    <li>Compute hash and compare with `Header.Hash` (constant-time comparison).</li>
+                    <li>{tDesc('Parse notification and normalize missing fields to empty strings.', 'Распарсьте уведомление и нормализуйте отсутствующие поля как пустые строки.', 'Parsează notificarea și normalizează câmpurile lipsă la șiruri goale.')}</li>
+                    <li>{tDesc('Build `PreparedString` in exact order and append `SecretKey`.', 'Соберите `PreparedString` в точном порядке и добавьте `SecretKey`.', 'Construiește `PreparedString` în ordinea exactă și adaugă `SecretKey`.')}</li>
+                    <li>{tDesc('Compute hash and compare with `Header.Hash` (constant-time comparison).', 'Вычислите hash и сравните с `Header.Hash` (сравнение constant-time).', 'Calculează hash-ul și compară-l cu `Header.Hash` (comparație constant-time).')}</li>
                   </ol>
 
                   <div className="border border-paynet-gray-200 rounded-md p-3 bg-paynet-gray-50">
@@ -712,7 +827,11 @@ Payment.ExternalID + Payment.ID + Payment.Merchant + Payment.StatusDate`}
                           </div>
                         </div>
                         <p className="text-xs sm:text-sm text-paynet-gray-600">
-                          Set the public HTTPS endpoint that will receive Paynet notification payloads.
+                          {tDesc(
+                            'Set the public HTTPS endpoint that will receive Paynet notification payloads.',
+                            'Укажите публичный HTTPS endpoint, который будет получать payload уведомлений Paynet.',
+                            'Setează endpoint-ul public HTTPS care va primi payload-urile de notificare Paynet.',
+                          )}
                         </p>
                         <div className="mt-4 max-w-xl">
                           <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Transaction ID</label>
@@ -802,8 +921,11 @@ Payment.ExternalID + Payment.ID + Payment.Merchant + Payment.StatusDate`}
                           </div>
                         )}
                         <p className="mt-4 text-xs sm:text-sm text-paynet-gray-600">
-                          This tool sends a test callback simulation from documentation UI. It is not a live production push
-                          from Paynet systems.
+                          {tDesc(
+                            'This tool sends a test callback simulation from documentation UI. It is not a live production push from Paynet systems.',
+                            'Этот инструмент отправляет тестовую симуляцию callback из UI документации. Это не боевая отправка из систем Paynet.',
+                            'Acest instrument trimite o simulare de callback de test din UI-ul documentației. Nu este un push live de producție din sistemele Paynet.',
+                          )}
                         </p>
                       </div>
                     </div>

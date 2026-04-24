@@ -159,15 +159,15 @@ function App() {
                 </div>
               ) : overviewMode === 'client-server-order-request' ? (
                 <div className="flex-1 w-full min-w-0">
-                  <ClientServerOrderRequest />
+                  <ClientServerOrderRequest language={language} />
                 </div>
               ) : overviewMode === 'client-server-order-request-v06' ? (
                 <div className="flex-1 w-full min-w-0">
-                  <ClientServerOrderRequestV06 />
+                  <ClientServerOrderRequestV06 language={language} />
                 </div>
               ) : overviewMode === 'client-server-notification' ? (
                 <div className="flex-1 w-full min-w-0">
-                  <ClientServerNotification />
+                  <ClientServerNotification language={language} />
                 </div>
               ) : currentEndpoint ? (
                 <div className="flex-1 w-full min-w-0">

@@ -20,6 +20,7 @@ const ruTranslations: Record<string, string> = {
   'Represents a standardized error response returned by the API.': 'Представляет стандартизированный ответ API с ошибкой.',
   'Represents the customer details for a payment.': 'Представляет данные клиента для платежа.',
   'Represents the payload for initiating a payment request.': 'Представляет тело запроса для инициации платежа.',
+  'Represents the payload for initiating a payment request. Fields not marked as required are optional.': 'Представляет тело запроса для инициации платежа. Поля, не отмеченные как обязательные, являются необязательными.',
   'Represents the payload required to initiate a refund for a specific payment transaction.': 'Представляет тело запроса, необходимое для инициации возврата по конкретной платежной транзакции.',
   'Represents the payload required to unlink a saved payment card.': 'Представляет тело запроса, необходимое для отвязки сохраненной платежной карты.',
   'The URL to redirect to if the payment is canceled.': 'URL для перенаправления в случае отмены платежа.',
@@ -53,6 +54,7 @@ const ruTranslations: Record<string, string> = {
   'The total amount for this quantity (usually UnitPrice * Quantity).': 'Общая сумма для этого количества (обычно UnitPrice * Quantity).',
   'The total amount for this service.': 'Общая сумма по этой услуге.',
   'The type of money or payment method used.': 'Используемый тип средств или способ оплаты.',
+  'Payment method type: "Card" for Visa&Mastercard; "Paynet" for Paynet Wallet; "MIA" for Mia; "Cash Invoice" for cash invoice; "All" for Все доступные способы.': 'Тип способа оплаты: "Card" для Visa&Mastercard; "Paynet" для Paynet Wallet; "MIA" для Mia; "Cash Invoice" для cash invoice; "All" для Все доступные способы.',
   'The type of refund being requested (e.g., "Full", "Partial").': 'Тип запрашиваемого возврата (например, "Full", "Partial").',
   'The unique code or identifier for the customer.': 'Уникальный код или идентификатор клиента.',
   'The unique hash identifying the specific card to be unlinked.': 'Уникальный хэш, идентифицирующий конкретную карту для отвязки.',
@@ -65,12 +67,14 @@ const ruTranslations: Record<string, string> = {
   'The user\'s username.': 'Имя пользователя.',
   'User controller': 'Контроллер пользователя.',
   '(Optional) A list of specific products under this service.': '(Необязательно) Список конкретных товаров в рамках этой услуги.',
+  '(Optional) A list of specific products under this service. If at least one Products field is provided, all Product fields become required.': '(Необязательно) Список конкретных товаров в рамках этой услуги. Если передан хотя бы один параметр Products, все поля Product становятся обязательными.',
   '(Optional) The customer\'s email address.': '(Необязательно) Email клиента.',
   '(Optional) The customer\'s first name.': '(Необязательно) Имя клиента.',
   '(Optional) The customer\'s last name.': '(Необязательно) Фамилия клиента.',
   '(Optional) The customer\'s phone number.': '(Необязательно) Номер телефона клиента.',
   '(Optional) The description of the product.': '(Необязательно) Описание товара.',
   '(Optional) The hash of the linked card if using a saved payment method.': '(Необязательно) Хэш привязанной карты при использовании сохраненного способа оплаты.',
+  '(Optional) Linked-card hash. If CardLinkHash is provided, the full Customer object (Code, NameFirst, NameLast, email, PhoneNumber) becomes required.': '(Необязательно) Хэш связанной карты. Если передан CardLinkHash, полный объект Customer (Code, NameFirst, NameLast, email, PhoneNumber) становится обязательным.',
   '(Optional) The specific account identifier to filter the statement.': '(Необязательно) Конкретный идентификатор счета для фильтрации выписки.',
   '(Optional) The unit of measurement for the product (e.g., kg, pcs).': '(Необязательно) Единица измерения товара (например, кг, шт).',
 };
@@ -92,6 +96,7 @@ const roTranslations: Record<string, string> = {
   'Represents a standardized error response returned by the API.': 'Reprezintă un răspuns de eroare standardizat returnat de API.',
   'Represents the customer details for a payment.': 'Reprezintă datele clientului pentru o plată.',
   'Represents the payload for initiating a payment request.': 'Reprezintă payload-ul pentru inițierea unei cereri de plată.',
+  'Represents the payload for initiating a payment request. Fields not marked as required are optional.': 'Reprezintă payload-ul pentru inițierea unei cereri de plată. Câmpurile care nu sunt marcate ca obligatorii sunt opționale.',
   'Represents the payload required to initiate a refund for a specific payment transaction.': 'Reprezintă payload-ul necesar pentru inițierea unei rambursări pentru o tranzacție de plată specifică.',
   'Represents the payload required to unlink a saved payment card.': 'Reprezintă payload-ul necesar pentru deconectarea unui card de plată salvat.',
   'The URL to redirect to if the payment is canceled.': 'URL-ul de redirecționare dacă plata este anulată.',
@@ -125,6 +130,7 @@ const roTranslations: Record<string, string> = {
   'The total amount for this quantity (usually UnitPrice * Quantity).': 'Suma totală pentru această cantitate (de obicei UnitPrice * Quantity).',
   'The total amount for this service.': 'Suma totală pentru acest serviciu.',
   'The type of money or payment method used.': 'Tipul de bani sau metoda de plată utilizată.',
+  'Payment method type: "Card" for Visa&Mastercard; "Paynet" for Paynet Wallet; "MIA" for Mia; "Cash Invoice" for cash invoice; "All" for Все доступные способы.': 'Tipul metodei de plată: "Card" pentru Visa&Mastercard; "Paynet" pentru Paynet Wallet; "MIA" pentru Mia; "Cash Invoice" pentru cash invoice; "All" pentru Toate metodele disponibile.',
   'The type of refund being requested (e.g., "Full", "Partial").': 'Tipul rambursării solicitate (de ex. "Full", "Partial").',
   'The unique code or identifier for the customer.': 'Codul unic sau identificatorul clientului.',
   'The unique hash identifying the specific card to be unlinked.': 'Hash-ul unic care identifică cardul specific ce trebuie deconectat.',
@@ -137,12 +143,14 @@ const roTranslations: Record<string, string> = {
   'The user\'s username.': 'Numele de utilizator.',
   'User controller': 'Controler utilizator.',
   '(Optional) A list of specific products under this service.': '(Opțional) O listă de produse specifice din acest serviciu.',
+  '(Optional) A list of specific products under this service. If at least one Products field is provided, all Product fields become required.': '(Opțional) O listă de produse specifice din acest serviciu. Dacă este transmis cel puțin un parametru Products, toate câmpurile Product devin obligatorii.',
   '(Optional) The customer\'s email address.': '(Opțional) Adresa de email a clientului.',
   '(Optional) The customer\'s first name.': '(Opțional) Prenumele clientului.',
   '(Optional) The customer\'s last name.': '(Opțional) Numele de familie al clientului.',
   '(Optional) The customer\'s phone number.': '(Opțional) Numărul de telefon al clientului.',
   '(Optional) The description of the product.': '(Opțional) Descrierea produsului.',
   '(Optional) The hash of the linked card if using a saved payment method.': '(Opțional) Hash-ul cardului asociat, dacă se folosește o metodă de plată salvată.',
+  '(Optional) Linked-card hash. If CardLinkHash is provided, the full Customer object (Code, NameFirst, NameLast, email, PhoneNumber) becomes required.': '(Opțional) Hash-ul cardului legat. Dacă este transmis CardLinkHash, întregul obiect Customer (Code, NameFirst, NameLast, email, PhoneNumber) devine obligatoriu.',
   '(Optional) The specific account identifier to filter the statement.': '(Opțional) Identificatorul specific al contului pentru filtrarea extrasului.',
   '(Optional) The unit of measurement for the product (e.g., kg, pcs).': '(Opțional) Unitatea de măsură pentru produs (de ex. kg, buc).',
 };
@@ -157,6 +165,11 @@ export const translateOpenApiDescription = (description: string | undefined, lan
   if (language === 'en') return description;
 
   const normalized = normalizeDescription(description);
+  if (normalized.startsWith('UI language for payment page')) {
+    return language === 'ru'
+      ? 'Язык интерфейса платежной страницы (пример: RO или RU или EN).'
+      : 'Limba interfeței paginii de plată (exemplu: RO sau RU sau EN).';
+  }
   const translated = descriptionsByLanguage[language]?.[normalized];
   return translated || description;
 };

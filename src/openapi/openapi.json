@@ -48,20 +48,37 @@
           "content": {
             "application/json": {
 							"example": {
-                      "Order": 122,
-                      "SaleAreaCode": "makle",
+                      "Order": 65465465,
+                      "SaleAreaCode": "onlidocumentation_md",
                       "LinkUrlSuccess": "https://shop-test.com/success",
                       "LinkUrlCancel": "https://shop-test.com/cancel",
                       "CardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
-                      "Customer": null,
+                      "Customer": {
+                        "Code": "464566161",
+                        "NameFirst": "First Name",
+                        "NameLast": "Last Name",
+                        "email": "mytestemail@gmail.com",
+                        "PhoneNumber": "37360000000"
+                      },
                       "Currency": 498,
                       "ExpiryDate": "2026-05-01T00:00:00",
                       "Services": [
                         {
                           "Name": "Demo eShop",
                           "Description": "Demo eShop online desc",
-                          "Amount": 3,
-                          "Products": null
+                          "Amount": 300,
+                          "Products": [
+                            {
+                              "Amount": 300,
+                              "Code": "546465654",
+                              "Description": "Demo product",
+                              "LineNo": 1,
+                              "Name": "Demo product",
+                              "UnitPrice": 100,
+                              "Quantity": 3,
+                              "TotalAmount": 300
+                            }
+                          ]
                         }
                       ],
                       "MoneyType": "all",
@@ -203,7 +220,7 @@
 							"example": {
 								"PaymentId": 296901,
 								"Amount": 50000,
-								"SaleAreaCode": "makle",
+								"SaleAreaCode": "onlidocumentation_md",
 								"Currency": 498,
 								"RefundType": "full",
 								"Reason": "Was customer error!"
@@ -382,21 +399,21 @@
       },
       "Customer": {
         "required": [
-          "code"
+          "Code"
         ],
         "type": "object",
         "properties": {
-          "code": {
+          "Code": {
             "type": "string",
             "description": "The unique code or identifier for the customer.",
             "nullable": true
           },
-          "nameFirst": {
+          "NameFirst": {
             "type": "string",
             "description": "(Optional) The customer's first name.",
             "nullable": true
           },
-          "nameLast": {
+          "NameLast": {
             "type": "string",
             "description": "(Optional) The customer's last name.",
             "nullable": true
@@ -406,7 +423,7 @@
             "description": "(Optional) The customer's email address.",
             "nullable": true
           },
-          "phoneNumber": {
+          "PhoneNumber": {
             "type": "string",
             "description": "(Optional) The customer's phone number.",
             "nullable": true
@@ -480,56 +497,57 @@
       },
       "PaymentRequest": {
         "required": [
-          "currency",
-          "expiryDate",
-          "linkUrlCancel",
-          "linkUrlSuccess",
-          "moneyType",
-          "order",
-          "saleAreaCode",
-          "services"
+          "Currency",
+          "ExpiryDate",
+          "Lang",
+          "LinkUrlCancel",
+          "LinkUrlSuccess",
+          "MoneyType",
+          "Order",
+          "SaleAreaCode",
+          "Services"
         ],
         "type": "object",
         "properties": {
-          "order": {
+          "Order": {
             "type": "integer",
             "description": "The unique identifier for the order.",
             "format": "int64"
           },
-          "saleAreaCode": {
+          "SaleAreaCode": {
             "type": "string",
             "description": "The code representing the sale area or merchant location.",
             "nullable": true
           },
-          "linkUrlSuccess": {
+          "LinkUrlSuccess": {
             "type": "string",
             "description": "The URL to redirect to upon a successful payment.",
             "nullable": true
           },
-          "linkUrlCancel": {
+          "LinkUrlCancel": {
             "type": "string",
             "description": "The URL to redirect to if the payment is canceled.",
             "nullable": true
           },
-          "cardLinkHash": {
+          "CardLinkHash": {
             "type": "string",
-            "description": "(Optional) The hash of the linked card if using a saved payment method.",
+            "description": "(Optional) Linked-card hash. If CardLinkHash is provided, the full Customer object (Code, NameFirst, NameLast, email, PhoneNumber) becomes required.",
             "nullable": true
           },
-          "customer": {
+          "Customer": {
             "$ref": "#/components/schemas/Customer"
           },
-          "currency": {
+          "Currency": {
             "type": "integer",
             "description": "The currency code.",
             "format": "int32"
           },
-          "expiryDate": {
+          "ExpiryDate": {
             "type": "string",
             "description": "The expiration date and time for this payment request.",
             "format": "date-time"
           },
-          "services": {
+          "Services": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Service"
@@ -537,7 +555,7 @@
             "description": "The list of services included in this payment.",
             "nullable": true
           },
-          "moneyType": {
+          "MoneyType": {
             "enum": [
               "All",
               "Card",
@@ -546,64 +564,66 @@
               "CashInvoice"
             ],
             "type": "string",
-            "description": "The type of money or payment method used."
+            "description": "Payment method type: \"Card\" for Visa&Mastercard; \"Paynet\" for Paynet Wallet; \"MIA\" for Mia; \"Cash Invoice\" for cash invoice; \"All\" for Все доступные способы."
           },
-          "lang": {
+          "Lang": {
             "type": "string",
             "description": "UI language for payment page (example: RO or RU or EN).",
             "nullable": true
           }
         },
         "additionalProperties": false,
-        "description": "Represents the payload for initiating a payment request."
+        "description": "Represents the payload for initiating a payment request. Fields not marked as required are optional."
       },
       "Product": {
         "required": [
-          "amount",
-          "lineNo",
-          "name",
-          "quantity",
-          "totalAmount",
-          "unitPrice"
+          "Amount",
+          "Code",
+          "Description",
+          "LineNo",
+          "Name",
+          "Quantity",
+          "TotalAmount",
+          "UnitPrice"
         ],
         "type": "object",
         "properties": {
-          "lineNo": {
+          "LineNo": {
             "type": "integer",
             "description": "The line number or position of the product in the list.",
             "format": "int32"
           },
-          "name": {
+          "Name": {
             "type": "string",
             "description": "The name of the product.",
             "nullable": true
           },
-          "description": {
+          "Description": {
             "type": "string",
             "description": "(Optional) The description of the product.",
             "nullable": true
           },
-          "unitPrice": {
+          "Code": {
+            "type": "string",
+            "description": "(Optional) Partner product code.",
+            "nullable": true
+          },
+          "UnitPrice": {
             "type": "integer",
             "description": "The price per single unit of the product.",
             "format": "int64"
           },
-          "unitProduct": {
-            "type": "string",
-            "description": "(Optional) The unit of measurement for the product (e.g., kg, pcs).",
-            "nullable": true
-          },
-          "quantity": {
+          "Quantity": {
             "type": "integer",
             "description": "The quantity of the product being purchased.",
             "format": "int64"
           },
-          "amount": {
+          "Amount": {
             "type": "integer",
             "description": "The total amount for this quantity (usually UnitPrice * Quantity).",
             "format": "int64"
           },
-          "totalAmount": {
+          "TotalAmount": {
             "type": "integer",
             "description": "The final total amount including any taxes or discounts.",
             "format": "int64"
@@ -656,33 +676,33 @@
       },
       "Service": {
         "required": [
-          "amount",
-          "description",
-          "name"
+          "Amount",
+          "Description",
+          "Name"
         ],
         "type": "object",
         "properties": {
-          "name": {
+          "Name": {
             "type": "string",
             "description": "The name of the service.",
             "nullable": true
           },
-          "description": {
+          "Description": {
             "type": "string",
             "description": "The description of the service.",
             "nullable": true
           },
-          "amount": {
+          "Amount": {
             "type": "integer",
             "description": "The total amount for this service.",
             "format": "int64"
           },
-          "products": {
+          "Products": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Product"
             },
-            "description": "(Optional) A list of specific products under this service.",
+            "description": "(Optional) A list of specific products under this service. If at least one Products field is provided, all Product fields become required.",
             "nullable": true
           }
         },

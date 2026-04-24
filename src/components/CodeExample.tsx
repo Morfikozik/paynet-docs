@@ -20,7 +20,7 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
   const [isLoading, setIsLoading] = useState(true);
   const [parameterValues, setParameterValues] = useState<Record<string, Record<string, string>>>({});
   const [requestBodyValue, setRequestBodyValue] = useState<Record<string, string>>({});
-  const [showParameterInput, setShowParameterInput] = useState(false);
+  const [showParameterInput, setShowParameterInput] = useState(true);
   const [isTestingApi, setIsTestingApi] = useState(false);
   const [testResponses, setTestResponses] = useState<Record<string, ApiTestResponse>>({});
   const [showTestResponse, setShowTestResponse] = useState<Record<string, boolean>>({});
@@ -421,8 +421,8 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
                     value={currentRequestBodyValue}
                     onChange={(e) => handleRequestBodyChange(e.target.value)}
                     placeholder={t.common.enterJsonRequestBody}
-                    rows={8}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows={14}
+                    className="w-full min-h-[22rem] px-3 py-2 border border-gray-300 rounded-md text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <div className="flex justify-between items-center mt-2">
                     <span className="text-xs text-gray-500">

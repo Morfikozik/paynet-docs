@@ -32,8 +32,8 @@
 				}
 			},
 			"ru": {
-				"title": "Портал Документации API1",
-				"description": "API для Системы Переводов Платежей2",
+				"title": "Портал Документации API",
+				"description": "API для Системы Переводов Платежей",
 				"contact": {
 					"name": "Поддержка API",
 					"email": "support@paynet.md",

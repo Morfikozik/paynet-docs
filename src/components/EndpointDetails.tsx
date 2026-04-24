@@ -111,7 +111,6 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
     const jsonContent = requestBody.content['application/json'];
     const fallbackContent = Object.values(requestBody.content)[0] as any;
     const selectedContent = jsonContent || fallbackContent;
-
     if (!selectedContent) return [];
 
     const example = selectedContent.example && typeof selectedContent.example === 'object'
@@ -120,55 +119,84 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
 
     const directSchema = resolveSchemaRef(selectedContent.schema);
     const matchedSchema = directSchema || (example ? findBestMatchingComponentSchema(example) : null);
-    const requiredFields = new Set(matchedSchema?.required || []);
 
-    const schemaRows = matchedSchema?.properties
-      ? Object.entries(matchedSchema.properties).map(([schemaName, schemaProp]: [string, any]) => {
-          const exampleName = example
-            ? Object.keys(example).find(key => normalizePropertyName(key) === normalizePropertyName(schemaName))
-            : undefined;
-          const displayName = exampleName || schemaName;
-          const baseType = schemaProp?.type || (schemaProp?.$ref ? 'object' : 'unknown');
-          const type = baseType;
+    type RequestBodyRow = {
+      name: string;
+      type: string;
+      in: 'body';
+      required: boolean;
+      description: string;
+    };
 
-          return {
-            name: displayName,
-            type,
-            in: 'body',
-            required: requiredFields.has(schemaName),
-            description: translateOpenApiDescription(schemaProp?.description, language) || t.common.description,
-          };
-        })
-      : [];
+    const rows: RequestBodyRow[] = [];
+    const seen = new Set<string>();
 
-    const schemaNormalizedNames = new Set(
-      schemaRows.map(item => normalizePropertyName(item.name))
-    );
-    const exampleOnlyRows = example
-      ? Object.entries(example)
-          .filter(([name]) => !schemaNormalizedNames.has(normalizePropertyName(name)))
-          .map(([name, value]) => ({
-            name,
-            type: inferType(value),
-            in: 'body',
-            required: false,
-            description: t.common.description,
-          }))
-      : [];
+    const getRowType = (schemaNode: any, value: unknown): string => {
+      if (schemaNode?.type) return schemaNode.type;
+      if (schemaNode?.$ref) return 'object';
+      return inferType(value);
+    };
 
-    if (schemaRows.length > 0 || exampleOnlyRows.length > 0) {
-      return [...schemaRows, ...exampleOnlyRows];
+    const addRow = (row: RequestBodyRow) => {
+      if (seen.has(row.name)) return;
+      seen.add(row.name);
+      rows.push(row);
+    };
+
+    const walk = (
+      schemaNode: any,
+      exampleNode: unknown,
+      parentPath = '',
+      required = false,
+      preferredName?: string,
+    ) => {
+      const resolvedNode = resolveSchemaRef(schemaNode);
+      const nodeType = getRowType(resolvedNode, exampleNode);
+
+      if (parentPath) {
+        addRow({
+          name: parentPath,
+          type: nodeType,
+          in: 'body',
+          required,
+          description: translateOpenApiDescription(resolvedNode?.description, language) || t.common.description,
+        });
+      }
+
+      if (nodeType === 'object') {
+        const schemaProps = resolvedNode?.properties || {};
+        const requiredSet = new Set(resolvedNode?.required || []);
+        const exampleObj = exampleNode && typeof exampleNode === 'object' && !Array.isArray(exampleNode)
+          ? (exampleNode as Record<string, unknown>)
+          : {};
+
+        const schemaKeys = Object.keys(schemaProps);
+        const exampleKeys = Object.keys(exampleObj);
+        const allKeys = Array.from(new Set([...schemaKeys, ...exampleKeys]));
+
+        allKeys.forEach((schemaKey) => {
+          const propSchema = schemaProps[schemaKey];
+          const exampleKey = exampleKeys.find((k) => normalizePropertyName(k) === normalizePropertyName(schemaKey)) || schemaKey;
+          const displayName = preferredName || exampleKey;
+          const nextPath = parentPath ? `${parentPath}.${displayName}` : displayName;
+          walk(propSchema, exampleObj[exampleKey], nextPath, requiredSet.has(schemaKey), exampleKey);
+        });
+        return;
+      }
+
+      if (nodeType === 'array') {
+        const arraySchema = resolveSchemaRef(resolvedNode?.items);
+        const firstItem = Array.isArray(exampleNode) && exampleNode.length > 0 ? exampleNode[0] : undefined;
+        const itemPath = `${parentPath}[]`;
+        walk(arraySchema, firstItem, itemPath, required);
+      }
+    };
+
+    if (matchedSchema || example) {
+      walk(matchedSchema, example, '', false);
     }
 
-    return example
-      ? Object.entries(example).map(([name, value]) => ({
-          name,
-          type: inferType(value),
-          in: 'body',
-          required: false,
-            description: t.common.description,
-        }))
-      : [];
+    return rows;
   }, [requestBody, spec, t.common.description, language]);
   
   // Set initial active response code - prefer 200, then first available

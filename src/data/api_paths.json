@@ -12,17 +12,17 @@
 						{
 							"language": "en",
 							"name": "Authentication and authorization.",
-							"description": "To access Paynet service and pass authorization, you need to get token authorization. You can get this token by calling the service method described below, specifying the parameters (username and password) received during partner registration."
+							"description": "To access the Paynet service and complete authorization, you need to obtain an authorization token. You can get this token by calling the service method described below and providing the parameters (username and password) received during partner registration."
 						},
 						{
 							"language": "ro",
 							"name": "Autentificare și autorizare.",
-							"description": "În esență, aceasta este o metodă de referință de bază, care permite obținerea informațiilor generale despre utilizatorii din sistem. rr"
+							"description": "Pentru a accesa serviciul Paynet și a finaliza autorizarea, trebuie să obțineți un token de autorizare. Acest token se obține apelând metoda serviciului descrisă mai jos și transmițând parametrii (username și password) primiți la înregistrarea partenerului."
 						},
 						{
 							"language": "ru",
 							"name": "Аутентификация и авторизация.",
-							"description": "Для доступа к сервису Paynet и прохождения авторизации необходимо получить токен авторизации. Получить токен можно, вызвав метод сервиса, описанный ниже, указав параметры (имя пользователя и пароль), полученные при регистрации партнёра."
+							"description": "Для доступа к сервису Paynet и прохождения авторизации необходимо получить токен авторизации. Этот токен можно получить, вызвав метод сервиса, описанный ниже, и передав параметры (username и password), полученные при регистрации партнера."
 						}
 					],
 					"responses": {
@@ -68,17 +68,17 @@
 						{
 							"language": "en",
 							"name": "Create an order",
-							"description": "In this model, identification and establishment of communication between the Partner’s servers and Paynet is required. Signing data is not required. The Partner’s system will transmit the payment information by contacting Payments. As a result, Partner will receive a payment ID, through which the Partner will be able to send the client to the Paynet payment form to confirm and pay the payment."
+							"description": "In order to perform a payment via Paynet API, the payment must first be registered in the Paynet system. The Create order method is used to create (register) a new payment order by transmitting the required payment details from the Partner’s system to Paynet. Upon successful registration, Paynet generates and returns a unique payment identifier (Payment ID). This Payment ID is then used to redirect the customer to the Paynet payment page, where the user can review, confirm, and complete the payment. In this model, direct server-to-server communication between the Partner and Paynet is required. Data signing is not mandatory, as authentication is handled via an authorization token."
 						},
 						{
 							"language": "ro",
 							"name": "Creați o plată.",
-							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
+							"description": "Pentru a efectua o plată prin API-ul Paynet, plata trebuie mai întâi înregistrată în sistemul Paynet. Metoda Create order este utilizată pentru a crea (înregistra) o comandă nouă de plată prin transmiterea către Paynet a datelor de plată necesare din sistemul Partenerului. După înregistrarea cu succes, Paynet generează și returnează un identificator unic al plății (Payment ID). Acest Payment ID este apoi folosit pentru redirecționarea clientului către pagina de plată Paynet, unde utilizatorul poate verifica, confirma și finaliza plata. În acest model este necesară comunicarea directă server-to-server între Partener și Paynet. Semnarea datelor nu este obligatorie, deoarece autentificarea se face prin token de autorizare."
 						},
 						{
 							"language": "ru",
 							"name": "Создание операции",
-							"description": "В этой модели требуется идентификация и установление связи между серверами Партнёра и Paynet. Подписание данных не требуется. Система Партнёра передаст информацию о платёже, обратившись в Payments. В результате Партнёр получит идентификатор платежа, по которому сможет перенаправить клиента на платёжную форму Paynet для подтверждения и оплаты."
+							"description": "Чтобы выполнить оплату через API Paynet, платеж сначала необходимо зарегистрировать в системе Paynet. Метод Create order используется для создания (регистрации) нового платежного заказа путем передачи необходимых платежных данных из системы Партнера в Paynet. После успешной регистрации Paynet формирует и возвращает уникальный идентификатор платежа (Payment ID). Далее этот Payment ID используется для перенаправления клиента на платежную страницу Paynet, где пользователь может проверить данные, подтвердить и завершить оплату. В этой модели требуется прямое взаимодействие сервер-сервер между Партнером и Paynet. Подписание данных не является обязательным, так как аутентификация выполняется через авторизационный токен."
 						}
 					],
 					"request": {},
@@ -203,17 +203,17 @@
 						{
 							"language": "en",
 							"name": "Get a payment info by merchant order id",
-							"description": "In this model, identification and establishment of communication between the Partner’s servers and Paynet is required. Signing data is not required. The Partner’s system will transmit the payment information by contacting Payments. As a result, Partner will receive a payment ID, through which the Partner will be able to send the client to the Paynet payment form to confirm and pay the payment."
+							"description": "The get payments by merchant method is used to retrieve a list of payments associated with a specific merchant. To perform this request, the Partner must provide the merchant identifier (MerchantId) in the request URL. Paynet will return a collection of payment records related to the specified merchant, including key details such as payment IDs, amounts, currencies, statuses, and timestamps. This method allows the Partner to monitor transaction activity, track multiple payments, and perform reconciliation for a given merchant within the Paynet system."
 						},
 						{
 							"language": "ro",
-							"name": "Obține informații despre o operație folosind ID-ul comenzii comerciantului.",
-							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
+							"name": "Obține informații despre o tranzacție folosind ID-ul comenzii comerciantului.",
+							"description": "Metoda get payments by merchant este utilizată pentru a obține o listă de plăți asociate unui comerciant specific. Pentru a efectua această solicitare, Partenerul trebuie să transmită identificatorul comerciantului (MerchantId) în URL-ul cererii. Paynet va returna o colecție de înregistrări de plată aferente comerciantului specificat, inclusiv detalii cheie precum ID-uri de plată, sume, valute, statusuri și marcaje de timp. Această metodă permite Partenerului să monitorizeze activitatea tranzacțiilor, să urmărească mai multe plăți și să efectueze reconcilierea pentru un comerciant în sistemul Paynet."
 						},
 						{
 							"language": "ru",
 							"name": "Получить операцию по ИД заказа мерчанта.",
-							"description": "В этой модели требуется идентификация и установление связи между серверами Партнёра и Paynet. Подписание данных не требуется. Система Партнёра передаст информацию о платёже, обратившись в Payments. В результате Партнёр получит идентификатор платежа, по которому сможет перенаправить клиента на платёжную форму Paynet для подтверждения и оплаты."
+							"description": "Метод get payments by merchant используется для получения списка платежей, связанных с конкретным мерчантом. Для выполнения этого запроса Партнер должен передать идентификатор мерчанта (MerchantId) в URL запроса. Paynet вернет набор платежных записей по указанному мерчанту, включая ключевые данные: ID платежей, суммы, валюты, статусы и временные метки. Этот метод позволяет Партнеру контролировать транзакционную активность, отслеживать несколько платежей и выполнять сверку по конкретному мерчанту в системе Paynet."
 						}
 					],
 					"responses": {
@@ -337,17 +337,17 @@
 						{
 							"language": "en",
 							"name": "Refund a payment",
-							"description": "In this model, identification and establishment of communication between the Partner’s servers and Paynet is required. Signing data is not required. The Partner’s system will transmit the payment information by contacting Payments. As a result, Partner will receive a payment ID, through which the Partner will be able to send the client to the Paynet payment form to confirm and pay the payment."
+							"description": "The refund method is used to return funds for a previously completed payment. To perform a refund, the Partner must send the original PaymentId, refund amount, currency, sale area code, refund type, and the reason for the refund. The refund can be processed as either a full refund or a partial refund, depending on the RefundType and the amount provided in the request. After the refund request is processed, Paynet returns the result of the operation, allowing the Partner to confirm whether the refund was successfully registered and executed in the Paynet system."
 						},
 						{
 							"language": "ro",
 							"name": "Returnarea  plații.",
-							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
+							"description": "Metoda de refund este utilizată pentru a returna fondurile unei plăți finalizate anterior. Pentru a efectua un refund, Partenerul trebuie să transmită PaymentId-ul inițial, suma refund-ului, valuta, codul zonei de vânzare, tipul refund-ului și motivul refund-ului. Refund-ul poate fi procesat fie ca refund total, fie ca refund parțial, în funcție de RefundType și de suma transmisă în cerere. După procesarea cererii de refund, Paynet returnează rezultatul operațiunii, permițând Partenerului să confirme dacă refund-ul a fost înregistrat și executat cu succes în sistemul Paynet."
 						},
 						{
 							"language": "ru",
 							"name": "Отмена операции",
-							"description": "В этой модели требуется идентификация и установление связи между серверами Партнёра и Paynet. Подписание данных не требуется. Система Партнёра передаст информацию о платёже, обратившись в Payments. В результате Партнёр получит идентификатор платежа, по которому сможет перенаправить клиента на платёжную форму Paynet для подтверждения и оплаты."
+							"description": "Метод refund используется для возврата средств по ранее завершенному платежу. Для выполнения refund Партнер должен передать исходный PaymentId, сумму возврата, валюту, код торговой зоны, тип refund и причину возврата. Refund может быть выполнен как полный или как частичный — в зависимости от RefundType и суммы, переданной в запросе. После обработки запроса на refund Paynet возвращает результат операции, что позволяет Партнеру подтвердить, что возврат был успешно зарегистрирован и выполнен в системе Paynet."
 						}
 					],
 					"responses": {
@@ -414,17 +414,17 @@
 						{
 							"language": "en",
 							"name": "Delete linken card",
-							"description": "The method performs deactivation and deletion of the card token in the system. As a result, the card is unlinked from the user account, and the token becomes invalid, preventing any further use in payment operations, including recurring charges."
+							"description": "The delete linked card method is used to deactivate and remove a previously linked card from the Paynet system. When this method is executed, the specified card token is permanently invalidated, and the card is unlinked from the customer account. As a result, the token can no longer be used for any payment operations, including recurring or one-click payments. To perform this request, the Partner must provide the unique card identifier (CardLinkHash), the corresponding SaleAreaCode, and the CustomerCode associated with the card. This method ensures that sensitive payment credentials are securely removed and prevents any further unauthorized or unintended use."
 						},
 						{
 							"language": "ro",
 							"name": "Deconectați un card atașat",
-							"description": "Metoda realizează dezactivarea și ștergerea tokenului cardului în sistem. În urma acestei operațiuni, cardul este deconectat de la contul utilizatorului, iar tokenul își pierde valabilitatea, ceea ce exclude posibilitatea utilizării ulterioare a acestuia în operațiuni de plată, inclusiv plăți recurente."
+							"description": "Metoda delete linked card este utilizată pentru a dezactiva și elimina un card legat anterior din sistemul Paynet. La executarea acestei metode, tokenul cardului specificat este invalidat permanent, iar cardul este deconectat de la contul clientului. Ca rezultat, tokenul nu mai poate fi utilizat pentru nicio operațiune de plată, inclusiv plăți recurente sau one-click. Pentru a efectua această solicitare, Partenerul trebuie să transmită identificatorul unic al cardului (CardLinkHash), SaleAreaCode corespunzător și CustomerCode asociat cardului. Această metodă asigură eliminarea securizată a credențialelor sensibile de plată și previne orice utilizare ulterioară neautorizată sau neintenționată."
 						},
 						{
 							"language": "ru",
 							"name": "Удаление токена карты",
-							"description": "Метод выполняет деактивацию и удаление токена карты в системе. В результате карта отвязывается от учетной записи пользователя, а токен утрачивает валидность, что исключает возможность его дальнейшего использования в платежных операциях, включая рекуррентные списания. "
+							"description": "Метод delete linked card используется для деактивации и удаления ранее привязанной карты из системы Paynet. При выполнении этого метода указанный токен карты безвозвратно инвалидируется, а карта отвязывается от аккаунта клиента. В результате токен больше не может использоваться для каких-либо платежных операций, включая рекуррентные или one-click платежи. Для выполнения запроса Партнер должен передать уникальный идентификатор карты (CardLinkHash), соответствующий SaleAreaCode и CustomerCode, связанный с картой. Этот метод обеспечивает безопасное удаление чувствительных платежных данных и предотвращает любое дальнейшее несанкционированное или непреднамеренное использование."
 						}
 					],
 					"responses": {
@@ -513,17 +513,17 @@
 						{
 							"language": "en",
 							"name": "Get a payment info by payment id",
-							"description": "In this model, identification and establishment of communication between the Partner’s servers and Paynet is required. Signing data is not required. The Partner’s system will transmit the payment information by contacting Payments. As a result, Partner will receive a payment ID, through which the Partner will be able to send the client to the Paynet payment form to confirm and pay the payment."
+							"description": "The get payment info method is used to retrieve detailed information about a specific payment using its unique identifier (PaymentId). To perform this request, the Partner must provide the payment ID in the request URL. Paynet will return the current status of the payment along with all relevant details, such as amount, currency, transaction status, and associated metadata. This method allows the Partner to verify the payment status, track transaction progress, and obtain up-to-date information about a previously registered payment."
 						},
 						{
 							"language": "ro",
-							"name": "obține o operație prin ID-ul de plată.",
-							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
+							"name": "Obține informații despre o tranzacție prin ID-ul de plată.",
+							"description": "Metoda get payment info este utilizată pentru a obține informații detaliate despre o plată specifică folosind identificatorul său unic (PaymentId). Pentru a efectua această solicitare, Partenerul trebuie să transmită ID-ul plății în URL-ul cererii. Paynet va returna statusul curent al plății împreună cu toate detaliile relevante, precum suma, valuta, statusul tranzacției și metadatele asociate. Această metodă permite Partenerului să verifice statusul plății, să urmărească progresul tranzacției și să obțină informații actualizate despre o plată înregistrată anterior."
 						},
 						{
 							"language": "ru",
 							"name": "Получить операцию по ID платежа.",
-							"description": "В этой модели требуется идентификация и установление связи между серверами Партнёра и Paynet. Подписание данных не требуется. Система Партнёра передаст информацию о платёже, обратившись в Payments. В результате Партнёр получит идентификатор платежа, по которому сможет перенаправить клиента на платёжную форму Paynet для подтверждения и оплаты."
+							"description": "Метод get payment info используется для получения подробной информации о конкретном платеже по его уникальному идентификатору (PaymentId). Для выполнения этого запроса Партнер должен передать ID платежа в URL запроса. Paynet вернет текущий статус платежа вместе со всеми релевантными деталями, такими как сумма, валюта, статус транзакции и связанные метаданные. Этот метод позволяет Партнеру проверять статус платежа, отслеживать прогресс транзакции и получать актуальную информацию о ранее зарегистрированном платеже."
 						}
 					],
 					"responses": {
@@ -651,7 +651,7 @@
 						},
 						{
 							"language": "ro",
-							"name": "Descărcați declarația.",
+							"name": "Descărcați extras",
 							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
 						},
 						{
@@ -727,12 +727,12 @@
 					"info": [
 						{
 							"language": "en",
-							"name": "Get transaction list",
+							"name": "Get statement",
 							"description": "Retrieves a list of payment transactions for a specified period based on the provided start and end dates. Used for generating statements and transaction reporting."
 						},
 						{
 							"language": "ro",
-							"name": "Obține lista tranzacțiilor",
+							"name": "Obține extras",
 							"description": "Returnează lista tranzacțiilor de plată pentru o perioadă specificată, pe baza datelor de început și sfârșit. Este utilizat pentru generarea extraselor și rapoartelor de tranzacții."
 						},
 						{
@@ -808,18 +808,18 @@
 					"info": [
 						{
 							"language": "en",
-							"name": "Download statement",
-							"description": "In this model, identification and establishment of communication between the Partner’s servers and Paynet is required. Signing data is not required. The Partner’s system will transmit the payment information by contacting Payments. As a result, Partner will receive a payment ID, through which the Partner will be able to send the client to the Paynet payment form to confirm and pay the payment."
+							"name": "Get transaction list",
+							"description": "The get transaction list method is used to retrieve a list of payments within a specified date and time interval. To perform this request, the Partner must provide the from and to parameters in the query string, defining the start and end of the search period. Paynet will return a collection of transactions that were created or processed within the specified timeframe. Each transaction record includes relevant details such as payment ID, amount, currency, status, and timestamps. This method allows the Partner to perform transaction monitoring, reporting, and reconciliation over a defined period."
 						},
 						{
 							"language": "ro",
-							"name": "Descărcați declarația.",
-							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
+							"name": "Obține lista tranzacțiilor",
+							"description": "Metoda get transaction list este utilizată pentru a obține o listă de plăți într-un interval specificat de dată și timp. Pentru a efectua această solicitare, Partenerul trebuie să transmită parametrii from și to în query string, definind începutul și sfârșitul perioadei de căutare. Paynet va returna o colecție de tranzacții care au fost create sau procesate în intervalul specificat. Fiecare înregistrare de tranzacție include detalii relevante precum ID-ul plății, suma, valuta, statusul și marcajele de timp. Această metodă permite Partenerului să efectueze monitorizarea tranzacțiilor, raportarea și reconcilierea pe o perioadă definită."
 						},
 						{
 							"language": "ru",
 							"name": "Скачать выписку",
-							"description": "В этой модели требуется идентификация и установление связи между серверами Партнёра и Paynet. Подписание данных не требуется. Система Партнёра передаст информацию о платёже, обратившись в Payments. В результате Партнёр получит идентификатор платежа, по которому сможет перенаправить клиента на платёжную форму Paynet для подтверждения и оплаты."
+							"description": "Метод get transaction list используется для получения списка платежей за указанный интервал даты и времени. Для выполнения этого запроса Партнер должен передать параметры from и to в query string, определяя начало и конец периода поиска. Paynet вернет набор транзакций, которые были созданы или обработаны в заданном временном диапазоне. Каждая запись транзакции содержит релевантные данные, такие как ID платежа, сумма, валюта, статус и временные метки. Этот метод позволяет Партнеру выполнять мониторинг транзакций, формировать отчетность и проводить сверку за определенный период."
 						}
 					],
 					"responses": {

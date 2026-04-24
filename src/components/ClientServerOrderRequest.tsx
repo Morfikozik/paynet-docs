@@ -1,6 +1,7 @@
 import React from 'react';
 import { FileText, AlertCircle, CheckCircle, Copy, Check, Send } from 'lucide-react';
 import CryptoJS from 'crypto-js';
+import { Language } from '../types/language';
 
 type FieldRow = {
   name: string;
@@ -10,7 +11,145 @@ type FieldRow = {
   description: string;
 };
 
-export const ClientServerOrderRequest: React.FC = () => {
+interface ClientServerOrderRequestProps {
+  language: Language;
+}
+
+export const ClientServerOrderRequest: React.FC<ClientServerOrderRequestProps> = ({ language }) => {
+  const isRu = language === 'ru';
+  const isRo = language === 'ro';
+  const tDesc = (en: string, ru: string, ro: string) => (isRu ? ru : isRo ? ro : en);
+  const parameterDescriptionTranslations: Record<string, { ru: string; ro: string }> = {
+    ExternalID: {
+      ru: 'Идентификатор заказа партнера в вашей системе.',
+      ro: 'Identificatorul comenzii partenerului în sistemul tău.',
+    },
+    Currency: {
+      ru: 'Числовой код валюты ISO 4217 (пример: 498).',
+      ro: 'Cod numeric valută ISO 4217 (exemplu: 498).',
+    },
+    Merchant: {
+      ru: 'PartnerID / MerchantCode.',
+      ro: 'PartnerID / MerchantCode.',
+    },
+    SaleAreaCode: {
+      ru: 'Код торговой зоны партнера; может быть пустым.',
+      ro: 'Codul zonei de vânzare al partenerului; poate fi gol.',
+    },
+    'Customer.Code': {
+      ru: 'Код клиента в системе партнера.',
+      ro: 'Codul clientului în sistemul partenerului.',
+    },
+    'Customer.NameFirst': {
+      ru: 'Имя клиента.',
+      ro: 'Prenumele clientului.',
+    },
+    'Customer.NameLast': {
+      ru: 'Фамилия клиента.',
+      ro: 'Numele de familie al clientului.',
+    },
+    'Customer.PhoneNumber': {
+      ru: 'Номер телефона клиента.',
+      ro: 'Numărul de telefon al clientului.',
+    },
+    'Customer.email': {
+      ru: 'Email адрес клиента.',
+      ro: 'Adresa de email a clientului.',
+    },
+    ExpiryDate: {
+      ru: 'Время истечения оплаты (ISO 8601).',
+      ro: 'Data/ora expirării plății (ISO 8601).',
+    },
+    'Services[].Name': {
+      ru: 'Название услуги.',
+      ro: 'Denumirea serviciului.',
+    },
+    'Services[].Description': {
+      ru: 'Описание услуги.',
+      ro: 'Descrierea serviciului.',
+    },
+    'Services[].Amount': {
+      ru: 'Сумма услуги в целочисленном формате.',
+      ro: 'Suma serviciului în format întreg.',
+    },
+    'Services[].Products[]': {
+      ru: 'Список товаров, включенных в услугу.',
+      ro: 'Lista produselor incluse în serviciu.',
+    },
+    'Services[].Products[].Amount': {
+      ru: 'Сумма товара в целочисленном формате.',
+      ro: 'Suma produsului în format întreg.',
+    },
+    'Services[].Products[].Barcode': {
+      ru: 'Штрихкод товара.',
+      ro: 'Codul de bare al produsului.',
+    },
+    'Services[].Products[].Code': {
+      ru: 'Код товара у партнера.',
+      ro: 'Codul produsului în sistemul partenerului.',
+    },
+    'Services[].Products[].Description': {
+      ru: 'Расширенное описание товара.',
+      ro: 'Descriere extinsă a produsului.',
+    },
+    'Services[].Products[].GroupId': {
+      ru: 'Идентификатор группы товара.',
+      ro: 'Identificatorul grupului de produse.',
+    },
+    'Services[].Products[].GroupName': {
+      ru: 'Название группы товара.',
+      ro: 'Denumirea grupului de produse.',
+    },
+    'Services[].Products[].LineNo': {
+      ru: 'Порядковый номер строки товара.',
+      ro: 'Numărul de ordine al liniei de produs.',
+    },
+    'Services[].Products[].Name': {
+      ru: 'Название товара.',
+      ro: 'Denumirea produsului.',
+    },
+    'Services[].Products[].UnitPrice': {
+      ru: 'Цена одной единицы в целочисленном формате.',
+      ro: 'Prețul unei unități în format întreg.',
+    },
+    'Services[].Products[].Quantity': {
+      ru: 'Количество единиц товара.',
+      ro: 'Cantitatea unităților de produs.',
+    },
+    'Services[].Products[].UnitProduct': {
+      ru: 'Тип / единица измерения товара.',
+      ro: 'Tipul / unitatea de măsură a produsului.',
+    },
+    'MoneyType.Code': {
+      ru: 'Код платежного инструмента (пример: PAYNET).',
+      ro: 'Codul instrumentului de plată (exemplu: PAYNET).',
+    },
+    LinkUrlSuccess: {
+      ru: 'URL для редиректа после успешной оплаты.',
+      ro: 'URL de redirecționare după plata reușită.',
+    },
+    LinkUrlCancel: {
+      ru: 'URL для редиректа при отмене оплаты.',
+      ro: 'URL de redirecționare la anularea plății.',
+    },
+    Lang: {
+      ru: 'Язык интерфейса платежной страницы (пример: RO или RU или EN).',
+      ro: 'Limba interfeței paginii de plată (exemplu: RO sau RU sau EN).',
+    },
+    SignVersion: {
+      ru: 'Версия алгоритма подписи, используйте v05.',
+      ro: 'Versiunea algoritmului de semnare, folosește v05.',
+    },
+    Signature: {
+      ru: 'Base64(MD5(PreparedString + SecretKey)).',
+      ro: 'Base64(MD5(PreparedString + SecretKey)).',
+    },
+  };
+  const getLocalizedParameterDescription = (name: string, fallback: string) => {
+    const localized = parameterDescriptionTranslations[name];
+    if (!localized) return fallback;
+    return tDesc(fallback, localized.ru, localized.ro);
+  };
   const requestUrl = 'https://test.paynet.md/acquiring/SetEcom';
   const liveRequestUrl = 'https://paynet.md/acquiring/SetEcom';
   const merchantCode = '265505';
@@ -300,14 +439,14 @@ ${inputs}
       <div className="mb-4 sm:mb-8">
         <div className="flex items-center gap-3 mb-2 sm:mb-3">
           <span className="text-xs font-mono px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">POST</span>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Order request v0.5</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Order request v0.5 (old)</h1>
         </div>
       </div>
 
       <div className="bg-gradient-to-r from-paynet-light to-paynet-gray-50 rounded-paynet border border-paynet-gray-200 overflow-hidden w-full max-w-none">
         <div className="w-full p-4 sm:p-6 flex items-center gap-3">
           <FileText className="w-5 h-5 text-paynet-primary" />
-          <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary">Order request v0.5</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary">Order request v0.5 (old)</h2>
         </div>
 
         <div className="p-4 sm:p-6 pt-0">
@@ -316,8 +455,11 @@ ${inputs}
             <div className="mb-6 bg-white p-4 rounded-lg border border-paynet-gray-200">
               <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Method Description</h3>
               <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed">
-                Creates a client-server payment request for Paynet `SetEcom` flow, generates a `v05` signature
-                from the payload and secret key, and allows you to send the signed request for integration testing.
+                {tDesc(
+                  'Creates a client-server payment request for Paynet `SetEcom` flow, generates a `v05` signature from the payload and secret key, and allows you to send the signed request for integration testing.',
+                  'Создаёт client-server платёжный запрос для сценария Paynet `SetEcom`, генерирует подпись `v05` на основе payload и secret key и позволяет отправить подписанный запрос для интеграционного тестирования.',
+                  'Creează o cerere de plată client-server pentru fluxul Paynet `SetEcom`, generează semnătura `v05` din payload și cheia secretă și permite trimiterea cererii semnate pentru testarea integrării.',
+                )}
               </p>
             </div>
 
@@ -387,7 +529,9 @@ ${inputs}
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.description}</td>
+                        <td className="px-4 py-3 text-sm text-paynet-gray-700">
+                          {getLocalizedParameterDescription(row.name, row.description)}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -398,13 +542,21 @@ ${inputs}
             <div className="mb-6 bg-white p-4 rounded-lg border border-paynet-gray-200">
               <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Signature generation</h3>
               <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed mb-3">
-                Signature for `v05` is generated using formula:
+                {tDesc(
+                  'Signature for `v05` is generated using formula:',
+                  'Подпись для `v05` формируется по формуле:',
+                  'Semnătura pentru `v05` se generează după formula:',
+                )}
               </p>
               <pre className="bg-paynet-gray-900 text-paynet-gray-100 p-3 rounded-md text-xs sm:text-sm overflow-x-auto mb-3">
 {`Signature = Base64(MD5(PreparedString + SecretKey))`}
               </pre>
               <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed mb-2">
-                `PreparedString` is formed in a strict order:
+                {tDesc(
+                  '`PreparedString` is formed in a strict order:',
+                  '`PreparedString` формируется в строгом порядке:',
+                  '`PreparedString` este format în ordine strictă:',
+                )}
               </p>
               <pre className="bg-paynet-gray-900 text-paynet-gray-100 p-3 rounded-md text-xs sm:text-sm overflow-x-auto mb-3 whitespace-pre-wrap">
 {`Currency +
@@ -416,7 +568,11 @@ for each Product: Product.Amount + Product.Barcode + Product.Code + Product.Desc
 Product.GroupId + Product.GroupName + Product.LineNo + Product.Name + Product.UnitPrice + Product.UnitProduct`}
               </pre>
               <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed">
-                Field order must not be changed. Empty fields are treated as empty strings.
+                {tDesc(
+                  'Field order must not be changed. Empty fields are treated as empty strings.',
+                  'Порядок полей нельзя изменять. Пустые поля обрабатываются как пустые строки.',
+                  'Ordinea câmpurilor nu trebuie schimbată. Câmpurile goale sunt tratate ca șiruri goale.',
+                )}
               </p>
             </div>
 

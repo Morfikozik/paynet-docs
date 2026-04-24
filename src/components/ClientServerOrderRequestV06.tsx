@@ -1,6 +1,7 @@
 import React from 'react';
 import { FileText, AlertCircle, CheckCircle, Copy, Check, Send } from 'lucide-react';
 import CryptoJS from 'crypto-js';
+import { Language } from '../types/language';
 
 type FieldRow = {
   name: string;
@@ -10,7 +11,133 @@ type FieldRow = {
   description: string;
 };
 
-export const ClientServerOrderRequestV06: React.FC = () => {
+interface ClientServerOrderRequestV06Props {
+  language: Language;
+}
+
+export const ClientServerOrderRequestV06: React.FC<ClientServerOrderRequestV06Props> = ({ language }) => {
+  const isRu = language === 'ru';
+  const isRo = language === 'ro';
+  const tDesc = (en: string, ru: string, ro: string) => (isRu ? ru : isRo ? ro : en);
+  const parameterDescriptionTranslations: Record<string, { ru: string; ro: string }> = {
+    Order: {
+      ru: 'Идентификатор заказа партнера в вашей системе.',
+      ro: 'Identificatorul comenzii partenerului în sistemul tău.',
+    },
+    Currency: {
+      ru: 'Числовой код валюты ISO 4217 (пример: 498).',
+      ro: 'Cod numeric valută ISO 4217 (exemplu: 498).',
+    },
+    Merchant: {
+      ru: 'PartnerID / MerchantCode.',
+      ro: 'PartnerID / MerchantCode.',
+    },
+    SaleAreaCode: {
+      ru: 'Код торговой зоны партнера.',
+      ro: 'Codul zonei de vânzare al partenerului.',
+    },
+    Amount: {
+      ru: 'Сумма платежа.',
+      ro: 'Suma plății.',
+    },
+    Description: {
+      ru: 'Описание заказа/услуги.',
+      ro: 'Descrierea comenzii/serviciului.',
+    },
+    CustomerCode: {
+      ru: 'Код клиента в системе партнера.',
+      ro: 'Codul clientului în sistemul partenerului.',
+    },
+    CustomerNameFirst: {
+      ru: 'Имя клиента.',
+      ro: 'Prenumele clientului.',
+    },
+    CustomerNameLast: {
+      ru: 'Фамилия клиента.',
+      ro: 'Numele de familie al clientului.',
+    },
+    CustomerPhoneNumber: {
+      ru: 'Номер телефона клиента.',
+      ro: 'Numărul de telefon al clientului.',
+    },
+    CustomerEmail: {
+      ru: 'Email адрес клиента.',
+      ro: 'Adresa de email a clientului.',
+    },
+    ExpiryDate: {
+      ru: 'Время истечения оплаты (ISO 8601).',
+      ro: 'Data/ora expirării plății (ISO 8601).',
+    },
+    ProductAmount: {
+      ru: 'Сумма товара.',
+      ro: 'Suma produsului.',
+    },
+    ProductBarcode: {
+      ru: 'Штрихкод товара.',
+      ro: 'Codul de bare al produsului.',
+    },
+    ProductCode: {
+      ru: 'Код товара у партнера.',
+      ro: 'Codul produsului în sistemul partenerului.',
+    },
+    ProductDescription: {
+      ru: 'Описание товара.',
+      ro: 'Descrierea produsului.',
+    },
+    ProductGroupId: {
+      ru: 'Идентификатор группы товара.',
+      ro: 'Identificatorul grupului de produse.',
+    },
+    ProductGroupName: {
+      ru: 'Название группы товара.',
+      ro: 'Denumirea grupului de produse.',
+    },
+    ProductLineNo: {
+      ru: 'Номер строки товара.',
+      ro: 'Numărul liniei produsului.',
+    },
+    ProductName: {
+      ru: 'Название товара.',
+      ro: 'Denumirea produsului.',
+    },
+    ProductUnitPrice: {
+      ru: 'Цена за единицу товара.',
+      ro: 'Prețul unitar al produsului.',
+    },
+    ProductQuantity: {
+      ru: 'Количество товара.',
+      ro: 'Cantitatea produsului.',
+    },
+    ProductUnitProduct: {
+      ru: 'Тип / единица измерения товара.',
+      ro: 'Tipul / unitatea de măsură a produsului.',
+    },
+    LinkUrlCancel: {
+      ru: 'URL для редиректа при отмене оплаты.',
+      ro: 'URL de redirecționare la anularea plății.',
+    },
+    LinkUrlSuccess: {
+      ru: 'URL для редиректа после успешной оплаты.',
+      ro: 'URL de redirecționare după plata reușită.',
+    },
+    Lang: {
+      ru: 'Язык интерфейса платежной страницы (пример: ro).',
+      ro: 'Limba interfeței paginii de plată (exemplu: ro).',
+    },
+    MoneyType: {
+      ru: 'Код платежного инструмента.',
+      ro: 'Codul instrumentului de plată.',
+    },
+    Signature: {
+      ru: 'Base64(MD5(RawData + SecretKey), raw bytes).',
+      ro: 'Base64(MD5(RawData + SecretKey), raw bytes).',
+    },
+  };
+  const getLocalizedParameterDescription = (name: string, fallback: string) => {
+    const localized = parameterDescriptionTranslations[name];
+    if (!localized) return fallback;
+    return tDesc(fallback, localized.ru, localized.ro);
+  };
   const requestUrl = 'https://test.paynet.md/ecom/checkout';
   const liveRequestUrl = 'https://paynet.md/ecom/checkout';
   const merchantCode = '265505';
@@ -287,8 +414,11 @@ ${inputs}
             <div className="mb-6 bg-white p-4 rounded-lg border border-paynet-gray-200">
               <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Method Description</h3>
               <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed">
-                Creates a client-server payment request for Paynet `SetEcom` flow, generates a `v05` signature
-                from the payload and secret key, and allows you to send the signed request for integration testing.
+                {tDesc(
+                  'Creates a client-server payment request for Paynet `SetEcom` flow, generates a `v05` signature from the payload and secret key, and allows you to send the signed request for integration testing.',
+                  'Создаёт client-server платёжный запрос для сценария Paynet `SetEcom`, генерирует подпись `v05` на основе payload и secret key и позволяет отправить подписанный запрос для интеграционного тестирования.',
+                  'Creează o cerere de plată client-server pentru fluxul Paynet `SetEcom`, generează semnătura `v05` din payload și cheia secretă și permite trimiterea cererii semnate pentru testarea integrării.',
+                )}
               </p>
             </div>
 
@@ -358,7 +488,9 @@ ${inputs}
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.description}</td>
+                        <td className="px-4 py-3 text-sm text-paynet-gray-700">
+                          {getLocalizedParameterDescription(row.name, row.description)}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -369,14 +501,22 @@ ${inputs}
             <div className="mb-6 bg-white p-4 rounded-lg border border-paynet-gray-200">
               <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Signature generation</h3>
               <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed mb-3">
-                Signature is generated using sorted parameters, RFC3986 URL encoding, and MD5 (raw bytes):
+                {tDesc(
+                  'Signature is generated using sorted parameters, RFC3986 URL encoding, and MD5 (raw bytes):',
+                  'Подпись формируется из отсортированных параметров с кодированием RFC3986 и MD5 (raw bytes):',
+                  'Semnătura se generează din parametri sortați, cu codare RFC3986 și MD5 (raw bytes):',
+                )}
               </p>
               <pre className="bg-paynet-gray-900 text-paynet-gray-100 p-3 rounded-md text-xs sm:text-sm overflow-x-auto mb-3">
 {`RawData = concat(rawurlencode(value) for all signing fields sorted by key)
 Signature = Base64(MD5(RawData + SecretKey))`}
               </pre>
               <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed mb-2">
-                Signing fields used in v0.6:
+                {tDesc(
+                  'Signing fields used in v0.6:',
+                  'Поля, используемые для подписи в v0.6:',
+                  'Câmpurile folosite la semnare în v0.6:',
+                )}
               </p>
               <pre className="bg-paynet-gray-900 text-paynet-gray-100 p-3 rounded-md text-xs sm:text-sm overflow-x-auto mb-3 whitespace-pre-wrap">
 {`Order, Currency, Merchant, SaleAreaCode, CustomerCode, CustomerNameFirst,
@@ -384,7 +524,11 @@ CustomerNameLast, CustomerPhoneNumber, CustomerEmail, ExpiryDate, Description,
 Amount, LinkUrlCancel, LinkUrlSuccess, Lang, MoneyType`}
               </pre>
               <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed">
-                Keys are sorted alphabetically before concatenation. Any field not present in JSON is skipped.
+                {tDesc(
+                  'Keys are sorted alphabetically before concatenation. Any field not present in JSON is skipped.',
+                  'Ключи сортируются по алфавиту перед конкатенацией. Поля, отсутствующие в JSON, пропускаются.',
+                  'Cheile sunt sortate alfabetic înainte de concatenare. Câmpurile lipsă din JSON sunt omise.',
+                )}
               </p>
             </div>
 

@@ -15,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange, apiI
   return (
     <header className="bg-white border-b border-paynet-gray-200 px-6 py-4 shadow-paynet-lg">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-end gap-3">
           <a 
             href="https://merchant.paynet.md" 
             target="_blank" 
@@ -23,9 +23,9 @@ export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange, apiI
             className="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200"
           >
             <img 
-              src="https://paynet.md/merchant/content/images/logo-paynet.svg" 
+              src="/logos/paynet%20business.svg" 
               alt="PayNet Logo" 
-              className="h-12 w-auto"
+              className="h-8 w-auto"
               onError={(e) => {
                 // Fallback if image fails to load
                 e.currentTarget.style.display = 'none';
@@ -36,9 +36,9 @@ export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange, apiI
               <span className="text-white font-bold text-lg">PN</span>
             </div>
           </a>
-          <div>
-            <span className="text-xs bg-paynet-orange text-white px-2 py-1 rounded-full font-medium">API</span>
-            <p className="text-sm text-paynet-gray-500 font-normal">
+          <div className="ml-3 flex flex-col justify-end leading-none -translate-y-1.5">
+            <span className="text-xs bg-paynet-orange text-white px-2 py-0.5 rounded-full font-medium w-fit mb-0.5">API</span>
+            <p className="text-sm text-paynet-gray-500 font-normal leading-none">
               {apiInfo?.title || 'API Documentation Portal'}
             </p>
           </div>

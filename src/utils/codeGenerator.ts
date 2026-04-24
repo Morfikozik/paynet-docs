@@ -1,4 +1,5 @@
 import { OpenAPISpec, Endpoint } from '../types/api';
+import { getAuthToken } from './apiTester';
 
 // Types for code generation
 interface CodeSnippet {
@@ -156,10 +157,11 @@ function buildRequestObject(endpoint: Endpoint, baseUrl: string, spec: OpenAPISp
   
   // Add authentication headers
   if (spec.components?.securitySchemes) {
-    //----------- add access by tocken for all request exclude the AUTH
-    if(path !== "/auth"){
-        headers['Authorization'] = 'Bearer {{_token_}}';
-    }    
+    // Add token for all requests except auth; fall back to placeholder.
+    if (path !== '/auth') {
+      const token = getAuthToken();
+      headers['Authorization'] = token ? `Bearer ${token}` : 'Bearer {{_token_}}';
+    }
   }
   
   // Add custom headers from parameters
