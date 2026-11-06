@@ -5,6 +5,8 @@ import { resolve } from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Relative base so the build works under any path (e.g. GitHub Pages /paynet-docs/).
+  base: './',
   plugins: [react()],
   optimizeDeps: {
     exclude: ['lucide-react'],

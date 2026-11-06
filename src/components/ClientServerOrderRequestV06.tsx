@@ -3,6 +3,14 @@ import { FileText, AlertCircle, CheckCircle, Copy, Check, Send } from 'lucide-re
 import CryptoJS from 'crypto-js';
 import { Language } from '../types/language';
 
+// Default order expiry: end of tomorrow (local time), so the sample request never ships already expired.
+const getDefaultExpiryDate = (): string => {
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T23:59:59`;
+};
+
 type FieldRow = {
   name: string;
   type: string;
@@ -157,7 +165,7 @@ export const ClientServerOrderRequestV06: React.FC<ClientServerOrderRequestV06Pr
     CustomerNameLast: 'Last name',
     CustomerPhoneNumber: '060000000',
     CustomerEmail: 'test@gmail.com',
-    ExpiryDate: '2026-12-31T23:59:59',
+    ExpiryDate: getDefaultExpiryDate(),
     ProductAmount: 100,
     ProductBarcode: 13243546,
     ProductCode: 'PRODUCT1',
