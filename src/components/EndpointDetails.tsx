@@ -337,7 +337,7 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
       </div>
 
       {/* Описание метода из OpenAPI (если есть) */}
-      {endpoint.description && (
+      {endpoint.description && !methodTranslation.description && (
         <div className="mb-8 bg-white p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
           <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary mb-3 sm:mb-4 flex items-center gap-2">
             <span>OpenAPI {t.common.methodDescription}</span>

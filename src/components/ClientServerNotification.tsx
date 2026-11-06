@@ -595,12 +595,12 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
 
       if (!response.ok) {
         const notFound = response.status === 404 || normalizedData?.code === 'NOT_FOUND_RECORD';
-        setPaymentStatusResult(notFound ? "Fail - transaction doesen't exist" : 'fail');
+        setPaymentStatusResult(notFound ? "Fail - transaction doesn't exist" : 'fail');
         return;
       }
 
       if (normalizedData?.code === 'NOT_FOUND_RECORD') {
-        setPaymentStatusResult("Fail - transaction doesen't exist");
+        setPaymentStatusResult("Fail - transaction doesn't exist");
         return;
       }
 
@@ -672,7 +672,7 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
                     <li>{tDesc('Paste your callback URL into `MerchantSystemUrl (callback URL)`.', 'Вставьте ваш callback URL в `MerchantSystemUrl (callback URL)`.', 'Introdu URL-ul tău de callback în `MerchantSystemUrl (callback URL)`.')}</li>
                     <li>{tDesc('Enter the merchant order number (`Order`) you used when creating the payment.', 'Введите номер заказа мерчанта (`Order`), который вы указали при создании платежа.', 'Introdu numărul comenzii comerciantului (`Order`) folosit la crearea plății.')}</li>
                     <li>{tDesc("Click `Get` to load transaction state from `GET /api/order/merchant/{'{id}'}`.", "Нажмите `Get`, чтобы загрузить состояние транзакции через `GET /api/order/merchant/{'{id}'}`.", "Apasă `Get` pentru a încărca starea tranzacției din `GET /api/order/merchant/{'{id}'}`.")}</li>
-                    <li>{tDesc("Check business status (`paid` / `fail` / `Fail - transaction doesen&apos;t exist`).", "Проверьте бизнес-статус (`paid` / `fail` / `Fail - transaction doesen&apos;t exist`).", "Verifică statusul business (`paid` / `fail` / `Fail - transaction doesen&apos;t exist`).")}</li>
+                    <li>{tDesc("Check business status (`paid` / `fail` / `Fail - transaction doesn't exist`).", "Проверьте бизнес-статус (`paid` / `fail` / `Fail - transaction doesn't exist`).", "Verifică statusul business (`paid` / `fail` / `Fail - transaction doesn't exist`).")}</li>
                     <li>{tDesc('Click `Send notification` to post callback payload to your URL and verify signature.', 'Нажмите `Send notification`, чтобы отправить callback payload на ваш URL и проверить подпись.', 'Apasă `Send notification` pentru a trimite payload-ul callback către URL-ul tău și a verifica semnătura.')}</li>
                   </ol>
                 </div>

@@ -1,3 +1,4 @@
+import { freshenRequestExample } from './sampleData';
 import { OpenAPISpec, Endpoint } from '../types/api';
 import { getAuthToken } from './apiTester';
 
@@ -213,7 +214,7 @@ function buildRequestObject(endpoint: Endpoint, baseUrl: string, spec: OpenAPISp
           }
         } else if (requestBody.content['application/json'].example) {
           // Use provided example
-          body = requestBody.content['application/json'].example;
+          body = freshenRequestExample(requestBody.content['application/json'].example);
         } else if (requestBody.content['application/json'].schema) {
           // Generate from schema
           body = generateExampleFromSchema(requestBody.content['application/json'].schema);

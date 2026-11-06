@@ -417,9 +417,9 @@ ${inputs}
               <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Method Description</h3>
               <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed">
                 {tDesc(
-                  'Creates a client-server payment request for Paynet `SetEcom` flow, generates a `v05` signature from the payload and secret key, and allows you to send the signed request for integration testing.',
-                  'Создаёт client-server платёжный запрос для сценария Paynet `SetEcom`, генерирует подпись `v05` на основе payload и secret key и позволяет отправить подписанный запрос для интеграционного тестирования.',
-                  'Creează o cerere de plată client-server pentru fluxul Paynet `SetEcom`, generează semnătura `v05` din payload și cheia secretă și permite trimiterea cererii semnate pentru testarea integrării.',
+                  'Creates a hosted checkout (client-server) payment request for `/ecom/checkout` (protocol v0.6), signs it with the secret key and opens the Paynet test payment page in a new tab. See the Hosted checkout and Signatures guides for the algorithm and test vectors.',
+                  'Создаёт платёжный запрос hosted checkout (client-server) для `/ecom/checkout` (протокол v0.6), подписывает его секретным ключом и открывает тестовую страницу оплаты Paynet в новой вкладке. Алгоритм и тестовые векторы — в руководствах «Hosted checkout» и «Подписи».',
+                  'Creează o cerere de plată hosted checkout (client-server) pentru `/ecom/checkout` (protocolul v0.6), o semnează cu cheia secretă și deschide pagina de plată de test Paynet într-un tab nou. Algoritmul și vectorii de test sunt în ghidurile „Hosted checkout” și „Semnături”.',
                 )}
               </p>
             </div>

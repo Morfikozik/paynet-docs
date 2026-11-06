@@ -1,66 +1,45 @@
-# Paynet Documentation Portal
+# Paynet Documentation Portal (v2)
 
-A modern, multilingual API documentation portal built with React, TypeScript, and Tailwind CSS.
+Портал документации Paynet E-commerce API: руководства на трёх языках (EN/RU/RO), справочник API с онлайн-тестером и машиночитаемая документация для ИИ-ассистентов.
 
-## Features
+Превью: https://morfikozik.github.io/paynet-docs/ · предыдущая версия: https://morfikozik.github.io/paynet-docs/legacy/
 
-- **Dynamic OpenAPI Loading**: Automatically loads and parses OpenAPI specifications from the `src/openapi/` directory
-- **Multi-language Support**: English, Romanian, and Russian translations
-- **Interactive Documentation**: Browse endpoints, view parameters, responses, and code examples
-- **Multiple Format Support**: Supports both JSON and YAML OpenAPI specifications
-- **Responsive Design**: Works seamlessly across desktop and mobile devices
-- **Code Examples**: Generate code examples in multiple programming languages (cURL, JavaScript, Python, PHP, Java, C#)
+## Где что лежит
 
-## Adding New API Specifications
+| Путь | Что это |
+|---|---|
+| `content/<en\|ru\|ro>/NN-slug.md` | **Руководства.** Единый источник текста и для портала, и для файлов ИИ. Номер `NN` задаёт порядок в меню. |
+| `src/openapi/openapi.json` | Спецификация server-to-server API (тестер, справочник, `openapi.json`). |
+| `src/data/api_paths.json` | Названия и описания методов на трёх языках, примеры ответов. |
+| `scripts/build-ai-docs.mjs` | Генерирует `llms.txt`, `llms-full.txt`, `docs/*.md`, `openapi.json` в `public/`. |
+| `scripts/check-docs.mjs` | Проверки: тестовые векторы подписей, примеры кода, HTML-форма, ссылки, одинаковый набор страниц во всех языках. |
+| `scripts/lib/signatures.mjs` | Эталонные алгоритмы подписи (checkout v0.6 и уведомления). |
+| `src/components/GuidePage.tsx`, `Markdown.tsx` | Отображение руководств на портале. |
+| `.github/workflows/deploy.yml` | Сборка, проверки, скриншоты и публикация на GitHub Pages. |
 
-To add a new API specification:
+## Как изменить текст
 
-1. Create a new file in the `src/openapi/` directory
-2. Use either `.json`, `.yaml`, or `.yml` extension
-3. Ensure the file contains a valid OpenAPI 3.0+ specification
-4. The application will automatically detect and load the new specification
+1. Отредактируйте нужный файл в `content/en/`, затем ту же страницу в `content/ru/` и `content/ro/`.
+2. Новая страница — новый файл `NN-slug.md` **во всех трёх папках** (иначе сборка упадёт).
+3. Ссылка на другую страницу: `[текст](#/guides/slug)`.
+4. Неподтверждённые факты помечайте блоком `> **Draft:** …` (`**Черновик:**`, `**Ciornă:**`).
+5. После push сайт пересобирается сам за 2–3 минуты.
 
-### Example file structure:
-```
-src/openapi/
-├── tps.yaml          # Main TPS API specification
-├── payments.json     # Additional payments API
-└── users.yaml        # User management API
-```
-
-## Development
+## Локальный запуск (для разработчиков)
 
 ```bash
-# Install dependencies
-npm install
-
-# Start development server
+npm ci
+node scripts/check-docs.mjs
+node scripts/build-ai-docs.mjs
 npm run dev
-
-# Build for production
-npm run build
 ```
 
-## File Formats Supported
+## Откат
 
-- **JSON**: Standard JSON format OpenAPI specifications
-- **YAML**: YAML format OpenAPI specifications (recommended for readability)
+- Исходная версия, полученная в архиве, сохранена в ветке `backup/v1-original` и всегда доступна по адресу `/legacy/`.
+- Вернуть сайт целиком к исходной версии: `git checkout main && git reset --hard backup/v1-original && git push --force` (потребуется вернуть и `.github/workflows/deploy.yml` из `main`, чтобы публикация продолжала работать). Проще — попросить Claude выполнить откат.
+- Откатить отдельное изменение: `git revert <commit>`.
 
-## Automatic Features
+## Открытые вопросы к Paynet
 
-- **Hot Reload**: Changes to OpenAPI files are automatically detected during development
-- **Validation**: Invalid OpenAPI specifications are automatically filtered out with console warnings
-- **Fallback**: If no valid specifications are found, the application falls back to the built-in sample data
-
-## Project Structure
-
-```
-src/
-├── openapi/          # OpenAPI specification files
-├── components/       # React components
-├── hooks/           # Custom React hooks
-├── utils/           # Utility functions
-├── locales/         # Translation files
-├── data/            # Static data and fallback content
-└── types/           # TypeScript type definitions
-```
+Список вопросов, которые нужно подтвердить перед публикацией, — в [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md).
