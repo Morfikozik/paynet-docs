@@ -23,7 +23,7 @@ export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange, apiI
             className="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200"
           >
             <img 
-              src="/logos/paynet%20business.svg" 
+              src="logos/paynet_business.svg" 
               alt="PayNet Logo" 
               className="h-8 w-auto"
               onError={(e) => {

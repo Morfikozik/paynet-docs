@@ -10,32 +10,32 @@ type PluginItem = {
 const plugins: PluginItem[] = [
   {
     name: 'Shopify',
-    logoUrl: '/logos/shopify.png',
+    logoUrl: 'logos/shopify.png',
     downloadUrl: 'https://developer.cybersource.com/technology-partners/Shopify_Managed.html',
   },
   {
     name: 'WordPress',
-    logoUrl: '/logos/wordpress.png',
+    logoUrl: 'logos/wordpress.png',
     downloadUrl: 'https://info.paynet.md/plugin/cms-wordpress.zip',
   },
   {
     name: 'OpenCart',
-    logoUrl: '/logos/opencart.png',
+    logoUrl: 'logos/opencart.png',
     downloadUrl: 'https://info.paynet.md/plugin/cms-opencart.zip',
   },
   {
     name: 'CS-Cart',
-    logoUrl: '/logos/cscart.png',
+    logoUrl: 'logos/cscart.png',
     downloadUrl: 'https://info.paynet.md/plugin/cms-cscart.zip',
   },
   {
     name: 'PrestaShop',
-    logoUrl: '/logos/prestashop.png',
+    logoUrl: 'logos/prestashop.png',
     downloadUrl: 'https://info.paynet.md/plugin/cms-prestashop.zip',
   },
   {
     name: 'Magento',
-    logoUrl: '/logos/magento.png',
+    logoUrl: 'logos/magento.png',
     downloadUrl: 'https://info.paynet.md/plugin/cms-magento.zip',
   },
 ];

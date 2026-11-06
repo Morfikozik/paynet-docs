@@ -1,4 +1,4 @@
-# TPS API Documentation Portal
+# Paynet Documentation Portal
 
 A modern, multilingual API documentation portal built with React, TypeScript, and Tailwind CSS.
 
