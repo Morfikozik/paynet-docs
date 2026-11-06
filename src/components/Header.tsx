@@ -1,5 +1,7 @@
 import React from 'react';
+import { Bot } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { guideUiText } from '../content/guides';
 import { Language } from '../types/language';
 
 interface HeaderProps {
@@ -44,10 +46,22 @@ export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange, apiI
           </div>
         </div>
         
-        <LanguageSwitcher
-          currentLanguage={language}
-          onLanguageChange={onLanguageChange}
-        />
+        <div className="flex items-center gap-3">
+          <a
+            href="llms-full.txt"
+            target="_blank"
+            rel="noopener noreferrer"
+            title={guideUiText[language].forAiHint}
+            className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-paynet border border-paynet-primary text-paynet-primary hover:bg-paynet-light transition-colors"
+          >
+            <Bot className="w-4 h-4" />
+            {guideUiText[language].forAi}
+          </a>
+          <LanguageSwitcher
+            currentLanguage={language}
+            onLanguageChange={onLanguageChange}
+          />
+        </div>
       </div>
     </header>
   );

@@ -5,8 +5,6 @@ export interface TranslationResources {
     search: string;
     endpoints: string;
     projectInfo: string;
-    parameters: string;
-    responses: string;
     codeExamples: string;
     name: string;
     type: string;

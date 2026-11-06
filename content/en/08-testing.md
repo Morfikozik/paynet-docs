@@ -1,0 +1,53 @@
+# Testing
+
+## Test environment
+
+| Item | Value |
+|---|---|
+| API base URL | `https://ecom-api-test.paynet.md` |
+| Hosted checkout URL | `https://test.paynet.md/ecom/checkout` |
+| API username / password | `771064` / `sLgMnGWJ` |
+| Merchant code | `265505` |
+| Sale area code | `onlidocumentation_md` |
+| Hosted checkout secret key | `F90D6485-9CCC-458B-96A3-8958AF9B4458` |
+| Notification secret key | `D9873689-E5F8-4272-A67F-0D8BA3F9BAA7` |
+
+These credentials are shared by everyone testing on this portal: other people's test payments are visible in searches and statements. Ask Paynet for your own test merchant if you need an isolated environment.
+
+## Test card
+
+| Card | Expiry | CVV | Result |
+|---|---|---|---|
+| Visa `4111 1111 1111 1111` | `12/27` | `777` | successful payment |
+
+> **Draft:** test cards for declined payments and 3-D Secure scenarios are not published yet. Ask Paynet if you need them.
+
+## Rules that make tests fail
+
+- **Reused `Order`.** Every order needs a new number. The portal generates one for you (current time in milliseconds).
+- **`ExpiryDate` in the past.** Use a future date. The portal sets it to the end of tomorrow.
+- **Amounts in MDL instead of minor units.** `100` means 1.00 MDL.
+- **Expired token.** Tokens live about 4 hours; call `/auth` again after `401`.
+- **Products don't add up.** If you send `Products`, send all product fields and keep `Amount` values consistent with the service `Amount`.
+
+## Test scenarios
+
+| # | Scenario | How | Expected |
+|---|---|---|---|
+| 1 | Authenticate | `POST /auth` with test credentials | `200`, `access_token` |
+| 2 | Wrong password | `POST /auth` with a wrong password | error `AUTHENTICATION_FAILED` |
+| 3 | Create order | `POST /api/order` | `200`, `paymentId`, `paymentLink`, `status` `1` |
+| 4 | Invalid request | `POST /api/order` without `Services` | `400`, `INVALID_PARAMETER` |
+| 5 | No token | `POST /api/order` without `Authorization` | `401`, `UNAUTHORIZED` |
+| 6 | Pay | open `paymentLink`, pay with the test card | redirect to `LinkUrlSuccess` |
+| 7 | Status | `GET /api/order/merchant/{Order}` | payment with `paidDate` set |
+| 8 | Unknown order | `GET /api/order/{id}` with a random ID | `404`, `NOT_FOUND_RECORD` |
+| 9 | Notification | portal **Notification** simulator → your URL | your handler verifies `Hash`, returns `200` |
+| 10 | Wrong hash | send a notification with a changed `Amount` | your handler rejects it |
+| 11 | Duplicate notification | send the same notification twice | your handler processes it once |
+| 12 | Hosted checkout | portal **Order request v0.6** | Paynet test payment page opens |
+| 13 | Refund | `POST /api/order/refund` for a paid payment | `200` |
+
+## Testing from this portal
+
+The "Test API Request" buttons call the test API directly from your browser. This works on the official portal domain. If you open a copy of the portal from another address, the browser may block the calls (CORS); use cURL or Postman instead. A Postman collection can be downloaded from the sidebar.

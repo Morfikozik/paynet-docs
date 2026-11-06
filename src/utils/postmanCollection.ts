@@ -2,7 +2,6 @@ import { OpenAPISpec } from '../types/api';
 
 type PostmanHeader = { key: string; value: string; type: 'text' };
 type PostmanQuery = { key: string; value: string; description?: string; disabled?: boolean };
-type PostmanVariable = { key: string; value: string; description?: string };
 type PostmanRequest = {
   method: string;
   header: PostmanHeader[];
@@ -45,8 +44,8 @@ const getOperationExample = (operation: any) => {
 const getOperationQueryParams = (operation: any): PostmanQuery[] => {
   const params = Array.isArray(operation?.parameters) ? operation.parameters : [];
   return params
-    .filter((param) => param?.in === 'query' && param?.name)
-    .map((param) => ({
+    .filter((param: any) => param?.in === 'query' && param?.name)
+    .map((param: any) => ({
       key: String(param.name),
       value: '',
       description: param.description || undefined,

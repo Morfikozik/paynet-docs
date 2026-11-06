@@ -1,29 +1,113 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "API Ecom",
-    "version": "v1"
+    "title": "Paynet E-commerce API",
+    "version": "v1",
+    "description": "Server-to-server API for Paynet e-commerce payments (Moldova): create orders, redirect the customer to the Paynet payment page, check payment status, refund, unlink saved cards and download statements.\n\nAuthentication: call POST /auth, then send `Authorization: Bearer <access_token>`.\nAmounts are integers in minor units (100 = 1.00 MDL). Currency is ISO 4217 numeric (498 = MDL).\n`Order` must be unique per payment; `ExpiryDate` must be in the future (YYYY-MM-DDTHH:mm:ss).\n\nGuides, hosted checkout (client-server) and notification (webhook) signatures: see llms-full.txt next to this file."
   },
+  "servers": [
+    {
+      "url": "https://ecom-api-test.paynet.md",
+      "description": "Test environment"
+    }
+  ],
   "paths": {
     "/api/linked-cards/unlink": {
       "post": {
         "tags": [
           "LinkedCard"
         ],
-          "summary": "Unlinks (deletes) a previously saved payment card for a specific customer.",
-          "requestBody": {
+        "summary": "Delete linked card",
+        "requestBody": {
           "description": "The payload containing the details needed to identify and unlink the card.",
           "content": {
             "application/json": {
-							"example": {
-              "CardLinkHash": "1037153_b3f50103610e4fe9948ff8db553151f3",
-              "SaleAreaCode": "",
-              "CustomerCode": "customer_code"
-          }
-						}
+              "example": {
+                "CardLinkHash": "1037153_b3f50103610e4fe9948ff8db553151f3",
+                "SaleAreaCode": "",
+                "CustomerCode": "customer_code"
+              }
+            }
           }
         },
         "responses": {
+          "200": {
+            "description": "Success executed unlink card.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "responseCode": "SUCCESS"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The wrong entred parametrs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 400,
+                  "message": "One or more entered parameters are incorrect.",
+                  "code": "INVALID_PARAMETER",
+                  "traceId": "9b9346f9-f83a-465d-ac8d-dc382c460c22",
+                  "details": "The invalid parameter is: XXXX"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access denied due to invalid or missing authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "Status": 401,
+                  "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+                  "Code": "UNAUTHORIZED",
+                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Access denied due to invalid or missing authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Record not found",
+                  "code": "NOT_FOUND_RECORD",
+                  "traceId": "16ce780d-2e89-47b8-9cd2-6d0d136d9816",
+                  "details": "No records were found for the provided data"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 500,
+                  "message": "One or more errors occurred.",
+                  "code": "TECHNICAL_ERROR",
+                  "traceId": "c546f06c-3674-4b55-8e0f-ce8aac66f49f",
+                  "details": "Please verify the transmitted data and try again, or contact support."
+                }
+              }
+            }
+          },
           "default": {
             "description": "Error",
             "content": {
@@ -34,7 +118,8 @@
               }
             }
           }
-        }
+        },
+        "description": "The delete linked card method is used to deactivate and remove a previously linked card from the Paynet system. When this method is executed, the specified card token is permanently invalidated, and the card is unlinked from the customer account. As a result, the token can no longer be used for any payment operations, including recurring or one-click payments. To perform this request, the Partner must provide the unique card identifier (CardLinkHash), the corresponding SaleAreaCode, and the CustomerCode associated with the card. This method ensures that sensitive payment credentials are securely removed and prevents any further unauthorized or unintended use."
       }
     },
     "/api/order": {
@@ -42,52 +127,166 @@
         "tags": [
           "Order"
         ],
-        "summary": "Registers a new payment transaction based on the provided request data.",       
+        "summary": "Create an order",
         "requestBody": {
           "description": "The payload containing the payment details",
           "content": {
             "application/json": {
-							"example": {
-                      "Order": 65465465,
-                      "SaleAreaCode": "onlidocumentation_md",
-                      "LinkUrlSuccess": "https://shop-test.com/success",
-                      "LinkUrlCancel": "https://shop-test.com/cancel",
-                      "CardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
-                      "Customer": {
-                        "Code": "464566161",
-                        "NameFirst": "First Name",
-                        "NameLast": "Last Name",
-                        "email": "mytestemail@gmail.com",
-                        "PhoneNumber": "37360000000"
-                      },
-                      "Currency": 498,
-                      "ExpiryDate": "2026-05-01T00:00:00",
-                      "Services": [
-                        {
-                          "Name": "Demo eShop",
-                          "Description": "Demo eShop online desc",
-                          "Amount": 300,
-                          "Products": [
-                            {
-                              "Amount": 300,
-                              "Code": "546465654",
-                              "Description": "Demo product",
-                              "LineNo": 1,
-                              "Name": "Demo product",
-                              "UnitPrice": 100,
-                              "Quantity": 3,
-                              "TotalAmount": 300
-                            }
-                          ]
-                        }
-                      ],
-                      "MoneyType": "all",
-                      "Lang": "EN"
-                    }
-						}
+              "example": {
+                "Order": 65465465,
+                "SaleAreaCode": "onlidocumentation_md",
+                "LinkUrlSuccess": "https://shop-test.com/success",
+                "LinkUrlCancel": "https://shop-test.com/cancel",
+                "CardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
+                "Customer": {
+                  "Code": "464566161",
+                  "NameFirst": "First Name",
+                  "NameLast": "Last Name",
+                  "email": "mytestemail@gmail.com",
+                  "PhoneNumber": "37360000000"
+                },
+                "Currency": 498,
+                "ExpiryDate": "2030-12-31T23:59:59",
+                "Services": [
+                  {
+                    "Name": "Demo eShop",
+                    "Description": "Demo eShop online desc",
+                    "Amount": 300,
+                    "Products": [
+                      {
+                        "Amount": 300,
+                        "Code": "546465654",
+                        "Description": "Demo product",
+                        "LineNo": 1,
+                        "Name": "Demo product",
+                        "UnitPrice": 100,
+                        "Quantity": 3,
+                        "TotalAmount": 300
+                      }
+                    ]
+                  }
+                ],
+                "MoneyType": "All",
+                "Lang": "EN"
+              }
+            }
           }
         },
         "responses": {
+          "200": {
+            "description": "Success executed create order.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                },
+                "example": {
+                  "paymentId": 317184,
+                  "paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
+                  "cardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
+                  "status": 1,
+                  "message": null,
+                  "order": 18223,
+                  "merchantCode": "111125",
+                  "saleAreaCode": "makle",
+                  "linkUrlSuccess": "http://localhost/home/success",
+                  "linkUrlCancel": "https://shop-test.paynet.md",
+                  "signature": "ea20bad9b2c464765542e000eb886057",
+                  "amount": {
+                    "requestAmount": 3,
+                    "requestCurrency": 498,
+                    "amount": 3,
+                    "amountCurrency": 3
+                  },
+                  "customer": {
+                    "code": null,
+                    "nameFirst": null,
+                    "nameLast": null,
+                    "email": null,
+                    "country": null,
+                    "city": null,
+                    "address": null,
+                    "phoneNumber": null,
+                    "cardLinkHash": null
+                  },
+                  "payer": null,
+                  "expiryDate": "2026-04-03 12:01:12",
+                  "registered": "2026-04-01 15:01:12",
+                  "paidDate": null,
+                  "services": [
+                    {
+                      "name": "Card of products",
+                      "description": "Cart of products",
+                      "amount": 3,
+                      "products": [
+                        {
+                          "lineNo": 1,
+                          "name": "Demo eShop",
+                          "description": "Demo eShop online desc",
+                          "unitPrice": 3,
+                          "unitProduct": null,
+                          "quantity": 100,
+                          "amount": 3,
+                          "totalAmount": 3
+                        }
+                      ]
+                    }
+                  ],
+                  "moneyType": "All"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The wrong entred parametrs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 400,
+                  "message": "One or more entered parameters are incorrect.",
+                  "code": "INVALID_PARAMETER",
+                  "traceId": "9b9346f9-f83a-465d-ac8d-dc382c460c22",
+                  "details": "The invalid parameter is: XXXX"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access denied due to invalid or missing authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "Status": 401,
+                  "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+                  "Code": "UNAUTHORIZED",
+                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 500,
+                  "message": "One or more errors occurred.",
+                  "code": "TECHNICAL_ERROR",
+                  "traceId": "c546f06c-3674-4b55-8e0f-ce8aac66f49f",
+                  "details": "Please verify the transmitted data and try again, or contact support."
+                }
+              }
+            }
+          },
           "default": {
             "description": "Error",
             "content": {
@@ -98,7 +297,8 @@
               }
             }
           }
-        }
+        },
+        "description": "In order to perform a payment via Paynet API, the payment must first be registered in the Paynet system. The Create order method is used to create (register) a new payment order by transmitting the required payment details from the Partner’s system to Paynet. Upon successful registration, Paynet generates and returns a unique payment identifier (Payment ID). This Payment ID is then used to redirect the customer to the Paynet payment page, where the user can review, confirm, and complete the payment. In this model, direct server-to-server communication between the Partner and Paynet is required. Data signing is not mandatory, as authentication is handled via an authorization token."
       }
     },
     "/api/order/{id}": {
@@ -106,7 +306,7 @@
         "tags": [
           "Order"
         ],
-        "summary": "Retrieves the details and current status of a specific payment transaction.",
+        "summary": "Get a payment info by payment id",
         "parameters": [
           {
             "name": "id",
@@ -120,6 +320,120 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success executed get order.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                },
+                "example": {
+                  "paymentId": 317184,
+                  "paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
+                  "cardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
+                  "status": 1,
+                  "message": null,
+                  "order": 18223,
+                  "merchantCode": "111125",
+                  "saleAreaCode": "makle",
+                  "linkUrlSuccess": "http://localhost/home/success",
+                  "linkUrlCancel": "https://shop-test.paynet.md",
+                  "signature": "ea20bad9b2c464765542e000eb886057",
+                  "amount": {
+                    "requestAmount": 3,
+                    "requestCurrency": 498,
+                    "amount": 3,
+                    "amountCurrency": 3
+                  },
+                  "customer": {
+                    "code": null,
+                    "nameFirst": null,
+                    "nameLast": null,
+                    "email": null,
+                    "country": null,
+                    "city": null,
+                    "address": null,
+                    "phoneNumber": null,
+                    "cardLinkHash": null
+                  },
+                  "payer": null,
+                  "expiryDate": "2026-04-03 12:01:12",
+                  "registered": "2026-04-01 15:01:12",
+                  "paidDate": null,
+                  "services": [
+                    {
+                      "name": "Card of products",
+                      "description": "Cart of products",
+                      "amount": 3,
+                      "products": [
+                        {
+                          "lineNo": 1,
+                          "name": "Demo eShop",
+                          "description": "Demo eShop online desc",
+                          "unitPrice": 3,
+                          "unitProduct": null,
+                          "quantity": 100,
+                          "amount": 3,
+                          "totalAmount": 3
+                        }
+                      ]
+                    }
+                  ],
+                  "moneyType": "All"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access denied due to invalid or missing authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "Status": 401,
+                  "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+                  "Code": "UNAUTHORIZED",
+                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The wrong entred parametrs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Record not found",
+                  "code": "NOT_FOUND_RECORD",
+                  "traceId": "e8e43475-84c2-405a-803f-eb68208f03be",
+                  "details": "No records were found for the provided data"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 500,
+                  "message": "One or more errors occurred.",
+                  "code": "TECHNICAL_ERROR",
+                  "traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+                  "details": "Please verify the transmitted data and try again, or contact support."
+                }
+              }
+            }
+          },
           "default": {
             "description": "Error",
             "content": {
@@ -130,7 +444,8 @@
               }
             }
           }
-        }
+        },
+        "description": "The get payment info method is used to retrieve detailed information about a specific payment using its unique identifier (PaymentId). To perform this request, the Partner must provide the payment ID in the request URL. Paynet will return the current status of the payment along with all relevant details, such as amount, currency, transaction status, and associated metadata. This method allows the Partner to verify the payment status, track transaction progress, and obtain up-to-date information about a previously registered payment."
       }
     },
     "/api/order/merchant/{id}": {
@@ -138,7 +453,7 @@
         "tags": [
           "Order"
         ],
-        "summary": "Retrieves the details of a payment transaction using the merchant's specific order ID.",
+        "summary": "Get a payment info by merchant order id",
         "parameters": [
           {
             "name": "id",
@@ -152,6 +467,120 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success executed get order.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                },
+                "example": {
+                  "paymentId": 317184,
+                  "paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
+                  "cardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
+                  "status": 1,
+                  "message": null,
+                  "order": 18223,
+                  "merchantCode": "111125",
+                  "saleAreaCode": "makle",
+                  "linkUrlSuccess": "http://localhost/home/success",
+                  "linkUrlCancel": "https://shop-test.paynet.md",
+                  "signature": "ea20bad9b2c464765542e000eb886057",
+                  "amount": {
+                    "requestAmount": 3,
+                    "requestCurrency": 498,
+                    "amount": 3,
+                    "amountCurrency": 3
+                  },
+                  "customer": {
+                    "code": null,
+                    "nameFirst": null,
+                    "nameLast": null,
+                    "email": null,
+                    "country": null,
+                    "city": null,
+                    "address": null,
+                    "phoneNumber": null,
+                    "cardLinkHash": null
+                  },
+                  "payer": null,
+                  "expiryDate": "2026-04-03 12:01:12",
+                  "registered": "2026-04-01 15:01:12",
+                  "paidDate": null,
+                  "services": [
+                    {
+                      "name": "Card of products",
+                      "description": "Cart of products",
+                      "amount": 3,
+                      "products": [
+                        {
+                          "lineNo": 1,
+                          "name": "Demo eShop",
+                          "description": "Demo eShop online desc",
+                          "unitPrice": 3,
+                          "unitProduct": null,
+                          "quantity": 100,
+                          "amount": 3,
+                          "totalAmount": 3
+                        }
+                      ]
+                    }
+                  ],
+                  "moneyType": "All"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access denied due to invalid or missing authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "Status": 401,
+                  "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+                  "Code": "UNAUTHORIZED",
+                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The wrong entred parametrs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Record not found",
+                  "code": "NOT_FOUND_RECORD",
+                  "traceId": "e8e43475-84c2-405a-803f-eb68208f03be",
+                  "details": "No records were found for the provided data"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 500,
+                  "message": "One or more errors occurred.",
+                  "code": "TECHNICAL_ERROR",
+                  "traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+                  "details": "Please verify the transmitted data and try again, or contact support."
+                }
+              }
+            }
+          },
           "default": {
             "description": "Error",
             "content": {
@@ -162,7 +591,8 @@
               }
             }
           }
-        }
+        },
+        "description": "Returns the payment registered with your order number (the `Order` value you sent when creating the payment). Use it when you do not have the Paynet paymentId, for example after a timeout during order creation. The response contains the current status, amounts, dates and payer details."
       }
     },
     "/api/order/search": {
@@ -170,12 +600,12 @@
         "tags": [
           "Order"
         ],
-        "summary": "Searches for payment transactions within a specified date range.",
+        "summary": "Get transaction list",
         "parameters": [
           {
             "name": "from",
             "in": "query",
-             "required": true,
+            "required": true,
             "description": "The starting date and time of the search interval.",
             "schema": {
               "type": "string",
@@ -185,7 +615,7 @@
           {
             "name": "to",
             "in": "query",
-             "required": true,
+            "required": true,
             "description": "The ending date and time of the search interval.",
             "schema": {
               "type": "string",
@@ -194,6 +624,59 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success executed download statement."
+          },
+          "400": {
+            "description": "One or more entered parameters are incorrect.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 400,
+                  "message": "One or more entered parameters are incorrect.",
+                  "code": "INVALID_PARAMETER",
+                  "traceId": "9697f2c8-b1c2-490a-84b3-8adda9bc22e9",
+                  "details": "The invalid parameter is: dateStart | dateFinish"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access denied due to invalid or missing authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "Status": 401,
+                  "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+                  "Code": "UNAUTHORIZED",
+                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 500,
+                  "message": "One or more errors occurred.",
+                  "code": "TECHNICAL_ERROR",
+                  "traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+                  "details": "Please verify the transmitted data and try again, or contact support."
+                }
+              }
+            }
+          },
           "default": {
             "description": "Error",
             "content": {
@@ -204,7 +687,8 @@
               }
             }
           }
-        }
+        },
+        "description": "The get transaction list method is used to retrieve a list of payments within a specified date and time interval. To perform this request, the Partner must provide the from and to parameters in the query string, defining the start and end of the search period. Paynet will return a collection of transactions that were created or processed within the specified timeframe. Each transaction record includes relevant details such as payment ID, amount, currency, status, and timestamps. This method allows the Partner to perform transaction monitoring, reporting, and reconciliation over a defined period."
       }
     },
     "/api/order/refund": {
@@ -212,23 +696,76 @@
         "tags": [
           "Order"
         ],
-        "summary": "Initiates a refund process for a previously completed payment transaction.",
+        "summary": "Refund a payment",
         "requestBody": {
           "description": "The payload containing the necessary details to process the refund.",
           "content": {
-						"application/json": {
-							"example": {
-								"PaymentId": 296901,
-								"Amount": 50000,
-								"SaleAreaCode": "onlidocumentation_md",
-								"Currency": 498,
-								"RefundType": "full",
-								"Reason": "Was customer error!"
-							}
-						}
-					}
+            "application/json": {
+              "example": {
+                "PaymentId": 296901,
+                "Amount": 50000,
+                "SaleAreaCode": "onlidocumentation_md",
+                "Currency": 498,
+                "RefundType": "full",
+                "Reason": "Was customer error!"
+              }
+            }
+          }
         },
         "responses": {
+          "200": {
+            "description": "Success executed refund.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Invoice": 296901,
+                  "SaleAreaCode": "makle",
+                  "Customer": null,
+                  "EventDate": "02.05.2025 15:01:07",
+                  "RefundType": "full",
+                  "Currency": 498,
+                  "Amount": 50000,
+                  "Merchant": "111125",
+                  "CardMask": null,
+                  "CardLinkHash": null,
+                  "MoneyType": "MIA_QR"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access denied due to invalid or missing authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "Status": 401,
+                  "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+                  "Code": "UNAUTHORIZED",
+                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 500,
+                  "message": "One or more errors occurred.",
+                  "code": "TECHNICAL_ERROR",
+                  "traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+                  "details": "Please verify the transmitted data and try again, or contact support."
+                }
+              }
+            }
+          },
           "default": {
             "description": "Error",
             "content": {
@@ -239,7 +776,8 @@
               }
             }
           }
-        }
+        },
+        "description": "The refund method is used to return funds for a previously completed payment. To perform a refund, the Partner must send the original PaymentId, refund amount, currency, sale area code, refund type, and the reason for the refund. The refund can be processed as either a full refund or a partial refund, depending on the RefundType and the amount provided in the request. After the refund request is processed, Paynet returns the result of the operation, allowing the Partner to confirm whether the refund was successfully registered and executed in the Paynet system."
       }
     },
     "/api/statement": {
@@ -247,14 +785,14 @@
         "tags": [
           "Statement"
         ],
-        "summary": "Retrieves the financial statement details for a specified date range.",
+        "summary": "Get statement",
         "parameters": [
           {
             "name": "dateStart",
             "in": "query",
-             "required": true,
+            "required": true,
             "description": "The starting date of the statement period.",
-            "schema": { 
+            "schema": {
               "type": "string",
               "format": "date-time"
             }
@@ -262,7 +800,7 @@
           {
             "name": "dateFinish",
             "in": "query",
-             "required": true,
+            "required": true,
             "description": "The ending date of the statement period.",
             "schema": {
               "type": "string",
@@ -280,6 +818,59 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success executed download statement file."
+          },
+          "400": {
+            "description": "One or more entered parameters are incorrect.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 400,
+                  "message": "One or more entered parameters are incorrect.",
+                  "code": "INVALID_PARAMETER",
+                  "traceId": "9697f2c8-b1c2-490a-84b3-8adda9bc22e9",
+                  "details": "The invalid parameter is: dateStart | dateFinish"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access denied due to invalid or missing authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "Status": 401,
+                  "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+                  "Code": "UNAUTHORIZED",
+                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 500,
+                  "message": "One or more errors occurred.",
+                  "code": "TECHNICAL_ERROR",
+                  "traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+                  "details": "Please verify the transmitted data and try again, or contact support."
+                }
+              }
+            }
+          },
           "default": {
             "description": "Error",
             "content": {
@@ -290,7 +881,8 @@
               }
             }
           }
-        }
+        },
+        "description": "Retrieves a list of payment transactions for a specified period based on the provided start and end dates. Used for generating statements and transaction reporting."
       }
     },
     "/api/statement/download": {
@@ -298,7 +890,7 @@
         "tags": [
           "Statement"
         ],
-        "summary": "Generates and downloads a financial statement report in Excel (.xlsx) format for the specified date range.",
+        "summary": "Download statement",
         "parameters": [
           {
             "name": "dateStart",
@@ -313,7 +905,7 @@
           {
             "name": "dateFinish",
             "in": "query",
-             "required": true,
+            "required": true,
             "description": "The ending date of the report period (must be within 31 days of the start date).",
             "schema": {
               "type": "string",
@@ -322,6 +914,67 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success executed download statement.",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The wrong entred parametrs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 400,
+                  "message": "One or more entered parameters are incorrect.",
+                  "code": "INVALID_PARAMETER",
+                  "traceId": "cf5573ee-4749-4190-8a1a-881ee53e7c0a",
+                  "details": "The invalid parameter is: dateStart | dateFinish"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access denied due to invalid or missing authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "Status": 401,
+                  "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+                  "Code": "UNAUTHORIZED",
+                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 500,
+                  "message": "One or more errors occurred.",
+                  "code": "TECHNICAL_ERROR",
+                  "traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+                  "details": "Please verify the transmitted data and try again, or contact support."
+                }
+              }
+            }
+          },
           "default": {
             "description": "Error",
             "content": {
@@ -332,7 +985,8 @@
               }
             }
           }
-        }
+        },
+        "description": "Generates the merchant statement for the period from dateStart to dateFinish and returns it as an Excel (.xlsx) file. The period must not exceed 31 days."
       }
     },
     "/auth": {
@@ -340,20 +994,54 @@
         "tags": [
           "User"
         ],
-        "summary": "Auth action for partner users",
+        "summary": "Authentication and authorization",
         "requestBody": {
           "description": "",
           "content": {
-	          "application/json": {
-							"example": {
-              "grantType": "password",
-              "username": "771064",
-              "password": "sLgMnGWJ"
+            "application/json": {
+              "example": {
+                "grantType": "password",
+                "username": "771064",
+                "password": "sLgMnGWJ"
+              }
             }
-						}
           }
         },
         "responses": {
+          "200": {
+            "description": "Success executed authentication.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                },
+                "example": {
+                  "access_token": "Ccxl7QQiMEoakkrUoiUn8PIgcmSN2ouP3XNjSmgqUH-Dn8UDg0...........",
+                  "token_type": "bearer",
+                  "expires_in": 14399
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The wrong entred parametrs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": [
+                  {
+                    "status": 500,
+                    "message": "Wrong credentials",
+                    "code": "AUTHENTICATION_FAILED",
+                    "traceId": "ab2002e6-50e7-4cea-a112-eadbddf83505",
+                    "details": null
+                  }
+                ]
+              }
+            }
+          },
           "default": {
             "description": "Error",
             "content": {
@@ -364,7 +1052,8 @@
               }
             }
           }
-        }
+        },
+        "description": "To access the Paynet service and complete authorization, you need to obtain an authorization token. You can get this token by calling the service method described below and providing the parameters (username and password) received during partner registration."
       }
     }
   },
@@ -564,7 +1253,7 @@
               "CashInvoice"
             ],
             "type": "string",
-            "description": "Payment method type: \"Card\" for Visa&Mastercard; \"Paynet\" for Paynet Wallet; \"MIA\" for Mia; \"Cash Invoice\" for cash invoice; \"All\" for Все доступные способы."
+            "description": "Payment method type: \"Card\" for Visa & Mastercard; \"Paynet\" for Paynet Wallet; \"MIA\" for MIA instant payments; \"CashInvoice\" for cash invoice; \"All\" for all methods enabled for the merchant."
           },
           "Lang": {
             "type": "string",
@@ -708,6 +1397,199 @@
         },
         "additionalProperties": false,
         "description": "Represents a service included in the payment request."
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "Bearer token for the Authorization header."
+          },
+          "token_type": {
+            "type": "string",
+            "description": "Always \"bearer\"."
+          },
+          "expires_in": {
+            "type": "integer",
+            "description": "Token lifetime in seconds (about 4 hours)."
+          }
+        },
+        "description": "Successful authentication response."
+      },
+      "PaymentResponse": {
+        "type": "object",
+        "description": "Payment object returned by create/get endpoints.",
+        "properties": {
+          "paymentId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Paynet payment ID. Store it with your order."
+          },
+          "paymentLink": {
+            "type": "string",
+            "description": "URL of the Paynet payment page. Redirect the customer here."
+          },
+          "cardLinkHash": {
+            "type": "string",
+            "nullable": true,
+            "description": "Saved card hash (linked-card scenarios)."
+          },
+          "status": {
+            "type": "integer",
+            "description": "Payment status code. A new order has status 1."
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Your order number (Order)."
+          },
+          "merchantCode": {
+            "type": "string"
+          },
+          "saleAreaCode": {
+            "type": "string"
+          },
+          "linkUrlSuccess": {
+            "type": "string"
+          },
+          "linkUrlCancel": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "object",
+            "properties": {
+              "requestAmount": {
+                "type": "integer"
+              },
+              "requestCurrency": {
+                "type": "integer"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "amountCurrency": {
+                "type": "integer"
+              }
+            }
+          },
+          "customer": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "code": {
+                "type": "string",
+                "nullable": true
+              },
+              "nameFirst": {
+                "type": "string",
+                "nullable": true
+              },
+              "nameLast": {
+                "type": "string",
+                "nullable": true
+              },
+              "email": {
+                "type": "string",
+                "nullable": true
+              },
+              "country": {
+                "type": "string",
+                "nullable": true
+              },
+              "city": {
+                "type": "string",
+                "nullable": true
+              },
+              "address": {
+                "type": "string",
+                "nullable": true
+              },
+              "phoneNumber": {
+                "type": "string",
+                "nullable": true
+              },
+              "cardLinkHash": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "payer": {
+            "type": "object",
+            "nullable": true,
+            "description": "Payer details after payment.",
+            "properties": {
+              "cardMask": {
+                "type": "string",
+                "nullable": true
+              },
+              "rrn": {
+                "type": "string",
+                "nullable": true
+              },
+              "cardExpireMonth": {
+                "type": "string",
+                "nullable": true
+              },
+              "cardExpireYear": {
+                "type": "string",
+                "nullable": true
+              },
+              "cardIssuer": {
+                "type": "string",
+                "nullable": true
+              },
+              "cardLinkHash": {
+                "type": "string",
+                "nullable": true
+              },
+              "moneyType": {
+                "type": "string",
+                "nullable": true
+              },
+              "payerName": {
+                "type": "string",
+                "nullable": true
+              },
+              "payerSurname": {
+                "type": "string",
+                "nullable": true
+              },
+              "payerIDNP": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "expiryDate": {
+            "type": "string",
+            "description": "Format \"YYYY-MM-DD HH:mm:ss\"."
+          },
+          "registered": {
+            "type": "string"
+          },
+          "paidDate": {
+            "type": "string",
+            "nullable": true,
+            "description": "Set when the payment is paid."
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "moneyType": {
+            "type": "string"
+          }
+        }
       }
     },
     "securitySchemes": {
@@ -721,7 +1603,7 @@
   },
   "security": [
     {
-      "Bearer": [ ]
+      "Bearer": []
     }
   ],
   "tags": [

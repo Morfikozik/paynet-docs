@@ -4,6 +4,7 @@ import { Endpoint } from '../types/api';
 import { TranslationResources } from '../types/language';
 import { generateCodeSnippets } from '../utils/codeGenerator';
 import { OpenAPISpec } from '../types/api';
+import { freshenRequestExample } from '../utils/sampleData';
 import { buildTestRequest, executeApiTest, formatApiResponse, ApiTestResponse, getAuthToken, clearAuthToken } from '../utils/apiTester';
 
 interface CodeExampleProps {
@@ -111,7 +112,7 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
       if (example) {
         setRequestBodyValue(prev => ({
           ...prev,
-          [endpoint.id]: JSON.stringify(example, null, 2)
+          [endpoint.id]: JSON.stringify(freshenRequestExample(example), null, 2)
         }));
       } else {
         setRequestBodyValue(prev => ({

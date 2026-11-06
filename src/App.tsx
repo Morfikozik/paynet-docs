@@ -13,6 +13,8 @@ import { ClientServerOrderRequest } from './components/ClientServerOrderRequest'
 import { ClientServerOrderRequestV06 } from './components/ClientServerOrderRequestV06';
 import { ClientServerNotification } from './components/ClientServerNotification';
 import { CodeExample } from './components/CodeExample';
+import { GuidePage } from './components/GuidePage';
+import { DEFAULT_GUIDE, getGuide, getGuides, guideUiText } from './content/guides';
 import { useLanguage } from './hooks/useLanguage';
 import { useOpenAPI } from './hooks/useOpenAPI';
 
@@ -32,7 +34,72 @@ function App() {
   const [activeEndpoint, setActiveEndpoint] = useState<string>('');
   // Temporarily keep Project Info hidden from UI by defaulting to endpoints.
   const [activeView, setActiveView] = useState<'endpoints' | 'project-info'>('endpoints');
-  const [overviewMode, setOverviewMode] = useState<'ecommerce' | 'server-server' | 'client-server' | 'plugins' | 'client-server-order-request' | 'client-server-order-request-v06' | 'client-server-notification' | null>('ecommerce');
+  type OverviewMode = 'guide' | 'ecommerce' | 'server-server' | 'client-server' | 'plugins' | 'client-server-order-request' | 'client-server-order-request-v06' | 'client-server-notification';
+  const [overviewMode, setOverviewMode] = useState<OverviewMode | null>('guide');
+  const [activeGuide, setActiveGuide] = useState<string>(DEFAULT_GUIDE);
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  const guides = useMemo(() => getGuides(language), [language]);
+  const currentGuide = getGuide(language, activeGuide);
+
+  // Hash routing: #/guides/<slug>, #/page/<mode>, #/api/<endpointId>.
+  // Makes every page linkable and lets guides link to each other.
+  const pageModes: Record<string, OverviewMode> = {
+    ecommerce: 'ecommerce',
+    'server-server': 'server-server',
+    'client-server': 'client-server',
+    plugins: 'plugins',
+    'order-request-v05': 'client-server-order-request',
+    'order-request-v06': 'client-server-order-request-v06',
+    notifications: 'client-server-notification',
+  };
+
+  const applyHash = React.useCallback((hash: string) => {
+    const [, kind, value] = hash.match(/^#\/(guides|page|api)\/(.+)$/) || [];
+    if (kind === 'guides' && value) {
+      setActiveView('endpoints');
+      setOverviewMode('guide');
+      setActiveGuide(decodeURIComponent(value));
+      setActiveEndpoint('');
+    } else if (kind === 'page' && value && pageModes[value]) {
+      setActiveView('endpoints');
+      setOverviewMode(pageModes[value]);
+      setActiveEndpoint('');
+    } else if (kind === 'api' && value) {
+      setActiveView('endpoints');
+      setOverviewMode(null);
+      setActiveEndpoint(decodeURIComponent(value));
+    } else {
+      setOverviewMode('guide');
+      setActiveGuide(DEFAULT_GUIDE);
+      setActiveEndpoint('');
+    }
+    if (contentRef.current) contentRef.current.scrollTop = 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  React.useEffect(() => {
+    applyHash(window.location.hash);
+    const onHashChange = () => applyHash(window.location.hash);
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, [applyHash]);
+
+  const navigate = (hash: string) => {
+    if (window.location.hash === hash) {
+      applyHash(hash);
+    } else {
+      window.location.hash = hash;
+    }
+  };
+
+  const handleMarkdownNavigate = (href: string) => {
+    if (href.startsWith('#/')) {
+      navigate(href);
+      return;
+    }
+    const target = document.getElementById(href.replace(/^#/, ''));
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const allEndpoints = useMemo(() => categories.flatMap(cat => cat.endpoints), [categories]);
 
@@ -44,51 +111,18 @@ function App() {
 
   const handleViewChange = (view: 'endpoints' | 'project-info') => {
     setActiveView(view);
-    if (view === 'endpoints') {
-      setOverviewMode('ecommerce');
-      setActiveEndpoint('');
-    }
+    if (view === 'endpoints') navigate(`#/guides/${DEFAULT_GUIDE}`);
   };
 
-  const handleEndpointSelect = (endpointId: string) => {
-    setOverviewMode(null);
-    setActiveEndpoint(endpointId);
-  };
-
-  const handleEcommerceOverviewSelect = () => {
-    setOverviewMode('ecommerce');
-    setActiveEndpoint('');
-  };
-
-  const handleServerServerOverviewSelect = () => {
-    setOverviewMode('server-server');
-    setActiveEndpoint('');
-  };
-
-  const handleClientServerOverviewSelect = () => {
-    setOverviewMode('client-server');
-    setActiveEndpoint('');
-  };
-
-  const handlePluginsOverviewSelect = () => {
-    setOverviewMode('plugins');
-    setActiveEndpoint('');
-  };
-
-  const handleClientServerOrderRequestSelect = () => {
-    setOverviewMode('client-server-order-request');
-    setActiveEndpoint('');
-  };
-
-  const handleClientServerOrderRequestV06Select = () => {
-    setOverviewMode('client-server-order-request-v06');
-    setActiveEndpoint('');
-  };
-
-  const handleClientServerNotificationSelect = () => {
-    setOverviewMode('client-server-notification');
-    setActiveEndpoint('');
-  };
+  const handleEndpointSelect = (endpointId: string) => navigate(`#/api/${endpointId}`);
+  const handleGuideSelect = (slug: string) => navigate(`#/guides/${slug}`);
+  const handleEcommerceOverviewSelect = () => navigate('#/page/ecommerce');
+  const handleServerServerOverviewSelect = () => navigate('#/page/server-server');
+  const handleClientServerOverviewSelect = () => navigate('#/page/client-server');
+  const handlePluginsOverviewSelect = () => navigate('#/page/plugins');
+  const handleClientServerOrderRequestSelect = () => navigate('#/page/order-request-v05');
+  const handleClientServerOrderRequestV06Select = () => navigate('#/page/order-request-v06');
+  const handleClientServerNotificationSelect = () => navigate('#/page/notifications');
 
   const currentEndpoint = allEndpoints.find(endpoint => endpoint.id === activeEndpoint);
 
@@ -122,13 +156,18 @@ function App() {
           clientServerOrderRequestActive={overviewMode === 'client-server-order-request'}
           clientServerOrderRequestV06Active={overviewMode === 'client-server-order-request-v06'}
           clientServerNotificationActive={overviewMode === 'client-server-notification'}
+          guides={guides}
+          activeGuide={overviewMode === 'guide' ? activeGuide : null}
+          onGuideSelect={handleGuideSelect}
+          guidesTitle={guideUiText[language].section}
+          notificationsLabel={guideUiText[language].notifications}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           t={t}
         />
 
         <div className="flex-1 min-h-0 min-w-0 flex flex-col xl:flex-row">
-          <div className="flex-1 min-h-0 min-w-0 overflow-y-auto border-r border-paynet-gray-200">
+          <div ref={contentRef} className="flex-1 min-h-0 min-w-0 overflow-y-auto border-r border-paynet-gray-200">
             <div className="p-4 sm:p-6 lg:p-8 h-full flex flex-col bg-white">
               <SpecSelector
                 availableSpecs={availableSpecs}
@@ -140,6 +179,10 @@ function App() {
               {activeView === 'project-info' ? (
                 <div className="flex-1 w-full min-w-0">
                   <ProjectInfo t={t} language={language} />
+                </div>
+              ) : overviewMode === 'guide' && currentGuide ? (
+                <div className="flex-1 w-full min-w-0">
+                  <GuidePage guide={currentGuide} language={language} onNavigate={handleMarkdownNavigate} />
                 </div>
               ) : overviewMode === 'ecommerce' ? (
                 <div className="flex-1 w-full min-w-0">

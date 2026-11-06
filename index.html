@@ -4,10 +4,26 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="logos/icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Paynet Documentation Portal</title>
+    <title>Paynet E-commerce API Documentation</title>
+    <meta name="description" content="Paynet e-commerce API: accept card, Paynet wallet and MIA payments. Guides, API reference, signatures with test vectors, notifications and an online API tester." />
+    <!-- Machine-readable documentation for AI assistants and tools -->
+    <link rel="alternate" type="text/markdown" title="Documentation for AI (llms-full.txt)" href="llms-full.txt" />
+    <link rel="alternate" type="text/plain" title="llms.txt" href="llms.txt" />
+    <link rel="alternate" type="application/json" title="OpenAPI" href="openapi.json" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Shown to crawlers and AI tools that do not run JavaScript; React replaces it on load. -->
+      <main style="font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; color: #334155">
+        <h1>Paynet E-commerce API Documentation</h1>
+        <p>This portal needs JavaScript. The same documentation is available as plain text:</p>
+        <ul>
+          <li><a href="llms-full.txt">llms-full.txt</a> — complete documentation in one file (recommended for AI assistants)</li>
+          <li><a href="llms.txt">llms.txt</a> — index of all pages</li>
+          <li><a href="openapi.json">openapi.json</a> — OpenAPI specification</li>
+        </ul>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

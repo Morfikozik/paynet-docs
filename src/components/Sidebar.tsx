@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, ChevronRight, Book, Download } from 'lucide-react';
+import { Search, ChevronRight, Book, Download, BookOpen } from 'lucide-react';
 import { OpenAPISpec, ServiceCategory } from '../types/api';
 import { TranslationResources } from '../types/language';
 import { buildPostmanCollectionFromOpenApi } from '../utils/postmanCollection';
@@ -25,6 +25,11 @@ interface SidebarProps {
   clientServerOrderRequestActive: boolean;
   clientServerOrderRequestV06Active: boolean;
   clientServerNotificationActive: boolean;
+  guides: Array<{ slug: string; title: string }>;
+  activeGuide: string | null;
+  onGuideSelect: (slug: string) => void;
+  guidesTitle: string;
+  notificationsLabel: string;
   searchQuery: string;
   onSearchChange: (query: string) => void;
   t: TranslationResources;
@@ -51,6 +56,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   clientServerOrderRequestActive,
   clientServerOrderRequestV06Active,
   clientServerNotificationActive,
+  guides,
+  activeGuide,
+  onGuideSelect,
+  guidesTitle,
+  notificationsLabel,
   searchQuery,
   onSearchChange,
   t,
@@ -97,6 +107,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
     );
 
   const pageSearchItems: SearchResult[] = [
+    ...guides.map((guide) => ({
+      id: `guide-${guide.slug}`,
+      group: 'Pages' as const,
+      title: guide.title,
+      subtitle: guidesTitle,
+      keywords: [guide.slug.replace(/-/g, ' '), 'guide'],
+      onSelect: () => onGuideSelect(guide.slug),
+      active: activeGuide === guide.slug,
+    })),
     {
       id: 'page-ecommerce',
       group: 'Pages',
@@ -148,8 +167,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       id: 'page-notification',
       group: 'Pages',
-      title: 'Notification',
-      keywords: ['callback', 'notification', 'client server'],
+      title: notificationsLabel,
+      keywords: ['callback', 'notification', 'webhook', 'hash'],
       onSelect: onClientServerNotificationSelect,
       active: clientServerNotificationActive,
     },
@@ -247,7 +266,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       if (grouped[item.group].length < 8) grouped[item.group].push(item);
     });
     return grouped;
-  }, [normalizedQuery, categories, activeEndpoint, ecommerceOverviewActive, serverServerOverviewActive]);
+  }, [normalizedQuery, categories, activeEndpoint, ecommerceOverviewActive, serverServerOverviewActive, guides, activeGuide]);
 
   React.useEffect(() => {
     if (searchQuery.trim()) {
@@ -290,7 +309,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
           />
         </div>
         
-        {/* TEMPORARILY HIDDEN IN UI: Postman download button. Keep handleDownloadPostmanCollection for quick restore later. */}
+        {currentSpec && (
+          <button
+            type="button"
+            onClick={handleDownloadPostmanCollection}
+            className="mt-3 w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-paynet-primary bg-white border border-paynet-gray-200 hover:bg-paynet-light rounded-lg transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Postman collection
+          </button>
+        )}
         </>
         )}
       </div>
@@ -357,6 +385,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {!normalizedQuery && (
         <>
+        <div className="mb-4">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-paynet-gray-500 mb-2 px-1">
+            <BookOpen className="w-3.5 h-3.5" />
+            {guidesTitle}
+          </div>
+          <div className="space-y-1">
+            {guides.map((guide) => (
+              <button
+                key={guide.slug}
+                type="button"
+                onClick={() => onGuideSelect(guide.slug)}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                  activeGuide === guide.slug
+                    ? 'bg-white border-l-4 border-paynet-primary shadow-paynet-lg font-semibold text-paynet-gray-900'
+                    : 'text-paynet-gray-700 hover:bg-paynet-light'
+                }`}
+              >
+                {guide.title}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="mb-3">
           <button
             type="button"
@@ -498,24 +548,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <div className="text-sm font-medium text-paynet-gray-900">Order request v0.6</div>
                   </div>
                 </button>
-                <button
-                  onClick={onClientServerNotificationSelect}
-                  className={`w-full text-left p-3 rounded-lg transition-all duration-200 group ${
-                    clientServerNotificationActive
-                      ? 'bg-white border-l-4 border-paynet-primary shadow-paynet-lg'
-                      : 'bg-white hover:bg-paynet-light hover:shadow-paynet'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono px-2 py-1 rounded-md font-semibold bg-blue-100 text-blue-700">
-                      POST
-                    </span>
-                    <div className="text-sm font-medium text-paynet-gray-900">Notification</div>
-                  </div>
-                </button>
               </div>
             )}
 
+            <div className="mb-3">
+              <button
+                onClick={onClientServerNotificationSelect}
+                className={`w-full text-left p-3 rounded-lg transition-all duration-200 group ${
+                  clientServerNotificationActive
+                    ? 'bg-white border-l-4 border-paynet-primary shadow-paynet-lg'
+                    : 'bg-white hover:bg-paynet-light hover:shadow-paynet'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono px-2 py-1 rounded-md font-semibold bg-blue-100 text-blue-700">
+                    POST
+                  </span>
+                  <div className="text-sm font-semibold text-paynet-gray-900">{notificationsLabel}</div>
+                </div>
+              </button>
+            </div>
             <div className="mb-3">
               <button
                 onClick={onPluginsOverviewSelect}

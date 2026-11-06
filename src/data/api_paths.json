@@ -203,17 +203,17 @@
 						{
 							"language": "en",
 							"name": "Get a payment info by merchant order id",
-							"description": "The get payments by merchant method is used to retrieve a list of payments associated with a specific merchant. To perform this request, the Partner must provide the merchant identifier (MerchantId) in the request URL. Paynet will return a collection of payment records related to the specified merchant, including key details such as payment IDs, amounts, currencies, statuses, and timestamps. This method allows the Partner to monitor transaction activity, track multiple payments, and perform reconciliation for a given merchant within the Paynet system."
+							"description": "Returns the payment registered with your order number (the `Order` value you sent when creating the payment). Use it when you do not have the Paynet paymentId, for example after a timeout during order creation. The response contains the current status, amounts, dates and payer details."
 						},
 						{
 							"language": "ro",
-							"name": "Obține informații despre o tranzacție folosind ID-ul comenzii comerciantului.",
-							"description": "Metoda get payments by merchant este utilizată pentru a obține o listă de plăți asociate unui comerciant specific. Pentru a efectua această solicitare, Partenerul trebuie să transmită identificatorul comerciantului (MerchantId) în URL-ul cererii. Paynet va returna o colecție de înregistrări de plată aferente comerciantului specificat, inclusiv detalii cheie precum ID-uri de plată, sume, valute, statusuri și marcaje de timp. Această metodă permite Partenerului să monitorizeze activitatea tranzacțiilor, să urmărească mai multe plăți și să efectueze reconcilierea pentru un comerciant în sistemul Paynet."
+							"name": "Obține informații despre plată după numărul comenzii comerciantului",
+							"description": "Returnează plata înregistrată cu numărul comenzii dvs. (valoarea `Order` transmisă la crearea plății). Folosiți-o când nu aveți paymentId Paynet, de exemplu după un timeout la crearea comenzii. Răspunsul conține statusul curent, sumele, datele și detaliile plătitorului."
 						},
 						{
 							"language": "ru",
-							"name": "Получить операцию по ИД заказа мерчанта.",
-							"description": "Метод get payments by merchant используется для получения списка платежей, связанных с конкретным мерчантом. Для выполнения этого запроса Партнер должен передать идентификатор мерчанта (MerchantId) в URL запроса. Paynet вернет набор платежных записей по указанному мерчанту, включая ключевые данные: ID платежей, суммы, валюты, статусы и временные метки. Этот метод позволяет Партнеру контролировать транзакционную активность, отслеживать несколько платежей и выполнять сверку по конкретному мерчанту в системе Paynet."
+							"name": "Получить операцию по номеру заказа мерчанта",
+							"description": "Возвращает платёж, зарегистрированный с вашим номером заказа (значение `Order`, переданное при создании платежа). Используйте, если у вас нет paymentId Paynet, например после таймаута при создании заказа. Ответ содержит текущий статус, суммы, даты и данные плательщика."
 						}
 					],
 					"responses": {
@@ -413,7 +413,7 @@
 					"info": [
 						{
 							"language": "en",
-							"name": "Delete linken card",
+							"name": "Delete linked card",
 							"description": "The delete linked card method is used to deactivate and remove a previously linked card from the Paynet system. When this method is executed, the specified card token is permanently invalidated, and the card is unlinked from the customer account. As a result, the token can no longer be used for any payment operations, including recurring or one-click payments. To perform this request, the Partner must provide the unique card identifier (CardLinkHash), the corresponding SaleAreaCode, and the CustomerCode associated with the card. This method ensures that sensitive payment credentials are securely removed and prevents any further unauthorized or unintended use."
 						},
 						{
@@ -432,8 +432,8 @@
 							"description": "Success executed unlink card.",
 							"content": {
 								"type": "application/json",
-								"object": {								 
-									"responseCode": "SUCCESS"								 
+								"object": {
+									"responseCode": "SUCCESS"
 								},
 								"schema": {
 									"$ref": "#/components/schemas/User"
@@ -476,12 +476,12 @@
 							"content": {
 								"type": "application/json",
 								"object": {
-  "status": 404,
-  "message": "Record not found",
-  "code": "NOT_FOUND_RECORD",
-  "traceId": "16ce780d-2e89-47b8-9cd2-6d0d136d9816",
-  "details": "No records were found for the provided data"
-},
+									"status": 404,
+									"message": "Record not found",
+									"code": "NOT_FOUND_RECORD",
+									"traceId": "16ce780d-2e89-47b8-9cd2-6d0d136d9816",
+									"details": "No records were found for the provided data"
+								},
 								"schema": {
 									"$ref": "#/components/schemas/Payment"
 								}
@@ -647,17 +647,17 @@
 						{
 							"language": "en",
 							"name": "Download statement",
-							"description": "In this model, identification and establishment of communication between the Partner’s servers and Paynet is required. Signing data is not required. The Partner’s system will transmit the payment information by contacting Payments. As a result, Partner will receive a payment ID, through which the Partner will be able to send the client to the Paynet payment form to confirm and pay the payment."
+							"description": "Generates the merchant statement for the period from dateStart to dateFinish and returns it as an Excel (.xlsx) file. The period must not exceed 31 days."
 						},
 						{
 							"language": "ro",
-							"name": "Descărcați extras",
-							"description": "În acest model, este necesară identificarea și stabilirea comunicării între serverele Partenerului și Paynet. Datele de semnătură nu sunt necesare. Sistemul Partenerului va transmite informațiile de plată contactând Payments. Drept urmare, Partenerul va primi un ID de plată, prin care Partenerul va putea trimite clientul către formularul de plată Paynet pentru a confirma și efectua plata."
+							"name": "Descărcați extrasul",
+							"description": "Generează extrasul comerciantului pentru perioada dateStart – dateFinish și îl returnează ca fișier Excel (.xlsx). Perioada nu trebuie să depășească 31 de zile."
 						},
 						{
 							"language": "ru",
 							"name": "Скачать выписку",
-							"description": "В этой модели требуется идентификация и установление связи между серверами Партнёра и Paynet. Подписание данных не требуется. Система Партнёра передаст информацию о платёже, обратившись в Payments. В результате Партнёр получит идентификатор платежа, по которому сможет перенаправить клиента на платёжную форму Paynet для подтверждения и оплаты."
+							"description": "Формирует выписку мерчанта за период от dateStart до dateFinish и возвращает её файлом Excel (.xlsx). Период не должен превышать 31 день."
 						}
 					],
 					"responses": {
@@ -691,12 +691,12 @@
 							"content": {
 								"type": "application/json",
 								"object": {
-  "status": 400,
-  "message": "One or more entered parameters are incorrect.",
-  "code": "INVALID_PARAMETER",
-  "traceId": "cf5573ee-4749-4190-8a1a-881ee53e7c0a",
-  "details": "The invalid parameter is: dateStart | dateFinish"
-},
+									"status": 400,
+									"message": "One or more entered parameters are incorrect.",
+									"code": "INVALID_PARAMETER",
+									"traceId": "cf5573ee-4749-4190-8a1a-881ee53e7c0a",
+									"details": "The invalid parameter is: dateStart | dateFinish"
+								},
 								"schema": {
 									"$ref": "#/components/schemas/ErrorObj"
 								}
@@ -818,7 +818,7 @@
 						},
 						{
 							"language": "ru",
-							"name": "Скачать выписку",
+							"name": "Список операций за период",
 							"description": "Метод get transaction list используется для получения списка платежей за указанный интервал даты и времени. Для выполнения этого запроса Партнер должен передать параметры from и to в query string, определяя начало и конец периода поиска. Paynet вернет набор транзакций, которые были созданы или обработаны в заданном временном диапазоне. Каждая запись транзакции содержит релевантные данные, такие как ID платежа, сумма, валюта, статус и временные метки. Этот метод позволяет Партнеру выполнять мониторинг транзакций, формировать отчетность и проводить сверку за определенный период."
 						}
 					],

@@ -5,8 +5,6 @@ export const ro: TranslationResources = {
     search: 'Căutare',
     endpoints: 'Metode',
     projectInfo: 'Info',
-    parameters: 'Parametri',
-    responses: 'Răspunsuri',
     codeExamples: 'Exemple de cod',
     name: 'Nume',
     type: 'Tip',

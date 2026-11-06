@@ -276,7 +276,6 @@ const fallbackGenerators = {
   },
   
   javascript: (request: any) => {
-    const headers = JSON.stringify(request.headers, null, 2);
     const options = {
       method: request.method,
       headers: request.headers,
@@ -405,7 +404,7 @@ export async function generateCodeSnippets({ endpoint, baseUrl, spec }: Generate
   const snippets: Record<string, CodeSnippet> = {};
   
   // Try to use openapi-snippet for each language
-  for (const [langKey, config] of Object.entries(LANGUAGE_CONFIGS)) {
+  for (const langKey of Object.keys(LANGUAGE_CONFIGS)) {
     try {
       // For now, use fallback generators since openapi-snippet requires more complex setup
       const fallbackGenerator = fallbackGenerators[langKey as keyof typeof fallbackGenerators];

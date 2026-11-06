@@ -13,6 +13,10 @@ export const Footer: React.FC<FooterProps> = ({ author, version }) => {
           <span className="font-medium text-paynet-primary">{author}</span>
           {' • '}
           <span className="text-paynet-gray-500">Version {version}</span>
+          {' • '}
+          <a href="legacy/" className="text-paynet-gray-500 hover:text-paynet-primary underline underline-offset-2">
+            Previous portal version
+          </a>
         </p>
       </div>
     </footer>

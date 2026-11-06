@@ -279,8 +279,10 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
       Message: 'Request was processed successfully.',
       EventDate: eventDate,
       Payment: {
-        Id: normalizedPaymentId,
-        ExternalId: normalizedExternalId,
+        // Field names follow the Paynet notification spec (ID / ExternalID), so the
+        // verifier samples on this page validate the simulated callback correctly.
+        ID: normalizedPaymentId,
+        ExternalID: normalizedExternalId,
         SaleAreaCode: String(
           firstDefined(paymentData?.SaleAreaCode, paymentData?.saleAreaCode, paymentInfoForNotification?.saleAreaCode, 'onlidocumentation_md')
         ),
@@ -378,8 +380,8 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
       normalize(mockNotification.EventType) +
       normalize(mockNotification.Payment.Amount) +
       normalize(mockNotification.Payment.Customer) +
-      normalize(mockNotification.Payment.ExternalId) +
-      normalize(mockNotification.Payment.Id) +
+      normalize(mockNotification.Payment.ExternalID) +
+      normalize(mockNotification.Payment.ID) +
       normalize(mockNotification.Payment.Merchant) +
       normalize(mockNotification.Payment.StatusDate);
     const hash = CryptoJS.enc.Base64.stringify(CryptoJS.MD5(preparedString + notificationSecretKey.trim()));
@@ -539,7 +541,7 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
 
   const getPaymentInfoById = async () => {
     if (!transactionId.trim()) {
-      setPaymentStatusError('Transaction ID is required.');
+      setPaymentStatusError('Merchant order number (Order) is required.');
       return;
     }
 
@@ -668,7 +670,7 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
                   <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Merchant UX flow</h3>
                   <ol className="list-decimal pl-5 space-y-2 text-sm sm:text-base text-paynet-gray-700">
                     <li>{tDesc('Paste your callback URL into `MerchantSystemUrl (callback URL)`.', 'Вставьте ваш callback URL в `MerchantSystemUrl (callback URL)`.', 'Introdu URL-ul tău de callback în `MerchantSystemUrl (callback URL)`.')}</li>
-                    <li>{tDesc('Enter a `Transaction ID` from your previous payment request.', 'Введите `Transaction ID` из предыдущего платежного запроса.', 'Introdu `Transaction ID` din cererea ta anterioară de plată.')}</li>
+                    <li>{tDesc('Enter the merchant order number (`Order`) you used when creating the payment.', 'Введите номер заказа мерчанта (`Order`), который вы указали при создании платежа.', 'Introdu numărul comenzii comerciantului (`Order`) folosit la crearea plății.')}</li>
                     <li>{tDesc("Click `Get` to load transaction state from `GET /api/order/merchant/{'{id}'}`.", "Нажмите `Get`, чтобы загрузить состояние транзакции через `GET /api/order/merchant/{'{id}'}`.", "Apasă `Get` pentru a încărca starea tranzacției din `GET /api/order/merchant/{'{id}'}`.")}</li>
                     <li>{tDesc("Check business status (`paid` / `fail` / `Fail - transaction doesen&apos;t exist`).", "Проверьте бизнес-статус (`paid` / `fail` / `Fail - transaction doesen&apos;t exist`).", "Verifică statusul business (`paid` / `fail` / `Fail - transaction doesen&apos;t exist`).")}</li>
                     <li>{tDesc('Click `Send notification` to post callback payload to your URL and verify signature.', 'Нажмите `Send notification`, чтобы отправить callback payload на ваш URL и проверить подпись.', 'Apasă `Send notification` pentru a trimite payload-ul callback către URL-ul tău și a verifica semnătura.')}</li>
@@ -834,7 +836,7 @@ Payment.ExternalID + Payment.ID + Payment.Merchant + Payment.StatusDate`}
                           )}
                         </p>
                         <div className="mt-4 max-w-xl">
-                          <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Transaction ID</label>
+                          <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Merchant order number (Order)</label>
                           <div className="flex gap-2">
                             <input
                               value={transactionId}

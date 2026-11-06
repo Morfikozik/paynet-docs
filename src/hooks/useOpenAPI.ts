@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { OpenAPISpec, ServiceCategory } from '../types/api';
+import { OpenAPISpec } from '../types/api';
 import { parseOpenAPI } from '../utils/openApiParser';
-import { loadOpenAPISpecs, getDefaultSpec } from '../utils/openApiLoader';
+import { loadOpenAPISpecs } from '../utils/openApiLoader';
 import { Language } from '../types/language';
 
 export const useOpenAPI = (language: Language = 'en') => {

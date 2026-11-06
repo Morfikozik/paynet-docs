@@ -5,8 +5,6 @@ export const en: TranslationResources = {
     search: 'Search',
     endpoints: 'Endpoints',
     projectInfo: 'Info',
-    parameters: 'Parameters',
-    responses: 'Responses',
     codeExamples: 'Code Examples',
     name: 'Name',
     type: 'Type',
