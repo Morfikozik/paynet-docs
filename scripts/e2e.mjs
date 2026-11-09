@@ -216,6 +216,64 @@ const contractStage = async (token) => {
   note('contract:summary', { checks: summary.length, failed: summary.filter((e) => !e.ok).map((e) => e.step) });
 };
 
+// ---- stage "cards": saved card (CardLinkHash) checks ----------------------------------------
+const cardsStage = async (token) => {
+  const browser = await chromium.launch();
+  const getPayment = async (order) => (await call('GET', `/api/order/merchant/${order}`, null, token)).body;
+  try {
+    for (const moneyType of ['Card', 'All']) {
+      const order = Date.now();
+      const created = await call('POST', '/api/order', orderBody(order, 200, { MoneyType: moneyType }), token);
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(created.body.paymentLink, { waitUntil: 'networkidle', timeout: 60000 });
+      const checkbox = await p.$$eval('input[type=checkbox]', (els) => els.map((e) => ({ name: e.name, checked: e.checked })));
+      note(`cards:checkbox-${moneyType}`, { checkbox });
+      if (moneyType === 'All') {
+        await fillAndPay(p, 'cards-pay');
+        await p.waitForURL(/morfikozik\.github\.io/, { timeout: 90000 }).catch(() => {});
+        const paid = await getPayment(order);
+        note('cards:after-pay', { status: paid.status, cardLinkHash: paid.cardLinkHash, customerCardLinkHash: paid.customer?.cardLinkHash });
+        const hash = paid.cardLinkHash || paid.customer?.cardLinkHash;
+        if (hash) {
+          // Same customer + token → the payment page should offer the saved card.
+          const sameOrder = order + 11;
+          const same = await call('POST', '/api/order', orderBody(sameOrder, 200, { CardLinkHash: hash }), token);
+          note('cards:same-customer', { http: same.status, cardLinkHash: same.body?.cardLinkHash, status: same.body?.status, message: same.body?.message ?? same.body?.details });
+          if (same.body?.paymentLink) {
+            const q = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+            await q.goto(same.body.paymentLink, { waitUntil: 'networkidle', timeout: 60000 });
+            await q.waitForTimeout(2000);
+            await snap(q, 'cards-saved-card-page');
+            note('cards:saved-card-visible', { text: (await q.innerText('body')).match(/411111[\*•x]*1111|\*{2,}\s*1111|•{2,}\s*1111/i)?.[0] || null });
+            await q.close();
+          }
+          // Another customer + the same token → should be refused or not show the card.
+          const otherOrder = order + 12;
+          const otherBody = orderBody(otherOrder, 200, { CardLinkHash: hash });
+          otherBody.Customer = { ...otherBody.Customer, Code: 'e2e-other-customer' };
+          const other = await call('POST', '/api/order', otherBody, token);
+          note('cards:other-customer', { http: other.status, body: other.body && { cardLinkHash: other.body.cardLinkHash, status: other.body.status, code: other.body.code, details: other.body.details } });
+          if (other.body?.paymentLink) {
+            const q = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+            await q.goto(other.body.paymentLink, { waitUntil: 'networkidle', timeout: 60000 });
+            await q.waitForTimeout(2000);
+            await snap(q, 'cards-other-customer-page');
+            note('cards:other-customer-card-visible', { text: (await q.innerText('body')).match(/411111[\*•x]*1111|\*{2,}\s*1111|•{2,}\s*1111/i)?.[0] || null });
+            await q.close();
+          }
+          // Unknown token for the same customer.
+          const fakeOrder = order + 13;
+          const fake = await call('POST', '/api/order', orderBody(fakeOrder, 200, { CardLinkHash: '0000000_00000000000000000000000000000000' }), token);
+          note('cards:unknown-token', { http: fake.status, body: fake.body && { cardLinkHash: fake.body.cardLinkHash, code: fake.body.code, details: fake.body.details } });
+        }
+      }
+      await p.close();
+    }
+  } finally {
+    await browser.close();
+  }
+};
+
 const main = async () => {
   if (stage === 'shop') return shopStage();
   const auth = await call('POST', '/auth', { grantType: 'password', username: '771064', password: 'sLgMnGWJ' });
@@ -224,6 +282,7 @@ const main = async () => {
   if (!token) throw new Error('no token');
   check('auth', '/auth', 'post', auth);
   if (stage === 'contract') return contractStage(token);
+  if (stage === 'cards') return cardsStage(token);
 
   const order1 = Date.now();
   const created = await call('POST', '/api/order', orderBody(order1, 300), token);

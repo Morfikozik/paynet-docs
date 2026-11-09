@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: 'explore | full | shop | contract'
+        description: 'explore | full | shop | contract | cards'
         required: true
         default: 'explore'
 
