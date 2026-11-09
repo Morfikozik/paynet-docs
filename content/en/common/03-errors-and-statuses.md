@@ -121,6 +121,7 @@ A failed payment does not produce a notification: the customer returns to `LinkU
 |---|---|---|
 | `ExpiryDate` in requests | `YYYY-MM-DDTHH:mm:ss`, **Chișinău local time** | `2026-12-31T23:59:59` |
 | Dates in payment responses | `YYYY-MM-DD HH:mm:ss` | `2026-04-01 15:01:12` |
+| `eventDate` in the refund response | `DD.MM.YYYY HH:mm:ss` | `09.11.2026 18:17:54` |
 | Dates in notifications | `YYYY-MM-DDTHH:mm:ss`, Chișinău local time | `2026-11-09T12:00:00` |
 | `from` / `to` in `/api/order/search` | ISO 8601 date-time | `2026-03-09T06:40:05.010Z` |
 | `dateStart` / `dateFinish` in statements | date | `2026-03-01` |
@@ -154,3 +155,34 @@ Chișinău local time is the `Europe/Chisinau` time zone: UTC+2 in winter, UTC+3
 | Result | Immediately in the `POST /api/order/refund` response. No callback notification is sent for refunds. |
 | Status afterwards | `5` after a full refund, `6` after a partial one. Both are final. |
 | Merchant balance | If there is no money on the merchant's Paynet account, the refund does not go through. |
+
+### Refund responses (checked on the test environment)
+
+| Situation | Response |
+|---|---|
+| Refund done | `200`, body below |
+| Payment not paid | `404 NOT_FOUND_RECORD` |
+| Amount above the paid amount | `400 INVALID_PARAMETER`, `details`: "The invalid parameter is: RefundType". The field named in `details` is misleading: the cause is the amount |
+| Full refund after a partial one | `400 INVALID_PARAMETER`, `details`: "The invalid parameter is: RefundType" |
+
+```json
+{
+  "paymentId": 328733,
+  "saleAreaCode": "onlidocumentation_md",
+  "customer": "464566161",
+  "eventDate": "09.11.2026 18:17:54",
+  "refundType": "full",
+  "currency": 498,
+  "amount": 400,
+  "merchant": "265505",
+  "cardMask": "411111******1111",
+  "cardLinkHash": null,
+  "moneyType": "CYBER_SOURCE"
+}
+```
+
+- `eventDate` in the refund response uses the format `DD.MM.YYYY HH:mm:ss`.
+- `moneyType` here is the processing code (for example `CYBER_SOURCE`), not the notification value (`CARD`…).
+- After a refund the payment's `paidDate` stays filled.
+
+> **Important:** the test environment accepted a second partial refund of the same payment. Paynet's rule is one refund per payment; do not rely on repeated refunds in production.

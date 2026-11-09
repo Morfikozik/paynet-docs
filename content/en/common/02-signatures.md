@@ -8,6 +8,7 @@ Signature = Base64( MD5( <string to sign> + SecretKey ) )
 
 - MD5 over the **UTF-8** bytes of the string (also for Cyrillic and Romanian diacritics).
 - Base64 of the **raw 16-byte digest** (not of the 32-character hex string). The result is always 24 characters and ends with `==`.
+- Do not confuse it with the `signature` field in the `POST /api/order` response: that is an internal value of the payment link (32 characters, equal to the `s` parameter in `paymentLink`). Do not use it for verification.
 
 What changes is how the string to sign is built:
 

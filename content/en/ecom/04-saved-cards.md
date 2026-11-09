@@ -8,7 +8,13 @@ This works only with the [server-to-server integration](#/guides/server-to-serve
 
 ## Enabling
 
-Card saving is enabled for your `SaleAreaCode` on the Paynet side: contact your Paynet manager. In the test environment it is enabled for `onlidocumentation_md`.
+Card saving is enabled for your `SaleAreaCode` on the Paynet side: contact your Paynet manager. For the shared test sale area `onlidocumentation_md` it is currently not enabled (no checkbox on the payment page, no `CardLinkHash`). To test the flow, ask to enable it for your own test sale area.
+
+## What `CardLinkHash` is
+
+- Paynet's internal identifier of a saved card. It is not the card number and not a Visa/Mastercard network token.
+- It is bound to the `SaleAreaCode` (which belongs to one merchant) and to the customer's `Customer.Code`.
+- It does not work in another sale area, even of the same merchant — unless Paynet has grouped those sale areas on its side.
 
 ## How it works
 
@@ -95,6 +101,7 @@ The rest is as usual: send the customer to `paymentLink` and wait for the `PAID`
 ## Rules
 
 - `CardLinkHash` works only together with the `Customer` it was issued for. Send the pair unchanged.
+- `CardLinkHash` is not covered by the notification signature. Before storing it, confirm the payment and the customer with the API — see [What the signature protects](#/guides/notifications).
 - The token is valid as long as the card is. If the card expired or was reissued, the customer pays with the new card and you receive a new `CardLinkHash` — replace the old one.
 - `CardLinkHash` in a notification may be `null` (the customer unchecked the box, or saving is not enabled). That is normal: just store nothing.
 - Keep `CardLinkHash` on your server and never expose it in the browser.

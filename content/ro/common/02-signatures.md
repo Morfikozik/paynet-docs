@@ -8,6 +8,7 @@ Signature = Base64( MD5( <string to sign> + SecretKey ) )
 
 - MD5 se calculează pe octeții **UTF-8** ai șirului (inclusiv pentru chirilice și diacritice românești).
 - Base64 se aplică pe **digestul brut de 16 octeți** (nu pe șirul hex de 32 de caractere). Rezultatul are mereu 24 de caractere și se termină cu `==`.
+- Nu o confundați cu câmpul `signature` din răspunsul `POST /api/order`: aceasta este o valoare internă a linkului de plată (32 de caractere, egală cu parametrul `s` din `paymentLink`). Nu o folosiți pentru verificări.
 
 Diferă doar modul în care se construiește șirul de semnat:
 

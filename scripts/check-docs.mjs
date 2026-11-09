@@ -49,6 +49,7 @@ for (const lang of languages) {
 for (const lang of languages) {
   for (const file of files[lang]) {
     const text = read(lang, file);
+    if (/sorted alphabetically by full name|отсортированные по алфавиту по полному имени|sortate alfabetic după numele complet/.test(text)) fail(`content/${lang}/${file}: notification fields must not be described as sorted alphabetically (Eventid comes before EventType)`);
     if (/up to 3 times|до 3 раз|până la 3 ori/.test(text)) fail(`content/${lang}/${file}: notifications are retried more than 3 times (7 attempts observed)`);
     if (/description of all `status` values will be published later|описание всех значений `status` будет опубликовано позже|descrierea tuturor valorilor `status` va fi publicată/.test(text)) fail(`content/${lang}/${file}: status values are confirmed, remove the draft note`);
   }
@@ -114,6 +115,23 @@ for (const lang of languages) {
   const notificationFile = files[lang].find((f) => f.endsWith('-notifications.md'));
   const notificationDoc = read(lang, notificationFile);
   if (!notificationDoc.includes(`Hash: ${expectedNotification}`)) fail(`content/${lang}/${notificationFile}: example Hash header should be ${expectedNotification}`);
+}
+
+// 4b. Every JavaScript sample must at least parse.
+const { execFileSync } = await import('node:child_process');
+for (const lang of languages) {
+  for (const file of files[lang]) {
+    codeBlocks(read(lang, file), 'javascript').forEach((code, index) => {
+      const tmp = path.join(os.tmpdir(), `paynet-syntax-${lang}-${index}-${process.pid}.mjs`);
+      fs.writeFileSync(tmp, code);
+      try {
+        execFileSync(process.execPath, ['--check', tmp], { stdio: 'pipe' });
+      } catch (error) {
+        fail(`content/${lang}/${file}: JavaScript sample #${index + 1} does not parse: ${String(error.stderr).split('\n').find((l) => l.includes('Error')) || ''}`);
+      }
+      fs.rmSync(tmp);
+    });
+  }
 }
 
 // 5. Notification code samples must use the real key spelling (Id / ExternalId).

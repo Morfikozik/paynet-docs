@@ -91,7 +91,7 @@ ExpectedHash   = Base64( MD5( UTF8( PreparedString + NotificationSecretKey ) ) )
 ```
 
 - Take the values exactly as they appear in the JSON body. A missing or `null` value is an empty string.
-- The order is fixed: the 9 fields above, sorted alphabetically by full name.
+- The order is fixed — exactly as in the line above. **Do not sort the names in code:** a plain sort puts `EventType` before `Eventid`, and the hash will not match.
 - Use the **notification** secret key (it is different from the checkout key).
 - Compare `ExpectedHash` with the `Hash` header. If they differ, reject the request (for example HTTP `400`) and do not change the order.
 
@@ -155,6 +155,98 @@ echo json_encode(['ResultCode' => 'SUCCESS']);
 
 > **Important:** build `PreparedString` from the values exactly as they appear in the JSON body. Do not reformat dates (keep `2026-11-09T12:00:00` as is) and do not convert numbers to another notation.
 
+## What the signature protects, and confirming with the API
+
+The `Hash` header protects only the fields that make up `PreparedString`:
+
+| Signed (checked by `Hash`) | Not signed |
+|---|---|
+| `EventDate`, `Eventid`, `EventType`, `Payment.Amount`, `Payment.Customer`, `Payment.ExternalId`, `Payment.Id`, `Payment.Merchant`, `Payment.StatusDate` | `Payment.PaidAmount`, `Payment.MoneyType`, `Payment.CardLinkHash`, `Payment.SaleAreaCode`, card and payer data (`CardMask`, `CardIssuer`, `PayerName`…), `Message` |
+
+A valid `Hash` confirms that order `ExternalId` is paid for `Amount`. It does **not** confirm the unsigned fields. Before you act on them — which amount to treat as received, whether to save a card — compare them with the authenticated API response `GET /api/order/merchant/{Order}`. That response is protected by your token and HTTPS.
+
+Compare the values, do not just call the method:
+
+| Check | Notification | API response |
+|---|---|---|
+| Payment | `Payment.Id` | `paymentId` |
+| Status | `EventType` = `PAID` | `status` = `4` |
+| Order amount | `Payment.Amount` (and your own order amount) | `amount.amount` |
+| Paid amount | `Payment.PaidAmount` | `amount.paidAmount` |
+| Customer | your order | `customer.code` |
+| Saved card | `Payment.CardLinkHash` | `cardLinkHash`, if the API returns it |
+
+If the values differ, do not fulfil the order automatically and do not save the card: send the order to manual review.
+
+If the signature is valid but you cannot fulfil the order (order not found, amounts differ), still answer `200` and send it to review: otherwise Paynet keeps retrying the notification.
+
+### Node.js
+
+```javascript
+// After the Hash check: store the notification, answer 200, then confirm with the API.
+const API = process.env.PAYNET_API_URL; // production https://ecom-api.paynet.md, test https://ecom-api-test.paynet.md
+
+async function confirmWithApi(notification, token, myOrder) {
+  const p = notification.Payment;
+  const response = await fetch(`${API}/api/order/merchant/${p.ExternalId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error(`Status check failed: HTTP ${response.status}`);
+  const payment = await response.json();
+
+  const problems = [];
+  if (payment.paymentId !== p.Id) problems.push('paymentId');
+  if (payment.status !== 4) problems.push('status');
+  if (payment.amount.amount !== p.Amount || p.Amount !== myOrder.amount) problems.push('Amount');
+  if (payment.amount.paidAmount !== p.PaidAmount) problems.push('PaidAmount');
+  if (payment.customer?.code !== myOrder.customerCode) problems.push('customer');
+  if (p.CardLinkHash && payment.cardLinkHash && payment.cardLinkHash !== p.CardLinkHash) problems.push('CardLinkHash');
+  return { ok: problems.length === 0, problems, payment };
+}
+
+// In the notification handler, after the Hash check:
+//   await saveNotificationOnce(p.Id, req.body);   // idempotent by Payment.Id
+//   res.status(200).json({ ResultCode: 'SUCCESS' });
+//   const check = await confirmWithApi(req.body, await getToken(), await loadOrder(p.ExternalId));
+//   if (check.ok) {
+//     if (p.PaidAmount === p.Amount /* or an agreed promotion */) await fulfil(p.ExternalId);
+//     if (p.CardLinkHash) await saveCard(check.payment.customer.code, p.CardLinkHash);
+//   } else {
+//     await sendToManualReview(p.ExternalId, check.problems); // do not fulfil automatically
+//   }
+```
+
+### PHP
+
+```php
+<?php
+// After the Hash check: store the notification, answer 200, then confirm with the API.
+function confirmWithApi(array $n, string $token, array $myOrder): array {
+    $api = getenv('PAYNET_API_URL'); // production https://ecom-api.paynet.md, test https://ecom-api-test.paynet.md
+    $p   = $n['Payment'];
+    $ch  = curl_init($api . '/api/order/merchant/' . $p['ExternalId']);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . $token],
+    ]);
+    $body = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if ($code !== 200) throw new RuntimeException("Status check failed: HTTP $code");
+    $pay = json_decode($body, true);
+
+    $problems = [];
+    if ($pay['paymentId'] !== $p['Id']) $problems[] = 'paymentId';
+    if ($pay['status'] !== 4) $problems[] = 'status';
+    if ($pay['amount']['amount'] !== $p['Amount'] || $p['Amount'] !== $myOrder['amount']) $problems[] = 'Amount';
+    if ($pay['amount']['paidAmount'] !== $p['PaidAmount']) $problems[] = 'PaidAmount';
+    if (($pay['customer']['code'] ?? null) !== $myOrder['customerCode']) $problems[] = 'customer';
+    if (!empty($p['CardLinkHash']) && !empty($pay['cardLinkHash']) && $pay['cardLinkHash'] !== $p['CardLinkHash']) $problems[] = 'CardLinkHash';
+    return ['ok' => !$problems, 'problems' => $problems, 'payment' => $pay];
+}
+// If 'ok' is false: do not fulfil automatically, send the order to manual review.
+```
+
 ## Respond and retries
 
 - Answer HTTP `200` **after** you have verified the hash and saved the result.
@@ -163,7 +255,7 @@ echo json_encode(['ResultCode' => 'SUCCESS']);
 - Because of retries the same notification can arrive more than once. Process each `Payment.Id` only once.
 - If a notification did not arrive (for example, your server was down longer than all attempts), check the status with `GET /api/order/{paymentId}` or `GET /api/order/merchant/{Order}`. You can ask Paynet support to send it again.
 - If your server is behind a firewall, ask Paynet support for the IP addresses notifications come from.
-- `PAID` is final: antifraud acts before the payment is confirmed, so it will not cancel this payment later. Only your own [refund](#/guides/errors-and-statuses) changes a paid payment.
+- Antifraud will not cancel a payment you received `PAID` for: it acts before the payment is confirmed. A paid payment changes status only after your own [refund](#/guides/errors-and-statuses) (`5` or `6`).
 
 ## Notification simulator on this portal
 

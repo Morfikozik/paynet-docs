@@ -28,7 +28,7 @@
             "application/json": {
               "example": {
                 "CardLinkHash": "1037153_b3f50103610e4fe9948ff8db553151f3",
-                "SaleAreaCode": "",
+                "SaleAreaCode": "onlidocumentation_md",
                 "CustomerCode": "customer_code"
               }
             }
@@ -46,7 +46,7 @@
             }
           },
           "400": {
-            "description": "The wrong entred parametrs",
+            "description": "Invalid request parameters.",
             "content": {
               "application/json": {
                 "schema": {
@@ -79,7 +79,7 @@
             }
           },
           "404": {
-            "description": "Access denied due to invalid or missing authentication token.",
+            "description": "Record not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -137,40 +137,27 @@
           "content": {
             "application/json": {
               "example": {
-                "Order": 65465465,
+                "Order": 1762444800000,
                 "SaleAreaCode": "onlidocumentation_md",
-                "LinkUrlSuccess": "https://shop-test.com/success",
-                "LinkUrlCancel": "https://shop-test.com/cancel",
-                "CardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
+                "LinkUrlSuccess": "https://shop.example/payment/success",
+                "LinkUrlCancel": "https://shop.example/payment/cancel",
                 "Customer": {
                   "Code": "464566161",
                   "NameFirst": "First Name",
                   "NameLast": "Last Name",
-                  "email": "mytestemail@gmail.com",
+                  "email": "customer@example.com",
                   "PhoneNumber": "37360000000"
                 },
                 "Currency": 498,
-                "ExpiryDate": "2030-12-31T23:59:59",
+                "ExpiryDate": "2026-12-31T23:59:59",
                 "Services": [
                   {
                     "Name": "Demo eShop",
-                    "Description": "Demo eShop online desc",
-                    "Amount": 300,
-                    "Products": [
-                      {
-                        "Amount": 300,
-                        "Code": "546465654",
-                        "Description": "Demo product",
-                        "LineNo": 1,
-                        "Name": "Demo product",
-                        "UnitPrice": 100,
-                        "Quantity": 3,
-                        "TotalAmount": 300
-                      }
-                    ]
+                    "Description": "Order #1762444800000",
+                    "Amount": 300
                   }
                 ],
-                "MoneyType": "All",
+                "MoneyType": "Card",
                 "Lang": "EN"
               }
             }
@@ -178,71 +165,71 @@
         },
         "responses": {
           "200": {
-            "description": "Success executed create order.",
+            "description": "Order created. Real response from the test environment for the request example (status 1 = registered, not paid yet).",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PaymentResponse"
                 },
                 "example": {
-                  "paymentId": 317184,
-                  "paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
-                  "cardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
+                  "paymentId": 328731,
+                  "paymentLink": "https://test.paynet.md/ecom/getecom/328731?s=8fa1bd0923368d3bb700fccacc263735",
+                  "cardLinkHash": null,
                   "status": 1,
                   "message": null,
-                  "order": 18223,
-                  "merchantCode": "111125",
-                  "saleAreaCode": "makle",
-                  "linkUrlSuccess": "http://localhost/home/success",
-                  "linkUrlCancel": "https://shop-test.paynet.md",
-                  "signature": "ea20bad9b2c464765542e000eb886057",
+                  "order": 1762444800000,
+                  "merchantCode": "265505",
+                  "saleAreaCode": "onlidocumentation_md",
+                  "linkUrlSuccess": "https://shop.example/payment/success",
+                  "linkUrlCancel": "https://shop.example/payment/cancel",
+                  "signature": "8fa1bd0923368d3bb700fccacc263735",
                   "amount": {
-                    "requestAmount": 3,
+                    "requestAmount": 300,
                     "requestCurrency": 498,
-                    "amount": 3,
-                    "amountCurrency": 3
+                    "amount": 300,
+                    "paidAmount": null
                   },
                   "customer": {
-                    "code": null,
-                    "nameFirst": null,
-                    "nameLast": null,
-                    "email": null,
+                    "code": "464566161",
+                    "nameFirst": "First Name",
+                    "nameLast": "Last Name",
+                    "email": "customer@example.com",
                     "country": null,
                     "city": null,
                     "address": null,
-                    "phoneNumber": null,
+                    "phoneNumber": "37360000000",
                     "cardLinkHash": null
                   },
                   "payer": null,
-                  "expiryDate": "2026-04-03 12:01:12",
-                  "registered": "2026-04-01 15:01:12",
+                  "expiryDate": "2026-12-31 23:59:59",
+                  "registered": "2026-11-09 18:16:41",
                   "paidDate": null,
                   "services": [
                     {
-                      "name": "Card of products",
-                      "description": "Cart of products",
-                      "amount": 3,
+                      "name": "Demo eShop",
+                      "description": "Order #1762444800000",
+                      "amount": 300,
                       "products": [
                         {
                           "lineNo": 1,
                           "name": "Demo eShop",
-                          "description": "Demo eShop online desc",
-                          "unitPrice": 3,
+                          "description": "Order #1762444800000",
+                          "unitPrice": 300,
                           "unitProduct": null,
                           "quantity": 100,
-                          "amount": 3,
-                          "totalAmount": 3
+                          "amount": 300,
+                          "totalAmount": 300
                         }
                       ]
                     }
                   ],
-                  "moneyType": "All"
+                  "moneyType": "Card"
                 }
               }
             }
           },
           "400": {
-            "description": "The wrong entred parametrs",
+            "description": "Invalid request parameters.",
             "content": {
               "application/json": {
                 "schema": {
@@ -325,65 +312,65 @@
         ],
         "responses": {
           "200": {
-            "description": "Success executed get order.",
+            "description": "Payment found. Real response from the test environment (status 1 = registered, not paid yet).",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PaymentResponse"
                 },
                 "example": {
-                  "paymentId": 317184,
-                  "paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
-                  "cardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
+                  "paymentId": 328731,
+                  "paymentLink": "https://test.paynet.md/ecom/getecom",
+                  "cardLinkHash": null,
                   "status": 1,
                   "message": null,
-                  "order": 18223,
-                  "merchantCode": "111125",
-                  "saleAreaCode": "makle",
-                  "linkUrlSuccess": "http://localhost/home/success",
-                  "linkUrlCancel": "https://shop-test.paynet.md",
-                  "signature": "ea20bad9b2c464765542e000eb886057",
+                  "order": 1762444800000,
+                  "merchantCode": "265505",
+                  "saleAreaCode": "onlidocumentation_md",
+                  "linkUrlSuccess": "https://shop.example/payment/success",
+                  "linkUrlCancel": "https://shop.example/payment/cancel",
+                  "signature": null,
                   "amount": {
-                    "requestAmount": 3,
+                    "requestAmount": 300,
                     "requestCurrency": 498,
-                    "amount": 3,
-                    "amountCurrency": 3
+                    "amount": 300,
+                    "paidAmount": null
                   },
                   "customer": {
-                    "code": null,
-                    "nameFirst": null,
-                    "nameLast": null,
-                    "email": null,
+                    "code": "464566161",
+                    "nameFirst": "First Name",
+                    "nameLast": "Last Name",
+                    "email": "customer@example.com",
                     "country": null,
                     "city": null,
                     "address": null,
-                    "phoneNumber": null,
+                    "phoneNumber": "37360000000",
                     "cardLinkHash": null
                   },
                   "payer": null,
-                  "expiryDate": "2026-04-03 12:01:12",
-                  "registered": "2026-04-01 15:01:12",
+                  "expiryDate": "2026-12-31 23:59:59",
+                  "registered": "2026-11-09 18:16:41",
                   "paidDate": null,
                   "services": [
                     {
-                      "name": "Card of products",
-                      "description": "Cart of products",
-                      "amount": 3,
+                      "name": "Demo eShop",
+                      "description": "Order #1762444800000",
+                      "amount": 300,
                       "products": [
                         {
                           "lineNo": 1,
                           "name": "Demo eShop",
-                          "description": "Demo eShop online desc",
-                          "unitPrice": 3,
+                          "description": "Order #1762444800000",
+                          "unitPrice": 300,
                           "unitProduct": null,
                           "quantity": 100,
-                          "amount": 3,
-                          "totalAmount": 3
+                          "amount": 300,
+                          "totalAmount": 300
                         }
                       ]
                     }
                   ],
-                  "moneyType": "All"
+                  "moneyType": "Card"
                 }
               }
             }
@@ -405,7 +392,7 @@
             }
           },
           "404": {
-            "description": "The wrong entred parametrs",
+            "description": "Record not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -472,65 +459,65 @@
         ],
         "responses": {
           "200": {
-            "description": "Success executed get order.",
+            "description": "Payment found. Real response from the test environment (status 1 = registered, not paid yet).",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PaymentResponse"
                 },
                 "example": {
-                  "paymentId": 317184,
-                  "paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
-                  "cardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
+                  "paymentId": 328731,
+                  "paymentLink": "https://test.paynet.md/ecom/getecom",
+                  "cardLinkHash": null,
                   "status": 1,
                   "message": null,
-                  "order": 18223,
-                  "merchantCode": "111125",
-                  "saleAreaCode": "makle",
-                  "linkUrlSuccess": "http://localhost/home/success",
-                  "linkUrlCancel": "https://shop-test.paynet.md",
-                  "signature": "ea20bad9b2c464765542e000eb886057",
+                  "order": 1762444800000,
+                  "merchantCode": "265505",
+                  "saleAreaCode": "onlidocumentation_md",
+                  "linkUrlSuccess": "https://shop.example/payment/success",
+                  "linkUrlCancel": "https://shop.example/payment/cancel",
+                  "signature": null,
                   "amount": {
-                    "requestAmount": 3,
+                    "requestAmount": 300,
                     "requestCurrency": 498,
-                    "amount": 3,
-                    "amountCurrency": 3
+                    "amount": 300,
+                    "paidAmount": null
                   },
                   "customer": {
-                    "code": null,
-                    "nameFirst": null,
-                    "nameLast": null,
-                    "email": null,
+                    "code": "464566161",
+                    "nameFirst": "First Name",
+                    "nameLast": "Last Name",
+                    "email": "customer@example.com",
                     "country": null,
                     "city": null,
                     "address": null,
-                    "phoneNumber": null,
+                    "phoneNumber": "37360000000",
                     "cardLinkHash": null
                   },
                   "payer": null,
-                  "expiryDate": "2026-04-03 12:01:12",
-                  "registered": "2026-04-01 15:01:12",
+                  "expiryDate": "2026-12-31 23:59:59",
+                  "registered": "2026-11-09 18:16:41",
                   "paidDate": null,
                   "services": [
                     {
-                      "name": "Card of products",
-                      "description": "Cart of products",
-                      "amount": 3,
+                      "name": "Demo eShop",
+                      "description": "Order #1762444800000",
+                      "amount": 300,
                       "products": [
                         {
                           "lineNo": 1,
                           "name": "Demo eShop",
-                          "description": "Demo eShop online desc",
-                          "unitPrice": 3,
+                          "description": "Order #1762444800000",
+                          "unitPrice": 300,
                           "unitProduct": null,
                           "quantity": 100,
-                          "amount": 3,
-                          "totalAmount": 3
+                          "amount": 300,
+                          "totalAmount": 300
                         }
                       ]
                     }
                   ],
-                  "moneyType": "All"
+                  "moneyType": "Card"
                 }
               }
             }
@@ -552,7 +539,7 @@
             }
           },
           "404": {
-            "description": "The wrong entred parametrs",
+            "description": "Record not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -629,7 +616,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success executed download statement."
+            "description": "Payments found for the period."
           },
           "400": {
             "description": "One or more entered parameters are incorrect.",
@@ -718,21 +705,21 @@
         },
         "responses": {
           "200": {
-            "description": "Success executed refund.",
+            "description": "Refund done. Real response from the test environment. eventDate uses the format dd.MM.yyyy HH:mm:ss.",
             "content": {
               "application/json": {
                 "example": {
-                  "Invoice": 296901,
-                  "SaleAreaCode": "makle",
-                  "Customer": null,
-                  "EventDate": "02.05.2025 15:01:07",
-                  "RefundType": "full",
-                  "Currency": 498,
-                  "Amount": 50000,
-                  "Merchant": "111125",
-                  "CardMask": null,
-                  "CardLinkHash": null,
-                  "MoneyType": "MIA_QR"
+                  "paymentId": 328733,
+                  "saleAreaCode": "onlidocumentation_md",
+                  "customer": "464566161",
+                  "eventDate": "09.11.2026 18:17:54",
+                  "refundType": "full",
+                  "currency": 498,
+                  "amount": 400,
+                  "merchant": "265505",
+                  "cardMask": "411111******1111",
+                  "cardLinkHash": null,
+                  "moneyType": "CYBER_SOURCE"
                 }
               }
             }
@@ -823,7 +810,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success executed download statement file."
+            "description": "Statement for the period."
           },
           "400": {
             "description": "One or more entered parameters are incorrect.",
@@ -919,7 +906,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success executed download statement.",
+            "description": "Statement as an .xlsx file.",
             "content": {
               "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
                 "schema": {
@@ -930,7 +917,7 @@
             }
           },
           "400": {
-            "description": "The wrong entred parametrs",
+            "description": "Invalid request parameters.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1028,7 +1015,7 @@
             }
           },
           "500": {
-            "description": "The wrong entred parametrs",
+            "description": "Request failed. See the error body.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1327,41 +1314,45 @@
       },
       "RefundRequest": {
         "required": [
-          "reason",
-          "refundType",
-          "saleAreaCode"
+          "PaymentId",
+          "SaleAreaCode",
+          "RefundType",
+          "Amount",
+          "Currency",
+          "Reason"
         ],
         "type": "object",
         "properties": {
-          "paymentId": {
+          "PaymentId": {
             "type": "integer",
             "description": "The unique internal identifier of the original payment transaction to be refunded.",
             "format": "int64"
           },
-          "saleAreaCode": {
+          "SaleAreaCode": {
             "type": "string",
-            "description": "The code identifying the specific sale area or point of sale where the original transaction occurred.",
-            "nullable": true
+            "description": "The code identifying the specific sale area or point of sale where the original transaction occurred."
           },
-          "refundType": {
+          "RefundType": {
             "type": "string",
-            "description": "The type of refund being requested (e.g., \"Full\", \"Partial\").",
-            "nullable": true
+            "description": "The type of refund: \"full\" or \"partial\".",
+            "enum": [
+              "full",
+              "partial"
+            ]
           },
-          "amount": {
+          "Amount": {
             "type": "integer",
             "description": "The exact amount to be refunded.",
             "format": "int64"
           },
-          "currency": {
+          "Currency": {
             "type": "integer",
             "description": "The numeric ISO code of the currency for the refund amount.",
             "format": "int32"
           },
-          "reason": {
+          "Reason": {
             "type": "string",
-            "description": "A descriptive reason or justification for processing the refund.",
-            "nullable": true
+            "description": "A descriptive reason or justification for processing the refund."
           }
         },
         "additionalProperties": false,

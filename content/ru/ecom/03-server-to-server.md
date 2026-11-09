@@ -123,25 +123,28 @@ Content-Type: application/json
 
 ```json
 {
-  "paymentId": 317184,
-  "paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
+  "paymentId": 328731,
+  "paymentLink": "https://test.paynet.md/ecom/getecom/328731?s=8fa1bd0923368d3bb700fccacc263735",
+  "cardLinkHash": null,
   "status": 1,
-  "order": 18223,
-  "merchantCode": "111125",
-  "saleAreaCode": "makle",
-  "amount": { "requestAmount": 3, "requestCurrency": 498, "amount": 3, "amountCurrency": 3 },
-  "expiryDate": "2026-04-03 12:01:12",
-  "registered": "2026-04-01 15:01:12",
+  "order": 1762444800000,
+  "merchantCode": "265505",
+  "saleAreaCode": "onlidocumentation_md",
+  "amount": { "requestAmount": 300, "requestCurrency": 498, "amount": 300, "paidAmount": null },
+  "expiryDate": "2026-12-31 23:59:59",
+  "registered": "2026-11-09 18:16:41",
   "paidDate": null,
   "moneyType": "All"
 }
 ```
 
-(Сокращено. Полный ответ также содержит `customer`, `payer`, `services`, `cardLinkHash`, `signature`, `linkUrlSuccess`, `linkUrlCancel`.)
+(Ответ тестовой среды, сокращён. После оплаты `status` = `4`, заполнены `paidDate` и `amount.paidAmount`. Полный ответ также содержит `customer`, `payer`, `services`, `cardLinkHash`, `signature`, `linkUrlSuccess`, `linkUrlCancel`.)
 
 Сохраните `paymentId` вместе с заказом: это ключ для проверки статуса, возвратов и уведомлений.
 
 **Повтор запроса.** Если отправить тот же `Order` с теми же данными (пока он не оплачен), вернутся тот же `paymentId` и `paymentLink` — повтор после таймаута безопасен. Тот же `Order` с другими данными или после оплаты даёт `500 TECHNICAL_ERROR`. Если корзина изменилась, используйте новый `Order`.
+
+«Те же данные» значит буквально тот же запрос. Сохраните тело запроса вместе с заказом и при повторе отправляйте его без изменений: например, пересчитанный `ExpiryDate` — это уже другие данные.
 
 ## 3. Перенаправьте покупателя
 

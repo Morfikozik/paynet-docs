@@ -29,32 +29,44 @@
 						"200": {
 							"description": "Success executed authentication.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"access_token": "Ccxl7QQiMEoakkrUoiUn8PIgcmSN2ouP3XNjSmgqUH-Dn8UDg0...........",
-									"token_type": "bearer",
-									"expires_in": 14399
-								},
-								"schema": {
-									"$ref": "#/components/schemas/User"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/AuthResponse"
+									},
+									"example": {
+										"access_token": "Ccxl7QQiMEoakkrUoiUn8PIgcmSN2ouP3XNjSmgqUH-Dn8UDg0...........",
+										"token_type": "bearer",
+										"expires_in": 14399
+									}
 								}
 							}
 						},
 						"500": {
-							"description": "The wrong entred parametrs",
+							"description": "Request failed. See the error body.",
 							"content": {
-								"type": "application/json",
-								"object": [
-									{
-										"status": 500,
-										"message": "Wrong credentials",
-										"code": "AUTHENTICATION_FAILED",
-										"traceId": "ab2002e6-50e7-4cea-a112-eadbddf83505",
-										"details": null
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": [
+										{
+											"status": 500,
+											"message": "Wrong credentials",
+											"code": "AUTHENTICATION_FAILED",
+											"traceId": "ab2002e6-50e7-4cea-a112-eadbddf83505",
+											"details": null
+										}
+									]
+								}
+							}
+						},
+						"default": {
+							"description": "Error",
+							"content": {
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
 									}
-								],
-								"schema": {
-									"$ref": "#/components/schemas/User"
 								}
 							}
 						}
@@ -84,112 +96,126 @@
 					"request": {},
 					"responses": {
 						"200": {
-							"description": "Success executed create order.",
+							"description": "Order created. Real response from the test environment for the request example (status 1 = registered, not paid yet).",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"paymentId": 317184,
-									"paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
-									"cardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
-									"status": 1,
-									"message": null,
-									"order": 18223,
-									"merchantCode": "111125",
-									"saleAreaCode": "makle",
-									"linkUrlSuccess": "http://localhost/home/success",
-									"linkUrlCancel": "https://shop-test.paynet.md",
-									"signature": "ea20bad9b2c464765542e000eb886057",
-									"amount": {
-										"requestAmount": 3,
-										"requestCurrency": 498,
-										"amount": 3,
-										"amountCurrency": 3
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/PaymentResponse"
 									},
-									"customer": {
-										"code": null,
-										"nameFirst": null,
-										"nameLast": null,
-										"email": null,
-										"country": null,
-										"city": null,
-										"address": null,
-										"phoneNumber": null,
-										"cardLinkHash": null
-									},
-									"payer": null,
-									"expiryDate": "2026-04-03 12:01:12",
-									"registered": "2026-04-01 15:01:12",
-									"paidDate": null,
-									"services": [
-										{
-											"name": "Card of products",
-											"description": "Cart of products",
-											"amount": 3,
-											"products": [
-												{
-													"lineNo": 1,
-													"name": "Demo eShop",
-													"description": "Demo eShop online desc",
-													"unitPrice": 3,
-													"unitProduct": null,
-													"quantity": 100,
-													"amount": 3,
-													"totalAmount": 3
-												}
-											]
-										}
-									],
-									"moneyType": "All"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/User"
+									"example": {
+										"paymentId": 328731,
+										"paymentLink": "https://test.paynet.md/ecom/getecom/328731?s=8fa1bd0923368d3bb700fccacc263735",
+										"cardLinkHash": null,
+										"status": 1,
+										"message": null,
+										"order": 1762444800000,
+										"merchantCode": "265505",
+										"saleAreaCode": "onlidocumentation_md",
+										"linkUrlSuccess": "https://shop.example/payment/success",
+										"linkUrlCancel": "https://shop.example/payment/cancel",
+										"signature": "8fa1bd0923368d3bb700fccacc263735",
+										"amount": {
+											"requestAmount": 300,
+											"requestCurrency": 498,
+											"amount": 300,
+											"paidAmount": null
+										},
+										"customer": {
+											"code": "464566161",
+											"nameFirst": "First Name",
+											"nameLast": "Last Name",
+											"email": "customer@example.com",
+											"country": null,
+											"city": null,
+											"address": null,
+											"phoneNumber": "37360000000",
+											"cardLinkHash": null
+										},
+										"payer": null,
+										"expiryDate": "2026-12-31 23:59:59",
+										"registered": "2026-11-09 18:16:41",
+										"paidDate": null,
+										"services": [
+											{
+												"name": "Demo eShop",
+												"description": "Order #1762444800000",
+												"amount": 300,
+												"products": [
+													{
+														"lineNo": 1,
+														"name": "Demo eShop",
+														"description": "Order #1762444800000",
+														"unitPrice": 300,
+														"unitProduct": null,
+														"quantity": 100,
+														"amount": 300,
+														"totalAmount": 300
+													}
+												]
+											}
+										],
+										"moneyType": "Card"
+									}
 								}
 							}
 						},
 						"400": {
-							"description": "The wrong entred parametrs",
+							"description": "Invalid request parameters.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 400,
-									"message": "One or more entered parameters are incorrect.",
-									"code": "INVALID_PARAMETER",
-									"traceId": "9b9346f9-f83a-465d-ac8d-dc382c460c22",
-									"details": "The invalid parameter is: XXXX"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 400,
+										"message": "One or more entered parameters are incorrect.",
+										"code": "INVALID_PARAMETER",
+										"traceId": "9b9346f9-f83a-465d-ac8d-dc382c460c22",
+										"details": "The invalid parameter is: XXXX"
+									}
 								}
 							}
 						},
 						"401": {
 							"description": "Access denied due to invalid or missing authentication token.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"Status": 401,
-									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
-									"Code": "UNAUTHORIZED",
-									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"Status": 401,
+										"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+										"Code": "UNAUTHORIZED",
+										"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+									}
 								}
 							}
 						},
 						"500": {
 							"description": "Internal server error occurred while processing the request.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 500,
-									"message": "One or more errors occurred.",
-									"code": "TECHNICAL_ERROR",
-									"traceId": "c546f06c-3674-4b55-8e0f-ce8aac66f49f",
-									"details": "Please verify the transmitted data and try again, or contact support."
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 500,
+										"message": "One or more errors occurred.",
+										"code": "TECHNICAL_ERROR",
+										"traceId": "c546f06c-3674-4b55-8e0f-ce8aac66f49f",
+										"details": "Please verify the transmitted data and try again, or contact support."
+									}
+								}
+							}
+						},
+						"default": {
+							"description": "Error",
+							"content": {
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									}
 								}
 							}
 						}
@@ -218,112 +244,126 @@
 					],
 					"responses": {
 						"200": {
-							"description": "Success executed get order.",
+							"description": "Payment found. Real response from the test environment (status 1 = registered, not paid yet).",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"paymentId": 317184,
-									"paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
-									"cardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
-									"status": 1,
-									"message": null,
-									"order": 18223,
-									"merchantCode": "111125",
-									"saleAreaCode": "makle",
-									"linkUrlSuccess": "http://localhost/home/success",
-									"linkUrlCancel": "https://shop-test.paynet.md",
-									"signature": "ea20bad9b2c464765542e000eb886057",
-									"amount": {
-										"requestAmount": 3,
-										"requestCurrency": 498,
-										"amount": 3,
-										"amountCurrency": 3
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/PaymentResponse"
 									},
-									"customer": {
-										"code": null,
-										"nameFirst": null,
-										"nameLast": null,
-										"email": null,
-										"country": null,
-										"city": null,
-										"address": null,
-										"phoneNumber": null,
-										"cardLinkHash": null
-									},
-									"payer": null,
-									"expiryDate": "2026-04-03 12:01:12",
-									"registered": "2026-04-01 15:01:12",
-									"paidDate": null,
-									"services": [
-										{
-											"name": "Card of products",
-											"description": "Cart of products",
-											"amount": 3,
-											"products": [
-												{
-													"lineNo": 1,
-													"name": "Demo eShop",
-													"description": "Demo eShop online desc",
-													"unitPrice": 3,
-													"unitProduct": null,
-													"quantity": 100,
-													"amount": 3,
-													"totalAmount": 3
-												}
-											]
-										}
-									],
-									"moneyType": "All"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/User"
+									"example": {
+										"paymentId": 328731,
+										"paymentLink": "https://test.paynet.md/ecom/getecom",
+										"cardLinkHash": null,
+										"status": 1,
+										"message": null,
+										"order": 1762444800000,
+										"merchantCode": "265505",
+										"saleAreaCode": "onlidocumentation_md",
+										"linkUrlSuccess": "https://shop.example/payment/success",
+										"linkUrlCancel": "https://shop.example/payment/cancel",
+										"signature": null,
+										"amount": {
+											"requestAmount": 300,
+											"requestCurrency": 498,
+											"amount": 300,
+											"paidAmount": null
+										},
+										"customer": {
+											"code": "464566161",
+											"nameFirst": "First Name",
+											"nameLast": "Last Name",
+											"email": "customer@example.com",
+											"country": null,
+											"city": null,
+											"address": null,
+											"phoneNumber": "37360000000",
+											"cardLinkHash": null
+										},
+										"payer": null,
+										"expiryDate": "2026-12-31 23:59:59",
+										"registered": "2026-11-09 18:16:41",
+										"paidDate": null,
+										"services": [
+											{
+												"name": "Demo eShop",
+												"description": "Order #1762444800000",
+												"amount": 300,
+												"products": [
+													{
+														"lineNo": 1,
+														"name": "Demo eShop",
+														"description": "Order #1762444800000",
+														"unitPrice": 300,
+														"unitProduct": null,
+														"quantity": 100,
+														"amount": 300,
+														"totalAmount": 300
+													}
+												]
+											}
+										],
+										"moneyType": "Card"
+									}
 								}
 							}
 						},
 						"401": {
 							"description": "Access denied due to invalid or missing authentication token.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"Status": 401,
-									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
-									"Code": "UNAUTHORIZED",
-									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"Status": 401,
+										"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+										"Code": "UNAUTHORIZED",
+										"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+									}
 								}
 							}
 						},
 						"404": {
-							"description": "The wrong entred parametrs",
+							"description": "Record not found.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 404,
-									"message": "Record not found",
-									"code": "NOT_FOUND_RECORD",
-									"traceId": "e8e43475-84c2-405a-803f-eb68208f03be",
-									"details": "No records were found for the provided data"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 404,
+										"message": "Record not found",
+										"code": "NOT_FOUND_RECORD",
+										"traceId": "e8e43475-84c2-405a-803f-eb68208f03be",
+										"details": "No records were found for the provided data"
+									}
 								}
 							}
 						},
 						"500": {
 							"description": "Internal server error occurred while processing the request.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 500,
-									"message": "One or more errors occurred.",
-									"code": "TECHNICAL_ERROR",
-									"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
-									"details": "Please verify the transmitted data and try again, or contact support."
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 500,
+										"message": "One or more errors occurred.",
+										"code": "TECHNICAL_ERROR",
+										"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+										"details": "Please verify the transmitted data and try again, or contact support."
+									}
+								}
+							}
+						},
+						"default": {
+							"description": "Error",
+							"content": {
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									}
 								}
 							}
 						}
@@ -352,55 +392,65 @@
 					],
 					"responses": {
 						"200": {
-							"description": "Success executed refund.",
+							"description": "Refund done. Real response from the test environment. eventDate uses the format dd.MM.yyyy HH:mm:ss.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"Invoice": 296901,
-									"SaleAreaCode": "makle",
-									"Customer": null,
-									"EventDate": "02.05.2025 15:01:07",
-									"RefundType": "full",
-									"Currency": 498,
-									"Amount": 50000,
-									"Merchant": "111125",
-									"CardMask": null,
-									"CardLinkHash": null,
-									"MoneyType": "MIA_QR"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/User"
+								"application/json": {
+									"example": {
+										"paymentId": 328733,
+										"saleAreaCode": "onlidocumentation_md",
+										"customer": "464566161",
+										"eventDate": "09.11.2026 18:17:54",
+										"refundType": "full",
+										"currency": 498,
+										"amount": 400,
+										"merchant": "265505",
+										"cardMask": "411111******1111",
+										"cardLinkHash": null,
+										"moneyType": "CYBER_SOURCE"
+									}
 								}
 							}
 						},
 						"401": {
 							"description": "Access denied due to invalid or missing authentication token.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"Status": 401,
-									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
-									"Code": "UNAUTHORIZED",
-									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"Status": 401,
+										"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+										"Code": "UNAUTHORIZED",
+										"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+									}
 								}
 							}
 						},
 						"500": {
 							"description": "Internal server error occurred while processing the request.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 500,
-									"message": "One or more errors occurred.",
-									"code": "TECHNICAL_ERROR",
-									"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
-									"details": "Please verify the transmitted data and try again, or contact support."
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 500,
+										"message": "One or more errors occurred.",
+										"code": "TECHNICAL_ERROR",
+										"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+										"details": "Please verify the transmitted data and try again, or contact support."
+									}
+								}
+							}
+						},
+						"default": {
+							"description": "Error",
+							"content": {
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									}
 								}
 							}
 						}
@@ -431,75 +481,87 @@
 						"200": {
 							"description": "Success executed unlink card.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"responseCode": "SUCCESS"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/User"
+								"application/json": {
+									"example": {
+										"responseCode": "SUCCESS"
+									}
 								}
 							}
 						},
 						"400": {
-							"description": "The wrong entred parametrs",
+							"description": "Invalid request parameters.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 400,
-									"message": "One or more entered parameters are incorrect.",
-									"code": "INVALID_PARAMETER",
-									"traceId": "9b9346f9-f83a-465d-ac8d-dc382c460c22",
-									"details": "The invalid parameter is: XXXX"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 400,
+										"message": "One or more entered parameters are incorrect.",
+										"code": "INVALID_PARAMETER",
+										"traceId": "9b9346f9-f83a-465d-ac8d-dc382c460c22",
+										"details": "The invalid parameter is: XXXX"
+									}
 								}
 							}
 						},
 						"401": {
 							"description": "Access denied due to invalid or missing authentication token.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"Status": 401,
-									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
-									"Code": "UNAUTHORIZED",
-									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"Status": 401,
+										"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+										"Code": "UNAUTHORIZED",
+										"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+									}
 								}
 							}
 						},
 						"404": {
-							"description": "Access denied due to invalid or missing authentication token.",
+							"description": "Record not found.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 404,
-									"message": "Record not found",
-									"code": "NOT_FOUND_RECORD",
-									"traceId": "16ce780d-2e89-47b8-9cd2-6d0d136d9816",
-									"details": "No records were found for the provided data"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 404,
+										"message": "Record not found",
+										"code": "NOT_FOUND_RECORD",
+										"traceId": "16ce780d-2e89-47b8-9cd2-6d0d136d9816",
+										"details": "No records were found for the provided data"
+									}
 								}
 							}
 						},
 						"500": {
 							"description": "Internal server error occurred while processing the request.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 500,
-									"message": "One or more errors occurred.",
-									"code": "TECHNICAL_ERROR",
-									"traceId": "c546f06c-3674-4b55-8e0f-ce8aac66f49f",
-									"details": "Please verify the transmitted data and try again, or contact support."
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 500,
+										"message": "One or more errors occurred.",
+										"code": "TECHNICAL_ERROR",
+										"traceId": "c546f06c-3674-4b55-8e0f-ce8aac66f49f",
+										"details": "Please verify the transmitted data and try again, or contact support."
+									}
+								}
+							}
+						},
+						"default": {
+							"description": "Error",
+							"content": {
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									}
 								}
 							}
 						}
@@ -528,112 +590,126 @@
 					],
 					"responses": {
 						"200": {
-							"description": "Success executed get order.",
+							"description": "Payment found. Real response from the test environment (status 1 = registered, not paid yet).",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"paymentId": 317184,
-									"paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
-									"cardLinkHash": "1043650_db78d40d62d84675bb75d70bd31ac621",
-									"status": 1,
-									"message": null,
-									"order": 18223,
-									"merchantCode": "111125",
-									"saleAreaCode": "makle",
-									"linkUrlSuccess": "http://localhost/home/success",
-									"linkUrlCancel": "https://shop-test.paynet.md",
-									"signature": "ea20bad9b2c464765542e000eb886057",
-									"amount": {
-										"requestAmount": 3,
-										"requestCurrency": 498,
-										"amount": 3,
-										"amountCurrency": 3
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/PaymentResponse"
 									},
-									"customer": {
-										"code": null,
-										"nameFirst": null,
-										"nameLast": null,
-										"email": null,
-										"country": null,
-										"city": null,
-										"address": null,
-										"phoneNumber": null,
-										"cardLinkHash": null
-									},
-									"payer": null,
-									"expiryDate": "2026-04-03 12:01:12",
-									"registered": "2026-04-01 15:01:12",
-									"paidDate": null,
-									"services": [
-										{
-											"name": "Card of products",
-											"description": "Cart of products",
-											"amount": 3,
-											"products": [
-												{
-													"lineNo": 1,
-													"name": "Demo eShop",
-													"description": "Demo eShop online desc",
-													"unitPrice": 3,
-													"unitProduct": null,
-													"quantity": 100,
-													"amount": 3,
-													"totalAmount": 3
-												}
-											]
-										}
-									],
-									"moneyType": "All"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/User"
+									"example": {
+										"paymentId": 328731,
+										"paymentLink": "https://test.paynet.md/ecom/getecom",
+										"cardLinkHash": null,
+										"status": 1,
+										"message": null,
+										"order": 1762444800000,
+										"merchantCode": "265505",
+										"saleAreaCode": "onlidocumentation_md",
+										"linkUrlSuccess": "https://shop.example/payment/success",
+										"linkUrlCancel": "https://shop.example/payment/cancel",
+										"signature": null,
+										"amount": {
+											"requestAmount": 300,
+											"requestCurrency": 498,
+											"amount": 300,
+											"paidAmount": null
+										},
+										"customer": {
+											"code": "464566161",
+											"nameFirst": "First Name",
+											"nameLast": "Last Name",
+											"email": "customer@example.com",
+											"country": null,
+											"city": null,
+											"address": null,
+											"phoneNumber": "37360000000",
+											"cardLinkHash": null
+										},
+										"payer": null,
+										"expiryDate": "2026-12-31 23:59:59",
+										"registered": "2026-11-09 18:16:41",
+										"paidDate": null,
+										"services": [
+											{
+												"name": "Demo eShop",
+												"description": "Order #1762444800000",
+												"amount": 300,
+												"products": [
+													{
+														"lineNo": 1,
+														"name": "Demo eShop",
+														"description": "Order #1762444800000",
+														"unitPrice": 300,
+														"unitProduct": null,
+														"quantity": 100,
+														"amount": 300,
+														"totalAmount": 300
+													}
+												]
+											}
+										],
+										"moneyType": "Card"
+									}
 								}
 							}
 						},
 						"401": {
 							"description": "Access denied due to invalid or missing authentication token.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"Status": 401,
-									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
-									"Code": "UNAUTHORIZED",
-									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"Status": 401,
+										"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+										"Code": "UNAUTHORIZED",
+										"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+									}
 								}
 							}
 						},
 						"404": {
-							"description": "The wrong entred parametrs",
+							"description": "Record not found.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 404,
-									"message": "Record not found",
-									"code": "NOT_FOUND_RECORD",
-									"traceId": "e8e43475-84c2-405a-803f-eb68208f03be",
-									"details": "No records were found for the provided data"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 404,
+										"message": "Record not found",
+										"code": "NOT_FOUND_RECORD",
+										"traceId": "e8e43475-84c2-405a-803f-eb68208f03be",
+										"details": "No records were found for the provided data"
+									}
 								}
 							}
 						},
 						"500": {
 							"description": "Internal server error occurred while processing the request.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 500,
-									"message": "One or more errors occurred.",
-									"code": "TECHNICAL_ERROR",
-									"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
-									"details": "Please verify the transmitted data and try again, or contact support."
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 500,
+										"message": "One or more errors occurred.",
+										"code": "TECHNICAL_ERROR",
+										"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+										"details": "Please verify the transmitted data and try again, or contact support."
+									}
+								}
+							}
+						},
+						"default": {
+							"description": "Error",
+							"content": {
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									}
 								}
 							}
 						}
@@ -662,59 +738,73 @@
 					],
 					"responses": {
 						"200": {
-							"description": "Success executed download statement.",
+							"description": "Statement as an .xlsx file.",
 							"content": {
-								"type": "application/vnd.ms-excel",
-								"object": {},
-								"schema": {
-									"$ref": " "
+								"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+									"schema": {
+										"type": "string",
+										"format": "binary"
+									}
+								}
+							}
+						},
+						"400": {
+							"description": "Invalid request parameters.",
+							"content": {
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 400,
+										"message": "One or more entered parameters are incorrect.",
+										"code": "INVALID_PARAMETER",
+										"traceId": "cf5573ee-4749-4190-8a1a-881ee53e7c0a",
+										"details": "The invalid parameter is: dateStart | dateFinish"
+									}
 								}
 							}
 						},
 						"401": {
 							"description": "Access denied due to invalid or missing authentication token.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"Status": 401,
-									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
-									"Code": "UNAUTHORIZED",
-									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
-								}
-							}
-						},
-						"400": {
-							"description": "The wrong entred parametrs",
-							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 400,
-									"message": "One or more entered parameters are incorrect.",
-									"code": "INVALID_PARAMETER",
-									"traceId": "cf5573ee-4749-4190-8a1a-881ee53e7c0a",
-									"details": "The invalid parameter is: dateStart | dateFinish"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/ErrorObj"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"Status": 401,
+										"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+										"Code": "UNAUTHORIZED",
+										"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+									}
 								}
 							}
 						},
 						"500": {
 							"description": "Internal server error occurred while processing the request.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 500,
-									"message": "One or more errors occurred.",
-									"code": "TECHNICAL_ERROR",
-									"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
-									"details": "Please verify the transmitted data and try again, or contact support."
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 500,
+										"message": "One or more errors occurred.",
+										"code": "TECHNICAL_ERROR",
+										"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+										"details": "Please verify the transmitted data and try again, or contact support."
+									}
+								}
+							}
+						},
+						"default": {
+							"description": "Error",
+							"content": {
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									}
 								}
 							}
 						}
@@ -743,59 +833,65 @@
 					],
 					"responses": {
 						"200": {
-							"description": "Success executed download statement file.",
-							"content": {
-								"type": "application/vnd.ms-excel",
-								"object": {},
-								"schema": {
-									"$ref": " "
-								}
-							}
+							"description": "Statement for the period."
 						},
 						"400": {
 							"description": "One or more entered parameters are incorrect.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 400,
-									"message": "One or more entered parameters are incorrect.",
-									"code": "INVALID_PARAMETER",
-									"traceId": "9697f2c8-b1c2-490a-84b3-8adda9bc22e9",
-									"details": "The invalid parameter is: dateStart | dateFinish"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 400,
+										"message": "One or more entered parameters are incorrect.",
+										"code": "INVALID_PARAMETER",
+										"traceId": "9697f2c8-b1c2-490a-84b3-8adda9bc22e9",
+										"details": "The invalid parameter is: dateStart | dateFinish"
+									}
 								}
 							}
 						},
 						"401": {
 							"description": "Access denied due to invalid or missing authentication token.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"Status": 401,
-									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
-									"Code": "UNAUTHORIZED",
-									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"Status": 401,
+										"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+										"Code": "UNAUTHORIZED",
+										"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+									}
 								}
 							}
 						},
 						"500": {
 							"description": "Internal server error occurred while processing the request.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 500,
-									"message": "One or more errors occurred.",
-									"code": "TECHNICAL_ERROR",
-									"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
-									"details": "Please verify the transmitted data and try again, or contact support."
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 500,
+										"message": "One or more errors occurred.",
+										"code": "TECHNICAL_ERROR",
+										"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+										"details": "Please verify the transmitted data and try again, or contact support."
+									}
+								}
+							}
+						},
+						"default": {
+							"description": "Error",
+							"content": {
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									}
 								}
 							}
 						}
@@ -824,59 +920,65 @@
 					],
 					"responses": {
 						"200": {
-							"description": "Success executed download statement.",
-							"content": {
-								"type": "application/vnd.ms-excel",
-								"object": {},
-								"schema": {
-									"$ref": " "
-								}
-							}
+							"description": "Payments found for the period."
 						},
 						"400": {
 							"description": "One or more entered parameters are incorrect.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 400,
-									"message": "One or more entered parameters are incorrect.",
-									"code": "INVALID_PARAMETER",
-									"traceId": "9697f2c8-b1c2-490a-84b3-8adda9bc22e9",
-									"details": "The invalid parameter is: dateStart | dateFinish"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 400,
+										"message": "One or more entered parameters are incorrect.",
+										"code": "INVALID_PARAMETER",
+										"traceId": "9697f2c8-b1c2-490a-84b3-8adda9bc22e9",
+										"details": "The invalid parameter is: dateStart | dateFinish"
+									}
 								}
 							}
 						},
 						"401": {
 							"description": "Access denied due to invalid or missing authentication token.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"Status": 401,
-									"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
-									"Code": "UNAUTHORIZED",
-									"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"Status": 401,
+										"Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+										"Code": "UNAUTHORIZED",
+										"TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+									}
 								}
 							}
 						},
 						"500": {
 							"description": "Internal server error occurred while processing the request.",
 							"content": {
-								"type": "application/json",
-								"object": {
-									"status": 500,
-									"message": "One or more errors occurred.",
-									"code": "TECHNICAL_ERROR",
-									"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
-									"details": "Please verify the transmitted data and try again, or contact support."
-								},
-								"schema": {
-									"$ref": "#/components/schemas/Payment"
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									},
+									"example": {
+										"status": 500,
+										"message": "One or more errors occurred.",
+										"code": "TECHNICAL_ERROR",
+										"traceId": "6bc2b683-e796-43ae-9775-6d9f116675a6",
+										"details": "Please verify the transmitted data and try again, or contact support."
+									}
+								}
+							}
+						},
+						"default": {
+							"description": "Error",
+							"content": {
+								"application/json": {
+									"schema": {
+										"$ref": "#/components/schemas/ErrorModel"
+									}
 								}
 							}
 						}

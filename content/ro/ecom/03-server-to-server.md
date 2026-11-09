@@ -123,25 +123,28 @@ Nu există o valoare separată pentru Apple Pay și Google Pay: apar atât cu `C
 
 ```json
 {
-  "paymentId": 317184,
-  "paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
+  "paymentId": 328731,
+  "paymentLink": "https://test.paynet.md/ecom/getecom/328731?s=8fa1bd0923368d3bb700fccacc263735",
+  "cardLinkHash": null,
   "status": 1,
-  "order": 18223,
-  "merchantCode": "111125",
-  "saleAreaCode": "makle",
-  "amount": { "requestAmount": 3, "requestCurrency": 498, "amount": 3, "amountCurrency": 3 },
-  "expiryDate": "2026-04-03 12:01:12",
-  "registered": "2026-04-01 15:01:12",
+  "order": 1762444800000,
+  "merchantCode": "265505",
+  "saleAreaCode": "onlidocumentation_md",
+  "amount": { "requestAmount": 300, "requestCurrency": 498, "amount": 300, "paidAmount": null },
+  "expiryDate": "2026-12-31 23:59:59",
+  "registered": "2026-11-09 18:16:41",
   "paidDate": null,
   "moneyType": "All"
 }
 ```
 
-(Prescurtat. Răspunsul complet conține și `customer`, `payer`, `services`, `cardLinkHash`, `signature`, `linkUrlSuccess`, `linkUrlCancel`.)
+(Răspuns din mediul de test, prescurtat. După plată `status` = `4`, iar `paidDate` și `amount.paidAmount` sunt completate. Răspunsul complet conține și `customer`, `payer`, `services`, `cardLinkHash`, `signature`, `linkUrlSuccess`, `linkUrlCancel`.)
 
 Salvați `paymentId` împreună cu comanda: este cheia pentru verificarea statusului, rambursări și notificări.
 
 **Repetarea cererii.** Dacă trimiteți din nou același `Order` cu aceleași date (cât timp nu este plătit), primiți același `paymentId` și `paymentLink` — repetarea după un timeout este sigură. Același `Order` cu date diferite sau după plată dă `500 TECHNICAL_ERROR`. Dacă s-a schimbat coșul, folosiți un `Order` nou.
+
+„Aceleași date” înseamnă literal aceeași cerere. Salvați corpul cererii împreună cu comanda și retrimiteți-l neschimbat: de exemplu, un `ExpiryDate` recalculat înseamnă deja date diferite.
 
 ## 3. Redirecționați clientul
 

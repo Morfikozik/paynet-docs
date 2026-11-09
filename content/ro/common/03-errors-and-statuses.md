@@ -121,6 +121,7 @@ O plată eșuată nu generează notificare: clientul revine la `LinkUrlCancel`. 
 |---|---|---|
 | `ExpiryDate` în cereri | `YYYY-MM-DDTHH:mm:ss`, **ora locală Chișinău** | `2026-12-31T23:59:59` |
 | Datele în răspunsurile despre plată | `YYYY-MM-DD HH:mm:ss` | `2026-04-01 15:01:12` |
+| `eventDate` în răspunsul la rambursare | `DD.MM.YYYY HH:mm:ss` | `09.11.2026 18:17:54` |
 | Datele în notificări | `YYYY-MM-DDTHH:mm:ss`, ora locală Chișinău | `2026-11-09T12:00:00` |
 | `from` / `to` în `/api/order/search` | dată-oră ISO 8601 | `2026-03-09T06:40:05.010Z` |
 | `dateStart` / `dateFinish` în extrase | dată | `2026-03-01` |
@@ -154,3 +155,34 @@ Ora locală Chișinău este fusul orar `Europe/Chisinau`: UTC+2 iarna, UTC+3 var
 | Rezultat | Imediat în răspunsul `POST /api/order/refund`. Pentru rambursări nu se trimite notificare pe callback. |
 | Statusul după | `5` după rambursarea integrală, `6` după cea parțială. Ambele sunt finale. |
 | Soldul comerciantului | Dacă în contul comerciantului din Paynet nu sunt bani, rambursarea nu trece. |
+
+### Răspunsuri la rambursare (verificat în mediul de test)
+
+| Situație | Răspuns |
+|---|---|
+| Rambursare efectuată | `200`, corpul mai jos |
+| Plata nu este achitată | `404 NOT_FOUND_RECORD` |
+| Suma depășește suma plătită | `400 INVALID_PARAMETER`, `details`: „The invalid parameter is: RefundType”. Câmpul din `details` este indicat greșit: cauza este suma |
+| Rambursare integrală după una parțială | `400 INVALID_PARAMETER`, `details`: „The invalid parameter is: RefundType” |
+
+```json
+{
+  "paymentId": 328733,
+  "saleAreaCode": "onlidocumentation_md",
+  "customer": "464566161",
+  "eventDate": "09.11.2026 18:17:54",
+  "refundType": "full",
+  "currency": 498,
+  "amount": 400,
+  "merchant": "265505",
+  "cardMask": "411111******1111",
+  "cardLinkHash": null,
+  "moneyType": "CYBER_SOURCE"
+}
+```
+
+- `eventDate` în răspunsul la rambursare are formatul `DD.MM.YYYY HH:mm:ss`.
+- `moneyType` aici este codul de procesare (de exemplu `CYBER_SOURCE`), nu valoarea din notificare (`CARD`…).
+- După rambursare `paidDate` al plății rămâne completat.
+
+> **Important:** mediul de test a acceptat o a doua rambursare parțială pentru aceeași plată. Regula Paynet este o singură rambursare per plată; nu vă bazați pe rambursări repetate în producție.

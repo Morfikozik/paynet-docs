@@ -49,9 +49,9 @@ Only the successful payment needs to be tested. There are no test cards for decl
 | 13 | Duplicate notification | send the same notification twice | your handler processes it once |
 | 14 | Hosted checkout | **Checkout form (try it)** | Paynet test payment page opens |
 | 15 | Refund | `POST /api/order/refund` for a paid payment | `200`; `status` becomes `5` (full) or `6` (partial) |
-| 16 | Second refund | repeat scenario 15 for the same payment | error: only one refund is possible |
-| 17 | Save a card | `POST /api/order` with `Customer`, pay keeping the "save card" checkbox | the `PAID` notification contains `CardLinkHash` |
-| 18 | Pay with a saved card | `POST /api/order` with `CardLinkHash` and the same `Customer` | the Paynet page shows the saved card |
+| 16 | Refund above the paid amount | `RefundType` `partial`, `Amount` above `PaidAmount` | `400 INVALID_PARAMETER` |
+| 17 | Save a card (if enabled for your `SaleAreaCode`) | `POST /api/order` with `Customer`, pay keeping the "save card" checkbox | the `PAID` notification contains `CardLinkHash` |
+| 18 | Pay with a saved card (if enabled) | `POST /api/order` with `CardLinkHash` and the same `Customer` | the Paynet page shows the saved card |
 | 19 | Customer left without paying | open `paymentLink`, close the page, open the link again | `status` stays `1`, payment is still possible |
 
 ## Testing from this portal

@@ -199,7 +199,11 @@ const rules = `## Rules for AI assistants
 - Paynet retries a notification while your server does not answer \`200\` (observed: 7 attempts in about 9 minutes, then it stops; the schedule is not guaranteed). Answer \`200\` fast, process each \`Payment.Id\` once, and poll the status API as a fallback.
 - Refunds: one refund per payment (full or partial), within 180 days, not for \`CASH_INVOICE\`, at most \`PaidAmount\`; the result is in the refund response (no callback); it fails if the merchant's Paynet balance is empty.
 - Saved cards (server-to-server only): send \`Customer\` to get \`Payment.CardLinkHash\` in the \`PAID\` notification (it may be \`null\`); next time send \`CardLinkHash\` with the same \`Customer\`. The customer still confirms on the Paynet page; it is not a silent charge.
-- Sections marked **Draft** are not confirmed by Paynet yet.`;
+- Notification signature order is fixed (EventDate, Eventid, EventType, Payment.Amount, Payment.Customer, Payment.ExternalId, Payment.Id, Payment.Merchant, Payment.StatusDate); never sort the names in code.
+- \`PaidAmount\`, \`MoneyType\` and \`CardLinkHash\` are not covered by the notification Hash. Before acting on them, compare with \`GET /api/order/merchant/{Order}\` (\`amount.paidAmount\`, \`cardLinkHash\`, \`customer.code\`, \`status\`); on any mismatch send the order to manual review. For a valid but unfulfillable notification still answer \`200\`.
+- To retry \`POST /api/order\` safely, resend the stored request body unchanged (a recomputed \`ExpiryDate\` is different data).
+- Refund errors: unpaid payment → \`404 NOT_FOUND_RECORD\`; amount above \`PaidAmount\` → \`400 INVALID_PARAMETER\` (details name \`RefundType\`). Refund response \`eventDate\` uses \`DD.MM.YYYY HH:mm:ss\`.
+- \`CardLinkHash\` is Paynet's internal saved-card token, bound to the \`SaleAreaCode\` and the \`Customer.Code\`.`;
 
 const reference = apiReference();
 

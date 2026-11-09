@@ -8,7 +8,13 @@ Funcționează doar la [integrarea server-to-server](#/guides/server-to-server).
 
 ## Activare
 
-Salvarea cardurilor se activează pentru `SaleAreaCode` dvs. pe partea Paynet: contactați managerul dvs. Paynet. În mediul de test este activată pentru `onlidocumentation_md`.
+Salvarea cardurilor se activează pentru `SaleAreaCode` dvs. pe partea Paynet: contactați managerul dvs. Paynet. Pentru zona de vânzare de test comună `onlidocumentation_md` ea nu este activată acum (pe pagina de plată nu există bifa, `CardLinkHash` nu vine). Pentru a testa scenariul, cereți activarea pentru zona dvs. de vânzare de test.
+
+## Ce este `CardLinkHash`
+
+- Identificatorul intern Paynet al unui card salvat. Nu este numărul cardului și nici un token de rețea Visa/Mastercard.
+- Este legat de `SaleAreaCode` (care aparține unui singur comerciant) și de `Customer.Code` al clientului.
+- Nu funcționează în altă zonă de vânzare, chiar a aceluiași comerciant — cu excepția cazului în care Paynet a grupat acele zone pe partea sa.
 
 ## Cum funcționează
 
@@ -95,6 +101,7 @@ Restul este ca de obicei: trimiteți clientul la `paymentLink` și așteptați n
 ## Reguli
 
 - `CardLinkHash` funcționează doar împreună cu `Customer` pentru care a fost emis. Trimiteți perechea neschimbată.
+- `CardLinkHash` nu este acoperit de semnătura notificării. Înainte de a-l salva, confirmați plata și clientul prin API — vezi [Ce protejează semnătura](#/guides/notifications).
 - Tokenul este valabil cât timp este valabil cardul. Dacă cardul a expirat sau a fost reemis, clientul plătește cu cardul nou și primiți un `CardLinkHash` nou — înlocuiți-l pe cel vechi.
 - `CardLinkHash` în notificare poate fi `null` (clientul a debifat sau salvarea nu este activată). Este normal: nu salvați nimic.
 - Păstrați `CardLinkHash` pe server și nu-l expuneți în browser.

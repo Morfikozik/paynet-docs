@@ -123,25 +123,28 @@ There is no separate value for Apple Pay or Google Pay: they are shown with `Car
 
 ```json
 {
-  "paymentId": 317184,
-  "paymentLink": "https://test.paynet.md/ecom/getecom/317184?s=ea20bad9b2c464765542e000eb886057",
+  "paymentId": 328731,
+  "paymentLink": "https://test.paynet.md/ecom/getecom/328731?s=8fa1bd0923368d3bb700fccacc263735",
+  "cardLinkHash": null,
   "status": 1,
-  "order": 18223,
-  "merchantCode": "111125",
-  "saleAreaCode": "makle",
-  "amount": { "requestAmount": 3, "requestCurrency": 498, "amount": 3, "amountCurrency": 3 },
-  "expiryDate": "2026-04-03 12:01:12",
-  "registered": "2026-04-01 15:01:12",
+  "order": 1762444800000,
+  "merchantCode": "265505",
+  "saleAreaCode": "onlidocumentation_md",
+  "amount": { "requestAmount": 300, "requestCurrency": 498, "amount": 300, "paidAmount": null },
+  "expiryDate": "2026-12-31 23:59:59",
+  "registered": "2026-11-09 18:16:41",
   "paidDate": null,
   "moneyType": "All"
 }
 ```
 
-(Shortened. The full response also contains `customer`, `payer`, `services`, `cardLinkHash`, `signature`, `linkUrlSuccess`, `linkUrlCancel`.)
+(Test environment response, shortened. After payment `status` = `4`, and `paidDate` and `amount.paidAmount` are filled. The full response also contains `customer`, `payer`, `services`, `cardLinkHash`, `signature`, `linkUrlSuccess`, `linkUrlCancel`.)
 
 Store `paymentId` together with your order. It is the key for status checks, refunds and notifications.
 
 **Repeating the request.** Sending the same `Order` again with the same data (while it is not paid) returns the same `paymentId` and `paymentLink`, so it is safe to retry after a timeout. The same `Order` with different data, or after payment, fails with `500 TECHNICAL_ERROR`. If the cart changes, use a new `Order`.
+
+"The same data" means literally the same request. Store the request body with the order and resend it unchanged: for example, a recomputed `ExpiryDate` already counts as different data.
 
 ## 3. Redirect the customer
 
