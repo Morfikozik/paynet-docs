@@ -31,7 +31,31 @@
 | `traceId` | Request ID. Send it to Paynet support when you report a problem. |
 | `details` | Extra information, e.g. the invalid parameter. |
 
-> **Note:** some `401` responses use capitalised keys (`Status`, `Message`, `Code`, `TraceId`). Read error fields case-insensitively. `/auth` may return the error object inside an array.
+> **Note:** `401` responses use capitalised keys (`Status`, `Message`, `Code`, `TraceId`). Read error fields case-insensitively. `/auth` may return the error object inside an array.
+
+### Invalid JSON or missing required fields
+
+If the request body cannot be read (invalid JSON, wrong types, a required field missing), the API answers `400` in a different format, with the error inside `errorInfo`:
+
+```json
+{
+  "errorInfo": {
+    "title": "One or more validation errors occurred.",
+    "status": 400,
+    "ppResponseCodeEnum": "TECHNICAL_ERROR",
+    "ppResponseCode": 1,
+    "ppResponseCodeText": "TECHNICAL_ERROR",
+    "errors": {
+      "$": ["JSON deserialization for type '…DeleteLinkedCardRequest' was missing required properties including: 'cardLinkHash', 'saleAreaCode', 'customerCode'."]
+    },
+    "traceId": "00-7c209d88f31e3e5cd2f7bd88ae2f23c2-ad167338e418068c-00"
+  }
+}
+```
+
+`errors` lists the problem fields. Handle both error formats: check for `errorInfo` first, then read `status` / `code` / `message`.
+
+Request field names are not case-sensitive: `CardLinkHash` and `cardLinkHash` are both accepted (checked on the test API). Use the spelling from the examples.
 
 ## Repeated order number (Order)
 

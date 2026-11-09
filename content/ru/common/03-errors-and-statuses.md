@@ -31,7 +31,31 @@
 | `traceId` | ID запроса. Передайте его в поддержку Paynet, когда сообщаете о проблеме. |
 | `details` | Дополнительная информация, например неверный параметр. |
 
-> **Примечание:** некоторые ответы `401` используют ключи с большой буквы (`Status`, `Message`, `Code`, `TraceId`). Читайте поля ошибки без учёта регистра. `/auth` может вернуть объект ошибки внутри массива.
+> **Примечание:** ответы `401` используют ключи с большой буквы (`Status`, `Message`, `Code`, `TraceId`). Читайте поля ошибки без учёта регистра. `/auth` может вернуть объект ошибки внутри массива.
+
+### Неверный JSON или нет обязательных полей
+
+Если тело запроса нельзя прочитать (неверный JSON, неверные типы, нет обязательного поля), API отвечает `400` в другом формате — ошибка внутри `errorInfo`:
+
+```json
+{
+  "errorInfo": {
+    "title": "One or more validation errors occurred.",
+    "status": 400,
+    "ppResponseCodeEnum": "TECHNICAL_ERROR",
+    "ppResponseCode": 1,
+    "ppResponseCodeText": "TECHNICAL_ERROR",
+    "errors": {
+      "$": ["JSON deserialization for type '…DeleteLinkedCardRequest' was missing required properties including: 'cardLinkHash', 'saleAreaCode', 'customerCode'."]
+    },
+    "traceId": "00-7c209d88f31e3e5cd2f7bd88ae2f23c2-ad167338e418068c-00"
+  }
+}
+```
+
+`errors` перечисляет проблемные поля. Обрабатывайте оба формата ошибок: сначала проверьте наличие `errorInfo`, затем читайте `status` / `code` / `message`.
+
+Названия полей в запросе не чувствительны к регистру: принимаются и `CardLinkHash`, и `cardLinkHash` (проверено на тестовом API). Используйте написание из примеров.
 
 ## Повтор номера заказа (Order)
 

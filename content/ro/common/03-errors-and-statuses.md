@@ -31,7 +31,31 @@
 | `traceId` | ID-ul cererii. Trimiteți-l suportului Paynet când raportați o problemă. |
 | `details` | Informații suplimentare, de ex. parametrul invalid. |
 
-> **Notă:** unele răspunsuri `401` folosesc chei cu majusculă (`Status`, `Message`, `Code`, `TraceId`). Citiți câmpurile erorii fără a ține cont de majuscule. `/auth` poate returna obiectul de eroare într-un array.
+> **Notă:** răspunsurile `401` folosesc chei cu majusculă (`Status`, `Message`, `Code`, `TraceId`). Citiți câmpurile erorii fără a ține cont de majuscule. `/auth` poate returna obiectul de eroare într-un array.
+
+### JSON invalid sau câmpuri obligatorii lipsă
+
+Dacă corpul cererii nu poate fi citit (JSON invalid, tipuri greșite, lipsește un câmp obligatoriu), API-ul răspunde `400` într-un alt format, cu eroarea în `errorInfo`:
+
+```json
+{
+  "errorInfo": {
+    "title": "One or more validation errors occurred.",
+    "status": 400,
+    "ppResponseCodeEnum": "TECHNICAL_ERROR",
+    "ppResponseCode": 1,
+    "ppResponseCodeText": "TECHNICAL_ERROR",
+    "errors": {
+      "$": ["JSON deserialization for type '…DeleteLinkedCardRequest' was missing required properties including: 'cardLinkHash', 'saleAreaCode', 'customerCode'."]
+    },
+    "traceId": "00-7c209d88f31e3e5cd2f7bd88ae2f23c2-ad167338e418068c-00"
+  }
+}
+```
+
+`errors` enumeră câmpurile cu probleme. Tratați ambele formate de eroare: verificați întâi `errorInfo`, apoi citiți `status` / `code` / `message`.
+
+Numele câmpurilor din cerere nu țin cont de majuscule: sunt acceptate și `CardLinkHash`, și `cardLinkHash` (verificat pe API-ul de test). Folosiți scrierea din exemple.
 
 ## Număr de comandă repetat (Order)
 

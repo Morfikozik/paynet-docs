@@ -56,13 +56,13 @@ The request has only two headers: `Content-Type` and `Hash`. There is no `Author
 | `Payment.Id` | long | Paynet payment ID (`paymentId`). Use it as the idempotency key. |
 | `Payment.ExternalId` | long | Your order number (`Order`). |
 | `Payment.SaleAreaCode` | string | Sale area code. |
-| `Payment.Customer` | string | Customer reference, may be masked. |
+| `Payment.Customer` | string | The customer code you sent in the order (`Customer.Code`), usually masked, e.g. `37369XXX111` or `name***@gmail.com`. |
 | `Payment.StatusDate` | string | When the payment reached this status (Chișinău local time). |
 | `Payment.Amount` | long | Order amount in minor units, as you sent it. |
 | `Payment.PaidAmount` | long | Amount actually paid by the customer, in minor units. See below. |
 | `Payment.Merchant` | string | Your merchant code. |
 | `Payment.MoneyType` | string | How the customer paid: `CARD`, `APPLEPAY`, `GOOGLEPAY`, `MIA_QR`, `PAYNET`, `CASH_INVOICE`. |
-| `Payment.CardMask`, `CardExpireMonth`, `CardExpireYear`, `CardIssuer` | string | Card details for card payments; may be `null`. |
+| `Payment.CardMask`, `CardExpireMonth`, `CardExpireYear`, `CardIssuer` | string | Card details. Filled for `CARD`, and also for `APPLEPAY` and `GOOGLEPAY` (the card behind the wallet); `null` for other payment methods. |
 | `Payment.CardLinkHash` | string | Saved card hash; may be `null`. |
 | `Payment.PayerName`, `PayerSurname`, `PayerIDNP` | string | Payer details; may be `null`. |
 | `Payment.RRN` | string | Retrieval reference number. |
@@ -166,9 +166,11 @@ echo json_encode(['ResultCode' => 'SUCCESS']);
 
 Open **General → Notifications → Notification simulator**:
 
-1. Enter your callback URL (it must be reachable from the internet and accept requests from the browser — CORS).
+1. Enter your callback URL. It must be reachable from the internet and, **for the simulator only**, accept requests from the browser (CORS).
 2. Enter the notification secret key (test: `D9873689-E5F8-4272-A67F-0D8BA3F9BAA7`).
 3. Enter your merchant order number (`Order`) of a **paid** test payment and press **Get** — the portal loads the payment.
 4. Press **Send notification** — the portal sends a signed `PAID` notification built from that payment to your URL and shows the `PreparedString` and `Hash` it used.
 
 This is a simulation sent from your browser, not a real Paynet notification. For unpaid orders the simulator sends nothing, just like Paynet.
+
+> **Important:** CORS is needed only for the simulator, because it posts from your browser. Real notifications are sent by the Paynet server, and CORS does not apply to them: do not enable CORS on your production endpoint for Paynet. A successful simulation checks your signature verification and processing, not delivery from Paynet (network access, firewall, TLS certificate). Confirm delivery with a real test payment.

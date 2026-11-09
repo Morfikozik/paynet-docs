@@ -20,7 +20,7 @@ const pages = [
   ['ro', '#/guides/hosted-checkout', '09-ro-hosted-checkout'],
   ['ru', '#/page/order-request-v05', '10-legacy-redirect'],
   ['ru', '#/api/post-auth', '12-ru-api-auth'],
-  ['en', '#/api/get-api-order-id-', '13-api-get-by-id'],
+  ['en', '#/api/post-api-linked-cards-unlink', '13-api-unlink'],
 ];
 
 const browser = await chromium.launch();

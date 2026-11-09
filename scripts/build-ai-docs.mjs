@@ -190,6 +190,7 @@ const rules = `## Rules for AI assistants
 - The hosted checkout secret key and the notification secret key are different. Secrets never go to browser code.
 - Notifications are sent only for paid payments (\`EventType\` = \`PAID\`); a failed payment only redirects the customer to \`LinkUrlCancel\`. Notification keys are \`Payment.Id\` and \`Payment.ExternalId\` (case-sensitive).
 - \`PaidAmount\` must equal \`Amount\` unless the merchant has an agreed promotion with Paynet; otherwise do not fulfil the order automatically.
+- Errors come in two formats: usually \`status\` / \`message\` / \`code\` / \`traceId\` / \`details\` (capitalised keys on \`401\`), but invalid JSON or missing required fields return \`400\` with an \`errorInfo\` object. Handle both.
 - Never treat the redirect to \`LinkUrlSuccess\` as proof of payment. Use a verified notification or the status API.
 - Sections marked **Draft** are not confirmed by Paynet yet.`;
 

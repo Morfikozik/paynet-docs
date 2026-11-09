@@ -56,13 +56,13 @@ Hash: lq3+OCn0J/zSyNF5iAoShg==
 | `Payment.Id` | long | ID платежа Paynet (`paymentId`). Используйте как ключ идемпотентности. |
 | `Payment.ExternalId` | long | Ваш номер заказа (`Order`). |
 | `Payment.SaleAreaCode` | string | Код торговой зоны. |
-| `Payment.Customer` | string | Ссылка на покупателя, может быть замаскирована. |
+| `Payment.Customer` | string | Код покупателя, который вы передали в заказе (`Customer.Code`), обычно замаскирован, например `37369XXX111` или `name***@gmail.com`. |
 | `Payment.StatusDate` | string | Когда платёж перешёл в этот статус (местное время Кишинёва). |
 | `Payment.Amount` | long | Сумма заказа в минимальных единицах, как вы её передали. |
 | `Payment.PaidAmount` | long | Фактически оплаченная покупателем сумма, в минимальных единицах. См. ниже. |
 | `Payment.Merchant` | string | Ваш код мерчанта. |
 | `Payment.MoneyType` | string | Чем заплатил покупатель: `CARD`, `APPLEPAY`, `GOOGLEPAY`, `MIA_QR`, `PAYNET`, `CASH_INVOICE`. |
-| `Payment.CardMask`, `CardExpireMonth`, `CardExpireYear`, `CardIssuer` | string | Данные карты при оплате картой; могут быть `null`. |
+| `Payment.CardMask`, `CardExpireMonth`, `CardExpireYear`, `CardIssuer` | string | Данные карты. Заполнены для `CARD`, а также для `APPLEPAY` и `GOOGLEPAY` (карта внутри кошелька); `null` для других способов оплаты. |
 | `Payment.CardLinkHash` | string | Хэш сохранённой карты; может быть `null`. |
 | `Payment.PayerName`, `PayerSurname`, `PayerIDNP` | string | Данные плательщика; могут быть `null`. |
 | `Payment.RRN` | string | Retrieval reference number. |
@@ -166,9 +166,11 @@ echo json_encode(['ResultCode' => 'SUCCESS']);
 
 Откройте **Общее → Уведомления → Симулятор уведомлений**:
 
-1. Введите ваш callback URL (он должен быть доступен из интернета и принимать запросы из браузера — CORS).
+1. Введите ваш callback URL. Он должен быть доступен из интернета и, **только для симулятора**, принимать запросы из браузера (CORS).
 2. Введите секретный ключ уведомлений (тест: `D9873689-E5F8-4272-A67F-0D8BA3F9BAA7`).
 3. Введите номер заказа мерчанта (`Order`) **оплаченного** тестового платежа и нажмите **Get** — портал загрузит платёж.
 4. Нажмите **Send notification** — портал отправит на ваш URL подписанное уведомление `PAID` по этому платежу и покажет использованные `PreparedString` и `Hash`.
 
 Это симуляция из вашего браузера, а не настоящее уведомление Paynet. Для неоплаченных заказов симулятор ничего не отправляет — так же, как Paynet.
+
+> **Важно:** CORS нужен только симулятору, потому что он отправляет запрос из браузера. Настоящие уведомления отправляет сервер Paynet, и CORS на них не влияет: не включайте CORS на боевом endpoint ради Paynet. Успешная симуляция проверяет вашу проверку подписи и обработку, но не доставку от Paynet (доступ из сети, firewall, TLS-сертификат). Доставку подтвердите настоящим тестовым платежом.

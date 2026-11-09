@@ -56,13 +56,13 @@ Cererea are doar două antete: `Content-Type` și `Hash`. Nu există antet `Auth
 | `Payment.Id` | long | ID-ul plății Paynet (`paymentId`). Folosiți-l drept cheie de idempotență. |
 | `Payment.ExternalId` | long | Numărul comenzii dvs. (`Order`). |
 | `Payment.SaleAreaCode` | string | Codul zonei de vânzare. |
-| `Payment.Customer` | string | Referința clientului, poate fi mascată. |
+| `Payment.Customer` | string | Codul clientului transmis în comandă (`Customer.Code`), de obicei mascat, de exemplu `37369XXX111` sau `name***@gmail.com`. |
 | `Payment.StatusDate` | string | Când plata a ajuns în acest status (ora locală Chișinău). |
 | `Payment.Amount` | long | Suma comenzii în unități minime, așa cum ați trimis-o. |
 | `Payment.PaidAmount` | long | Suma plătită efectiv de client, în unități minime. Vezi mai jos. |
 | `Payment.Merchant` | string | Codul dvs. de comerciant. |
 | `Payment.MoneyType` | string | Cum a plătit clientul: `CARD`, `APPLEPAY`, `GOOGLEPAY`, `MIA_QR`, `PAYNET`, `CASH_INVOICE`. |
-| `Payment.CardMask`, `CardExpireMonth`, `CardExpireYear`, `CardIssuer` | string | Datele cardului la plata cu cardul; pot fi `null`. |
+| `Payment.CardMask`, `CardExpireMonth`, `CardExpireYear`, `CardIssuer` | string | Datele cardului. Completate pentru `CARD`, precum și pentru `APPLEPAY` și `GOOGLEPAY` (cardul din portofel); `null` pentru alte metode de plată. |
 | `Payment.CardLinkHash` | string | Hash-ul cardului salvat; poate fi `null`. |
 | `Payment.PayerName`, `PayerSurname`, `PayerIDNP` | string | Datele plătitorului; pot fi `null`. |
 | `Payment.RRN` | string | Retrieval reference number. |
@@ -166,9 +166,11 @@ echo json_encode(['ResultCode' => 'SUCCESS']);
 
 Deschideți **General → Notificări → Simulator notificări**:
 
-1. Introduceți URL-ul dvs. de callback (trebuie să fie accesibil din internet și să accepte cereri din browser — CORS).
+1. Introduceți URL-ul dvs. de callback. Trebuie să fie accesibil din internet și, **doar pentru simulator**, să accepte cereri din browser (CORS).
 2. Introduceți cheia secretă pentru notificări (test: `D9873689-E5F8-4272-A67F-0D8BA3F9BAA7`).
 3. Introduceți numărul comenzii comerciantului (`Order`) al unei plăți de test **achitate** și apăsați **Get** — portalul încarcă plata.
 4. Apăsați **Send notification** — portalul trimite la URL-ul dvs. o notificare `PAID` semnată, construită din această plată, și afișează `PreparedString` și `Hash` folosite.
 
 Este o simulare trimisă din browserul dvs., nu o notificare reală Paynet. Pentru comenzile neplătite simulatorul nu trimite nimic — la fel ca Paynet.
+
+> **Important:** CORS este necesar doar simulatorului, deoarece trimite cererea din browser. Notificările reale sunt trimise de serverul Paynet și CORS nu se aplică: nu activați CORS pe endpoint-ul de producție pentru Paynet. O simulare reușită verifică validarea semnăturii și procesarea, nu livrarea de la Paynet (acces din rețea, firewall, certificat TLS). Confirmați livrarea cu o plată de test reală.

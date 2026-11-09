@@ -1127,23 +1127,23 @@
       },
       "DeleteLinkedCardRequest": {
         "required": [
-          "cardLinkHash",
-          "customerCode",
-          "saleAreaCode"
+          "CardLinkHash",
+          "CustomerCode",
+          "SaleAreaCode"
         ],
         "type": "object",
         "properties": {
-          "cardLinkHash": {
+          "CardLinkHash": {
             "type": "string",
             "description": "The unique hash identifying the specific card to be unlinked.",
             "nullable": true
           },
-          "saleAreaCode": {
+          "SaleAreaCode": {
             "type": "string",
             "description": "The code identifying the specific sale area or merchant environment.",
             "nullable": true
           },
-          "customerCode": {
+          "CustomerCode": {
             "type": "string",
             "description": "The unique identifier or code of the customer who owns the linked card.",
             "nullable": true
