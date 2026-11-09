@@ -20,7 +20,7 @@ These credentials are shared by everyone testing on this portal: other people's 
 |---|---|---|---|
 | Visa `4111 1111 1111 1111` | `12/27` | `777` | successful payment |
 
-Only the successful payment needs to be tested. There are no test cards for declined or 3-D Secure payments. When a real payment fails, the customer is simply redirected to `LinkUrlCancel` and no notification is sent.
+Test cards can only reproduce a successful payment: there are no cards for declined or 3-D Secure payments. You still need to implement decline handling and test it with mocked API responses: `status` = `5` and the customer returning to `LinkUrlCancel` (see [Failed payment](#/guides/errors-and-statuses)). When a real payment fails, the customer is simply redirected to `LinkUrlCancel` and no notification is sent.
 
 ## Rules that make tests fail
 

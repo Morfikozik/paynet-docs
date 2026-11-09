@@ -180,51 +180,138 @@ If the values differ, do not fulfil the order automatically and do not save the 
 
 If the signature is valid but you cannot fulfil the order (order not found, amounts differ), still answer `200` and send it to review: otherwise Paynet keeps retrying the notification.
 
-### Node.js
+### Complete handler: Node.js
+
+Verifies the signature, stores the notification once, answers `200`, then confirms the values with the API and fulfils the order or sends it to review. The logic of this sample is tested automatically on every documentation build.
 
 ```javascript
-// After the Hash check: store the notification, answer 200, then confirm with the API.
-const API = process.env.PAYNET_API_URL; // production https://ecom-api.paynet.md, test https://ecom-api-test.paynet.md
+// paynet-notifications.mjs — complete notification handler, no dependencies (Node.js 18+).
+import crypto from 'node:crypto';
 
-async function confirmWithApi(notification, token, myOrder) {
-  const p = notification.Payment;
-  const response = await fetch(`${API}/api/order/merchant/${p.ExternalId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!response.ok) throw new Error(`Status check failed: HTTP ${response.status}`);
-  const payment = await response.json();
+// The 9 signed fields, in this exact order. Do not sort.
+const signedValues = (n) => {
+  const p = n.Payment || {};
+  return [n.EventDate, n.Eventid, n.EventType, p.Amount, p.Customer, p.ExternalId, p.Id, p.Merchant, p.StatusDate];
+};
 
-  const problems = [];
-  if (payment.paymentId !== p.Id) problems.push('paymentId');
-  if (payment.status !== 4) problems.push('status');
-  if (payment.amount.amount !== p.Amount || p.Amount !== myOrder.amount) problems.push('Amount');
-  if (payment.amount.paidAmount !== p.PaidAmount) problems.push('PaidAmount');
-  if (payment.customer?.code !== myOrder.customerCode) problems.push('customer');
-  if (p.CardLinkHash && payment.cardLinkHash && payment.cardLinkHash !== p.CardLinkHash) problems.push('CardLinkHash');
-  return { ok: problems.length === 0, problems, payment };
+export function verifyHash(notification, hashHeader, secret) {
+  const prepared = signedValues(notification).map((v) => (v === null || v === undefined ? '' : String(v))).join('');
+  const expected = crypto.createHash('md5').update(prepared + secret, 'utf8').digest('base64');
+  const received = String(hashHeader || '');
+  return received.length === expected.length && crypto.timingSafeEqual(Buffer.from(received), Buffer.from(expected));
 }
 
-// In the notification handler, after the Hash check:
-//   await saveNotificationOnce(p.Id, req.body);   // idempotent by Payment.Id
-//   res.status(200).json({ ResultCode: 'SUCCESS' });
-//   const check = await confirmWithApi(req.body, await getToken(), await loadOrder(p.ExternalId));
-//   if (check.ok) {
-//     if (p.PaidAmount === p.Amount /* or an agreed promotion */) await fulfil(p.ExternalId);
-//     if (p.CardLinkHash) await saveCard(check.payment.customer.code, p.CardLinkHash);
-//   } else {
-//     await sendToManualReview(p.ExternalId, check.problems); // do not fulfil automatically
-//   }
+/**
+ * deps.secret      notification secret key
+ * deps.apiUrl      https://ecom-api.paynet.md (test: https://ecom-api-test.paynet.md)
+ * deps.getToken()  returns a valid Bearer token (POST /auth, cached)
+ * deps.fetch       fetch implementation (globalThis.fetch)
+ * deps.db          your storage:
+ *   saveNotificationOnce(paymentId, notification) -> true if new, false if already stored
+ *   findOrder(order) -> { amount, customerCode, promotionAgreed } or null
+ *   markPaid(order, paidAmount), saveCard(customerCode, cardLinkHash), sendToReview(order, problems)
+ *
+ * handle(rawBody, hashHeader) -> { status, processing }
+ *   status: HTTP status to answer Paynet; processing: promise of the work done after answering.
+ */
+export function createPaynetHandler(deps) {
+  const { db } = deps;
+
+  async function confirmWithApi(n, order) {
+    const p = n.Payment;
+    const response = await deps.fetch(`${deps.apiUrl}/api/order/merchant/${p.ExternalId}`, {
+      headers: { Authorization: `Bearer ${await deps.getToken()}` },
+    });
+    if (!response.ok) throw new Error(`Status check failed: HTTP ${response.status}`);
+    const payment = await response.json();
+
+    const problems = [];
+    if (payment.paymentId !== p.Id) problems.push('paymentId');
+    if (payment.status !== 4) problems.push('status');
+    if (payment.amount?.amount !== p.Amount || p.Amount !== order.amount) problems.push('Amount');
+    if (payment.amount?.paidAmount !== p.PaidAmount) problems.push('PaidAmount');
+    if (payment.customer?.code !== order.customerCode) problems.push('customer');
+    if (p.CardLinkHash && payment.cardLinkHash && payment.cardLinkHash !== p.CardLinkHash) problems.push('CardLinkHash');
+    return problems;
+  }
+
+  async function process(n) {
+    const p = n.Payment;
+    if (n.EventType !== 'PAID') return db.sendToReview(p.ExternalId, ['EventType']);
+    const order = await db.findOrder(p.ExternalId);
+    if (!order) return db.sendToReview(p.ExternalId, ['unknown order']);
+
+    const problems = await confirmWithApi(n, order);
+    if (p.PaidAmount !== p.Amount && !order.promotionAgreed) problems.push('PaidAmount differs from Amount');
+    if (problems.length) return db.sendToReview(p.ExternalId, problems);
+
+    await db.markPaid(p.ExternalId, p.PaidAmount);
+    if (p.CardLinkHash) await db.saveCard(order.customerCode, p.CardLinkHash);
+  }
+
+  return async function handle(rawBody, hashHeader) {
+    let n;
+    try {
+      n = JSON.parse(rawBody);
+    } catch {
+      return { status: 400, processing: null };
+    }
+    if (!verifyHash(n, hashHeader, deps.secret)) return { status: 400, processing: null };
+
+    const isNew = await db.saveNotificationOnce(n.Payment?.Id, n); // idempotency by Payment.Id
+    if (!isNew) return { status: 200, processing: null }; // a retry: already stored
+    // Answer 200 now; confirm and fulfil after the answer. If this work fails, the stored
+    // notification stays unprocessed and a background job can retry it.
+    return { status: 200, processing: process(n) };
+  };
+}
 ```
 
-### PHP
+Connecting it to Express (read the raw body, answer first, process after):
+
+```javascript
+import express from 'express';
+import { createPaynetHandler } from './paynet-notifications.mjs';
+
+const handle = createPaynetHandler({
+  secret: process.env.PAYNET_NOTIFICATION_SECRET,
+  apiUrl: process.env.PAYNET_API_URL,
+  getToken, // your cached POST /auth
+  fetch: globalThis.fetch,
+  db, // your storage
+});
+
+const app = express();
+app.post('/paynet/notification', express.text({ type: '*/*' }), async (req, res) => {
+  const { status, processing } = await handle(req.body, req.get('Hash'));
+  res.status(status).json(status === 200 ? { ResultCode: 'SUCCESS' } : { error: 'Invalid notification' });
+  processing?.catch((error) => console.error('Paynet notification processing failed', error));
+});
+```
+
+### Complete handler: PHP
 
 ```php
 <?php
-// After the Hash check: store the notification, answer 200, then confirm with the API.
-function confirmWithApi(array $n, string $token, array $myOrder): array {
-    $api = getenv('PAYNET_API_URL'); // production https://ecom-api.paynet.md, test https://ecom-api-test.paynet.md
-    $p   = $n['Payment'];
-    $ch  = curl_init($api . '/api/order/merchant/' . $p['ExternalId']);
+// paynet-notification.php — complete notification handler (PHP 7.4+, ext-curl).
+// $db must implement: saveNotificationOnce($paymentId, array $n): bool, findOrder($order): ?array
+// (['amount' => int, 'customerCode' => string, 'promotionAgreed' => bool]), markPaid($order, $paidAmount),
+// saveCard($customerCode, $cardLinkHash), sendToReview($order, array $problems).
+
+function paynetVerifyHash(array $n, string $hashHeader, string $secret): bool {
+    $p = $n['Payment'] ?? [];
+    $s = fn($v) => $v === null ? '' : (string) $v;
+    // The 9 signed fields, in this exact order. Do not sort.
+    $prepared = $s($n['EventDate'] ?? null) . $s($n['Eventid'] ?? null) . $s($n['EventType'] ?? null)
+              . $s($p['Amount'] ?? null) . $s($p['Customer'] ?? null) . $s($p['ExternalId'] ?? null)
+              . $s($p['Id'] ?? null) . $s($p['Merchant'] ?? null) . $s($p['StatusDate'] ?? null);
+    $expected = base64_encode(md5($prepared . $secret, true));
+    return hash_equals($expected, $hashHeader);
+}
+
+function paynetConfirmWithApi(array $n, array $order, string $apiUrl, string $token): array {
+    $p  = $n['Payment'];
+    $ch = curl_init($apiUrl . '/api/order/merchant/' . $p['ExternalId']);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . $token],
@@ -236,15 +323,53 @@ function confirmWithApi(array $n, string $token, array $myOrder): array {
     $pay = json_decode($body, true);
 
     $problems = [];
-    if ($pay['paymentId'] !== $p['Id']) $problems[] = 'paymentId';
-    if ($pay['status'] !== 4) $problems[] = 'status';
-    if ($pay['amount']['amount'] !== $p['Amount'] || $p['Amount'] !== $myOrder['amount']) $problems[] = 'Amount';
-    if ($pay['amount']['paidAmount'] !== $p['PaidAmount']) $problems[] = 'PaidAmount';
-    if (($pay['customer']['code'] ?? null) !== $myOrder['customerCode']) $problems[] = 'customer';
+    if (($pay['paymentId'] ?? null) !== $p['Id']) $problems[] = 'paymentId';
+    if (($pay['status'] ?? null) !== 4) $problems[] = 'status';
+    if (($pay['amount']['amount'] ?? null) !== $p['Amount'] || $p['Amount'] !== $order['amount']) $problems[] = 'Amount';
+    if (($pay['amount']['paidAmount'] ?? null) !== ($p['PaidAmount'] ?? null)) $problems[] = 'PaidAmount';
+    if (($pay['customer']['code'] ?? null) !== $order['customerCode']) $problems[] = 'customer';
     if (!empty($p['CardLinkHash']) && !empty($pay['cardLinkHash']) && $pay['cardLinkHash'] !== $p['CardLinkHash']) $problems[] = 'CardLinkHash';
-    return ['ok' => !$problems, 'problems' => $problems, 'payment' => $pay];
+    return $problems;
 }
-// If 'ok' is false: do not fulfil automatically, send the order to manual review.
+
+function paynetProcess(array $n, $db, string $apiUrl, string $token): void {
+    $p = $n['Payment'];
+    if (($n['EventType'] ?? '') !== 'PAID') { $db->sendToReview($p['ExternalId'], ['EventType']); return; }
+    $order = $db->findOrder($p['ExternalId']);
+    if (!$order) { $db->sendToReview($p['ExternalId'], ['unknown order']); return; }
+
+    $problems = paynetConfirmWithApi($n, $order, $apiUrl, $token);
+    if (($p['PaidAmount'] ?? null) !== $p['Amount'] && empty($order['promotionAgreed'])) $problems[] = 'PaidAmount differs from Amount';
+    if ($problems) { $db->sendToReview($p['ExternalId'], $problems); return; }
+
+    $db->markPaid($p['ExternalId'], $p['PaidAmount']);
+    if (!empty($p['CardLinkHash'])) $db->saveCard($order['customerCode'], $p['CardLinkHash']);
+}
+
+// --- Endpoint -------------------------------------------------------------
+function paynetHandleRequest($db, callable $getToken): void {
+    $raw = file_get_contents('php://input');
+    $n   = json_decode($raw, true);
+    if (!is_array($n) || !paynetVerifyHash($n, $_SERVER['HTTP_HASH'] ?? '', getenv('PAYNET_NOTIFICATION_SECRET'))) {
+        http_response_code(400);
+        exit('Invalid notification');
+    }
+    $isNew = $db->saveNotificationOnce($n['Payment']['Id'] ?? null, $n); // idempotency by Payment.Id
+
+    // Answer 200 first.
+    http_response_code(200);
+    header('Content-Type: application/json');
+    echo json_encode(['ResultCode' => 'SUCCESS']);
+    if (function_exists('fastcgi_finish_request')) fastcgi_finish_request();
+
+    if ($isNew) {
+        try {
+            paynetProcess($n, $db, getenv('PAYNET_API_URL'), $getToken());
+        } catch (Throwable $e) {
+            error_log('Paynet notification processing failed: ' . $e->getMessage()); // retry from storage later
+        }
+    }
+}
 ```
 
 ## Respond and retries

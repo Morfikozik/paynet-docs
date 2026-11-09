@@ -20,7 +20,7 @@ Aceste date sunt comune pentru toți cei care testează pe portal: plățile de 
 |---|---|---|---|
 | Visa `4111 1111 1111 1111` | `12/27` | `777` | plată reușită |
 
-Trebuie testată doar plata reușită. Nu există carduri de test pentru plăți refuzate sau 3-D Secure. Când o plată reală eșuează, clientul este doar redirecționat la `LinkUrlCancel` și nu se trimite notificare.
+Cardurile de test pot reproduce doar o plată reușită: nu există carduri pentru plăți refuzate sau 3-D Secure. Tratarea refuzului trebuie totuși implementată și testată cu răspunsuri API simulate: `status` = `5` și revenirea clientului la `LinkUrlCancel` (vezi [Plată eșuată](#/guides/errors-and-statuses)). Când o plată reală eșuează, clientul este doar redirecționat la `LinkUrlCancel` și nu se trimite notificare.
 
 ## Ce face testele să eșueze
 

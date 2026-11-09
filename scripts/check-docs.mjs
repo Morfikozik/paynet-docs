@@ -134,6 +134,76 @@ for (const lang of languages) {
   }
 }
 
+// 4c. The complete notification handlers: run the Node.js one against mocked Paynet/API/storage, lint the PHP one.
+for (const lang of languages) {
+  const notificationFile = files[lang].find((f) => f.endsWith('-notifications.md'));
+  const doc = read(lang, notificationFile);
+  const nodeHandler = codeBlocks(doc, 'javascript').find((code) => code.includes('export function createPaynetHandler'));
+  if (!nodeHandler) {
+    fail(`content/${lang}/${notificationFile}: complete Node.js handler not found`);
+  } else {
+    const tmp = path.join(os.tmpdir(), `paynet-handler-${lang}-${process.pid}.mjs`);
+    fs.writeFileSync(tmp, nodeHandler);
+    const { createPaynetHandler } = await import(pathToFileURL(tmp).href);
+    fs.rmSync(tmp);
+
+    const notification = { ...notificationInput, Payment: { ...notificationInput.Payment, PaidAmount: notificationInput.Payment.Amount, CardLinkHash: null } };
+    const apiPayment = (overrides = {}) => ({
+      paymentId: notification.Payment.Id, status: 4, cardLinkHash: null, customer: { code: 'C-1' },
+      amount: { amount: notification.Payment.Amount, paidAmount: notification.Payment.Amount }, ...overrides,
+    });
+    const makeDb = () => {
+      const seen = new Set();
+      const calls = { paid: 0, review: [] };
+      return {
+        calls,
+        saveNotificationOnce: async (id) => (seen.has(id) ? false : (seen.add(id), true)),
+        findOrder: async () => ({ amount: notification.Payment.Amount, customerCode: 'C-1', promotionAgreed: false }),
+        markPaid: async () => { calls.paid += 1; },
+        saveCard: async () => {},
+        sendToReview: async (order, problems) => { calls.review.push(problems.join(',')); },
+      };
+    };
+    const run = async (apiResponse, body = notification, hash = expectedNotification, db = makeDb()) => {
+      const handle = createPaynetHandler({
+        secret: NOTIFICATION_KEY, apiUrl: 'https://ecom-api-test.paynet.md', getToken: async () => 't', db,
+        fetch: async () => ({ ok: true, status: 200, json: async () => apiResponse }),
+      });
+      const result = await handle(JSON.stringify(body), hash);
+      await result.processing;
+      return { result, db, handle };
+    };
+
+    const ok = await run(apiPayment());
+    if (ok.result.status !== 200 || ok.db.calls.paid !== 1) fail(`content/${lang}/${notificationFile}: handler must answer 200 and fulfil a valid notification once`);
+    const again = await ok.handle(JSON.stringify(notification), expectedNotification);
+    await again.processing;
+    if (again.status !== 200 || ok.db.calls.paid !== 1) fail(`content/${lang}/${notificationFile}: handler must answer 200 to a repeated notification without fulfilling it again`);
+    const bad = await run(apiPayment(), notification, 'AAAAAAAAAAAAAAAAAAAAAA==');
+    if (bad.result.status !== 400 || bad.db.calls.paid !== 0) fail(`content/${lang}/${notificationFile}: handler must reject a wrong Hash with 400`);
+    const tampered = await run(apiPayment({ amount: { amount: notification.Payment.Amount, paidAmount: 1 } }));
+    if (tampered.db.calls.paid !== 0 || !tampered.db.calls.review.join().includes('PaidAmount')) fail(`content/${lang}/${notificationFile}: handler must send a PaidAmount mismatch to review`);
+  }
+
+  const phpHandler = (doc.match(/```php\n([\s\S]*?)```/g) || []).map((b) => b.slice(7, -3)).find((code) => code.includes('function paynetHandleRequest'));
+  if (!phpHandler) {
+    fail(`content/${lang}/${notificationFile}: complete PHP handler not found`);
+  } else {
+    try {
+      const tmp = path.join(os.tmpdir(), `paynet-handler-${lang}-${process.pid}.php`);
+      fs.writeFileSync(tmp, phpHandler);
+      try {
+        execFileSync('php', ['-l', tmp], { stdio: 'pipe' });
+      } catch (error) {
+        if (error.code !== 'ENOENT') fail(`content/${lang}/${notificationFile}: PHP handler has a syntax error: ${String(error.stdout || error.stderr).trim()}`);
+      }
+      fs.rmSync(tmp);
+    } catch (error) {
+      fail(`content/${lang}/${notificationFile}: PHP check failed: ${error.message}`);
+    }
+  }
+}
+
 // 5. Notification code samples must use the real key spelling (Id / ExternalId).
 for (const lang of languages) {
   for (const file of files[lang]) {
