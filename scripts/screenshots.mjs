@@ -52,6 +52,7 @@ for (const [language, hash, name] of pages) {
 for (const [hash, name, action] of [
   ['#/guides/signatures', '14-ru-ai-menu-guide', 'menu'],
   ['#/api/post-api-order', '15-ru-ai-menu-api', 'menu'],
+  ['#/api/post-api-order', '17-ru-api-order-json', 'none'],
   ['#/api/post-api-order', '16-ru-api-code-tab', 'php'],
 ]) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1100 } });
