@@ -228,7 +228,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   );
 
   return (
-    <div className="w-full md:w-72 lg:w-80 bg-paynet-gray-50 border-r border-paynet-gray-200 flex flex-col md:flex-shrink-0 max-h-[45vh] md:max-h-none">
+    <div className="w-full md:w-72 lg:w-80 h-full bg-paynet-gray-50 border-r border-paynet-gray-200 flex flex-col md:flex-shrink-0 min-h-0">
       <div className="p-5 border-b border-paynet-gray-200 flex-shrink-0 bg-white">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-paynet-gray-400 w-4 h-4" />

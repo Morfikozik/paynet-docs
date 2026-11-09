@@ -54,6 +54,32 @@ for (const [language, hash, name] of pages) {
   await page.screenshot({ path: path.join(outDir, '11-ru-search.png') });
   await context.close();
 }
+// Phone screenshots (390x844).
+for (const [lang, hash, name, action] of [
+  ['ru', '#/', 'm01-home', null],
+  ['ru', '#/guides/notifications', 'm02-guide', null],
+  ['ru', '#/guides/notifications', 'm03-menu-open', 'menu'],
+  ['ru', '#/api/post-api-order', 'm04-api-top', null],
+  ['ru', '#/api/post-api-order', 'm05-api-request', 'scroll-request'],
+  ['ru', '#/guides/errors-and-statuses', 'm06-table', 'scroll-table'],
+  ['ru', '#/page/notification-simulator', 'm07-simulator', null],
+]) {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  await context.addInitScript((l) => localStorage.setItem('tps-api-language', l), lang);
+  const page = await context.newPage();
+  page.on('pageerror', (err) => log.push(`[${name}] pageerror: ${err.message}`));
+  await page.goto(baseUrl + hash, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(600);
+  if (action === 'menu') await page.click('button[aria-label="Open menu"]');
+  if (action === 'scroll-request') await page.locator('textarea').first().scrollIntoViewIfNeeded();
+  if (action === 'scroll-table') await page.locator('table').first().scrollIntoViewIfNeeded();
+  await page.waitForTimeout(400);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  if (overflow > 0) log.push(`[${name}] horizontal overflow: ${overflow}px`);
+  await page.screenshot({ path: path.join(outDir, `${name}.png`) });
+  await context.close();
+}
+
 // AI menu opened on a guide and on an API method; code tab of an API method.
 for (const [hash, name, action] of [
   ['#/guides/signatures', '14-ru-ai-menu-guide', 'menu'],

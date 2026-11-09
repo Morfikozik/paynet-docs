@@ -44,12 +44,29 @@ const parseHash = (hash: string): Route | { redirect: string } => {
   return { kind: 'home' };
 };
 
+// True when the viewport is at least `px` wide (kept in sync on resize).
+function useMinWidth(px: number) {
+  const query = `(min-width: ${px}px)`;
+  const [matches, setMatches] = React.useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
+  React.useEffect(() => {
+    const media = window.matchMedia(query);
+    const onChange = () => setMatches(media.matches);
+    onChange();
+    media.addEventListener('change', onChange);
+    return () => media.removeEventListener('change', onChange);
+  }, [query]);
+  return matches;
+}
+
 function App() {
   const { language, changeLanguage, t, apiInfo } = useLanguage();
   const { categories, baseUrl, currentSpec } = useOpenAPI(language);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [route, setRoute] = useState<Route>({ kind: 'home' });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const isDesktop = useMinWidth(768);
+  const isWide = useMinWidth(1280);
   const contentRef = React.useRef<HTMLDivElement>(null);
 
   const applyHash = React.useCallback((hash: string) => {
@@ -119,39 +136,88 @@ function App() {
     return <HomePage language={language} onNavigate={navigate} />;
   };
 
+  const navigateAndClose = (hash: string) => {
+    setMenuOpen(false);
+    navigate(hash);
+  };
+
+  const codePanel = currentEndpoint ? (
+    <CodeExample endpoint={currentEndpoint} baseUrl={baseUrl} spec={currentSpec} t={t} />
+  ) : null;
+
   return (
-    <div className="h-screen bg-gradient-to-br from-paynet-gray-50 to-paynet-light overflow-hidden flex flex-col">
-      <Header language={language} onLanguageChange={changeLanguage} apiInfo={apiInfo} onHome={() => navigate('#/')} />
+    <div className="h-dvh bg-gradient-to-br from-paynet-gray-50 to-paynet-light overflow-hidden flex flex-col">
+      <Header
+        language={language}
+        onLanguageChange={changeLanguage}
+        apiInfo={apiInfo}
+        onHome={() => navigateAndClose('#/')}
+        onMenu={() => setMenuOpen((open) => !open)}
+        menuOpen={menuOpen}
+      />
 
-      <div className="flex flex-1 min-h-0 min-w-0 flex-col md:flex-row">
-        <Sidebar
-          language={language}
-          categories={categories}
-          currentSpec={currentSpec}
-          route={route}
-          navigate={navigate}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
+      <div className="flex flex-1 min-h-0 min-w-0">
+        {/* Sidebar: a fixed column on desktop, a slide-in drawer on phones. */}
+        <div
+          className={
+            isDesktop
+              ? 'flex min-h-0'
+              : `fixed inset-0 z-40 flex transition-opacity ${menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`
+          }
+          aria-hidden={!isDesktop && !menuOpen}
+        >
+          <div
+            className={
+              isDesktop
+                ? 'flex min-h-0'
+                : `w-[86vw] max-w-sm h-full flex shadow-xl transition-transform ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`
+            }
+          >
+            <Sidebar
+              language={language}
+              categories={categories}
+              currentSpec={currentSpec}
+              route={route}
+              navigate={navigateAndClose}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+            />
+          </div>
+          {!isDesktop && (
+            <button
+              type="button"
+              aria-label="Close menu"
+              className="flex-1 bg-black/40"
+              onClick={() => setMenuOpen(false)}
+            />
+          )}
+        </div>
 
-        <div className="flex-1 min-h-0 min-w-0 flex flex-col xl:flex-row">
-          <div ref={contentRef} className="flex-1 min-h-0 min-w-0 overflow-y-auto border-r border-paynet-gray-200">
-            <div className="p-4 sm:p-6 lg:p-8 min-h-full flex flex-col bg-white">
+        <div className="flex-1 min-h-0 min-w-0 flex">
+          <div ref={contentRef} className="flex-1 min-h-0 min-w-0 overflow-y-auto bg-white xl:border-r border-paynet-gray-200">
+            <div className="px-4 py-5 sm:p-6 lg:p-8 min-h-full flex flex-col">
               <div className="flex-1 w-full min-w-0">{renderContent()}</div>
+              {/* On narrower screens the request panel continues the page instead of a separate column. */}
+              {codePanel && !isWide && (
+                <div className="mt-8 pt-6 border-t border-paynet-gray-200 min-w-0">{codePanel}</div>
+              )}
+              {!isDesktop && (
+                <div className="-mx-4 mt-8">
+                  <Footer author={apiInfo.author} version={apiInfo.version} />
+                </div>
+              )}
             </div>
           </div>
 
-          {currentEndpoint && (
-            <div className="w-full xl:w-144 bg-white overflow-y-auto flex-shrink-0 border-t xl:border-t-0 xl:border-l border-paynet-gray-200 max-h-96 xl:max-h-none">
-              <div className="p-4 sm:p-6">
-                <CodeExample endpoint={currentEndpoint} baseUrl={baseUrl} spec={currentSpec} t={t} />
-              </div>
+          {codePanel && isWide && (
+            <div className="w-144 bg-white overflow-y-auto flex-shrink-0 border-l border-paynet-gray-200">
+              <div className="p-6">{codePanel}</div>
             </div>
           )}
         </div>
       </div>
 
-      <Footer author={apiInfo.author} version={apiInfo.version} />
+      {isDesktop && <Footer author={apiInfo.author} version={apiInfo.version} />}
     </div>
   );
 }
