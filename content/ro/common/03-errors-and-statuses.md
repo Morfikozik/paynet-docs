@@ -9,7 +9,7 @@
 | `401` | `UNAUTHORIZED` | Tokenul Bearer lipsește, este invalid sau a expirat. | Apelați din nou `/auth` și repetați o singură dată. |
 | `404` | `NOT_FOUND_RECORD` | Nu există plată/înregistrare cu acest ID. | Verificați ID-ul (`paymentId` sau `Order`-ul dvs.). |
 | `500` | `TECHNICAL_ERROR` | Eroare pe partea Paynet **sau** un `Order` repetat care nu poate fi refolosit (vezi mai jos). | Verificați cu `GET /api/order/merchant/{Order}` dacă comanda există; dacă este o eroare tehnică reală, reîncercați mai târziu, cu pauză. |
-| `500` | `AUTHENTICATION_FAILED` | `/auth` cu utilizator sau parolă greșite. | Verificați datele de autentificare. |
+| `401` | `AUTHENTICATION_FAILED` | `/auth` cu utilizator sau parolă greșite. | Verificați datele de autentificare. |
 
 ## Corpul erorii
 
@@ -31,7 +31,7 @@
 | `traceId` | ID-ul cererii. Trimiteți-l suportului Paynet când raportați o problemă. |
 | `details` | Informații suplimentare, de ex. parametrul invalid. |
 
-> **Notă:** răspunsurile `401` folosesc chei cu majusculă (`Status`, `Message`, `Code`, `TraceId`). Citiți câmpurile erorii fără a ține cont de majuscule. `/auth` poate returna obiectul de eroare într-un array.
+> **Notă:** un `401` pentru token lipsă, invalid sau expirat folosește chei cu majusculă (`Status`, `Message`, `Code`, `TraceId`), iar `401` de la `/auth` pentru parolă greșită folosește cheile obișnuite (`status`, `message`…). Citiți câmpurile erorii fără a ține cont de majuscule.
 
 ### JSON invalid sau câmpuri obligatorii lipsă
 

@@ -35,7 +35,7 @@
 | # | Сценарий | Как | Ожидается |
 |---|---|---|---|
 | 1 | Аутентификация | `POST /auth` с тестовыми данными | `200`, `access_token` |
-| 2 | Неверный пароль | `POST /auth` с неверным паролем | ошибка `AUTHENTICATION_FAILED` |
+| 2 | Неверный пароль | `POST /auth` с неверным паролем | `401`, `AUTHENTICATION_FAILED` |
 | 3 | Создание заказа | `POST /api/order` | `200`, `paymentId`, `paymentLink`, `status` `1` |
 | 4 | Повтор того же запроса | отправить сценарий 3 ещё раз без изменений | тот же `paymentId` и `paymentLink` |
 | 5 | Тот же `Order`, другая сумма | изменить `Amount`, оставить `Order` | `500`, `TECHNICAL_ERROR` |

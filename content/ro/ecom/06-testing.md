@@ -35,7 +35,7 @@ Cardurile de test pot reproduce doar o plată reușită: nu există carduri pent
 | # | Scenariu | Cum | Rezultat așteptat |
 |---|---|---|---|
 | 1 | Autentificare | `POST /auth` cu datele de test | `200`, `access_token` |
-| 2 | Parolă greșită | `POST /auth` cu parolă greșită | eroare `AUTHENTICATION_FAILED` |
+| 2 | Parolă greșită | `POST /auth` cu parolă greșită | `401`, `AUTHENTICATION_FAILED` |
 | 3 | Creare comandă | `POST /api/order` | `200`, `paymentId`, `paymentLink`, `status` `1` |
 | 4 | Repetarea aceleiași cereri | trimiteți scenariul 3 din nou, nemodificat | același `paymentId` și `paymentLink` |
 | 5 | Același `Order`, altă sumă | modificați `Amount`, păstrați `Order` | `500`, `TECHNICAL_ERROR` |

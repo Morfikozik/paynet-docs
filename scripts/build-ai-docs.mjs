@@ -193,7 +193,7 @@ const rules = `## Rules for AI assistants
 - The hosted checkout secret key and the notification secret key are different. Secrets never go to browser code.
 - Notifications are sent only for paid payments (\`EventType\` = \`PAID\`); a failed payment only redirects the customer to \`LinkUrlCancel\`. Notification keys are \`Payment.Id\` and \`Payment.ExternalId\` (case-sensitive).
 - \`PaidAmount\` must equal \`Amount\` unless the merchant has an agreed promotion with Paynet; otherwise do not fulfil the order automatically.
-- Errors come in two formats: usually \`status\` / \`message\` / \`code\` / \`traceId\` / \`details\` (capitalised keys on \`401\`), but invalid JSON or missing required fields return \`400\` with an \`errorInfo\` object. Handle both.
+- Errors come in two formats: usually \`status\` / \`message\` / \`code\` / \`traceId\` / \`details\` (capitalised keys on a token \`401\`; \`/auth\` with a wrong password returns \`401 AUTHENTICATION_FAILED\` with the usual keys), but invalid JSON or missing required fields return \`400\` with an \`errorInfo\` object. Handle both.
 - Never treat the redirect to \`LinkUrlSuccess\` as proof of payment. Use a verified notification or the status API.
 - Payment \`status\`: \`1\` registered (not paid), \`3\` pending (bank processing), \`4\` paid, \`5\` cancelled (declined, antifraud or full refund), \`6\` partially refunded. \`5\` and \`6\` are final; \`2\` is not used; there is no expired status (an expired unpaid order stays \`1\`). Paid = verified \`PAID\` notification or \`status\` \`4\`.
 - After a declined payment (\`status\` \`5\`) create a new order with a new \`Order\`. If the order is still \`1\`, the customer can reuse the same \`paymentLink\`. While it is \`3\`, do not create a new order.

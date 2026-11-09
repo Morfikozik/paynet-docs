@@ -163,6 +163,11 @@ const typeOf = (v) => (v === null ? 'null' : Array.isArray(v) ? 'array' : Number
 function validate(value, schemaIn, at, problems) {
   const schema = resolve(schemaIn);
   if (!schema) return;
+  if (schema.oneOf) {
+    const attempts = schema.oneOf.map((option) => { const p = []; validate(value, option, at, p); return p; });
+    if (!attempts.some((p) => p.length === 0)) problems.push(...attempts.sort((a, b) => a.length - b.length)[0]);
+    return;
+  }
   if (value === null) {
     if (!schema.nullable && schema.type) problems.push(`${at}: null, schema type ${schema.type} is not nullable`);
     return;

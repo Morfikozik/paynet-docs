@@ -46,34 +46,52 @@
             }
           },
           "400": {
-            "description": "Invalid request parameters.",
+            "description": "Invalid request. Either the usual error body or, when the body cannot be read, an errorInfo object.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorModel"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorInfoResponse"
+                    }
+                  ]
                 },
                 "example": {
-                  "status": 400,
-                  "message": "One or more entered parameters are incorrect.",
-                  "code": "INVALID_PARAMETER",
-                  "traceId": "9b9346f9-f83a-465d-ac8d-dc382c460c22",
-                  "details": "The invalid parameter is: XXXX"
+                  "errorInfo": {
+                    "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+                    "title": "One or more validation errors occurred.",
+                    "status": 400,
+                    "detail": null,
+                    "instance": null,
+                    "ppResponseCodeEnum": "TECHNICAL_ERROR",
+                    "ppResponseCode": 1,
+                    "ppResponseCodeText": "TECHNICAL_ERROR",
+                    "errors": {
+                      "$": [
+                        "JSON deserialization for type '…DeleteLinkedCardRequest' was missing required properties including: 'cardLinkHash', 'saleAreaCode', 'customerCode'."
+                      ]
+                    },
+                    "traceId": "00-7c209d88f31e3e5cd2f7bd88ae2f23c2-ad167338e418068c-00"
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Access denied due to invalid or missing authentication token.",
+            "description": "Bearer token missing, invalid or expired. Keys are capitalised.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorModel"
+                  "$ref": "#/components/schemas/ErrorModelUnauthorized"
                 },
                 "example": {
                   "Status": 401,
                   "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
                   "Code": "UNAUTHORIZED",
-                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                  "TraceId": "b4480a88-5942-455c-99ac-68d3547aaccb"
                 }
               }
             }
@@ -229,11 +247,18 @@
             }
           },
           "400": {
-            "description": "Invalid request parameters.",
+            "description": "Invalid request. Either the usual error body or, when the body cannot be read, an errorInfo object.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorModel"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorInfoResponse"
+                    }
+                  ]
                 },
                 "example": {
                   "status": 400,
@@ -246,17 +271,17 @@
             }
           },
           "401": {
-            "description": "Access denied due to invalid or missing authentication token.",
+            "description": "Bearer token missing, invalid or expired. Keys are capitalised.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorModel"
+                  "$ref": "#/components/schemas/ErrorModelUnauthorized"
                 },
                 "example": {
                   "Status": 401,
                   "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
                   "Code": "UNAUTHORIZED",
-                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                  "TraceId": "b4480a88-5942-455c-99ac-68d3547aaccb"
                 }
               }
             }
@@ -376,17 +401,17 @@
             }
           },
           "401": {
-            "description": "Access denied due to invalid or missing authentication token.",
+            "description": "Bearer token missing, invalid or expired. Keys are capitalised.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorModel"
+                  "$ref": "#/components/schemas/ErrorModelUnauthorized"
                 },
                 "example": {
                   "Status": 401,
                   "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
                   "Code": "UNAUTHORIZED",
-                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                  "TraceId": "b4480a88-5942-455c-99ac-68d3547aaccb"
                 }
               }
             }
@@ -523,17 +548,17 @@
             }
           },
           "401": {
-            "description": "Access denied due to invalid or missing authentication token.",
+            "description": "Bearer token missing, invalid or expired. Keys are capitalised.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorModel"
+                  "$ref": "#/components/schemas/ErrorModelUnauthorized"
                 },
                 "example": {
                   "Status": 401,
                   "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
                   "Code": "UNAUTHORIZED",
-                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                  "TraceId": "b4480a88-5942-455c-99ac-68d3547aaccb"
                 }
               }
             }
@@ -616,7 +641,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Payments found for the period."
+            "description": "Payments found for the period.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentSearchResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "One or more entered parameters are incorrect.",
@@ -636,17 +668,17 @@
             }
           },
           "401": {
-            "description": "Access denied due to invalid or missing authentication token.",
+            "description": "Bearer token missing, invalid or expired. Keys are capitalised.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorModel"
+                  "$ref": "#/components/schemas/ErrorModelUnauthorized"
                 },
                 "example": {
                   "Status": 401,
                   "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
                   "Code": "UNAUTHORIZED",
-                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                  "TraceId": "b4480a88-5942-455c-99ac-68d3547aaccb"
                 }
               }
             }
@@ -720,22 +752,25 @@
                   "cardMask": "411111******1111",
                   "cardLinkHash": null,
                   "moneyType": "CYBER_SOURCE"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/RefundResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Access denied due to invalid or missing authentication token.",
+            "description": "Bearer token missing, invalid or expired. Keys are capitalised.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorModel"
+                  "$ref": "#/components/schemas/ErrorModelUnauthorized"
                 },
                 "example": {
                   "Status": 401,
                   "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
                   "Code": "UNAUTHORIZED",
-                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                  "TraceId": "b4480a88-5942-455c-99ac-68d3547aaccb"
                 }
               }
             }
@@ -763,6 +798,40 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid refund: amount above the paid amount, or another refund of the same payment. details names RefundType.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 400,
+                  "message": "One or more entered parameters are incorrect.",
+                  "code": "INVALID_PARAMETER",
+                  "traceId": "e353a049-9eca-44e9-bc17-e5c4816320da",
+                  "details": "The invalid parameter is: RefundType"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payment not found or not paid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Record not found",
+                  "code": "NOT_FOUND_RECORD",
+                  "traceId": "72f97a7d-3a42-4c5f-9d8e-e98ee2aaa9ac",
+                  "details": "No records were found for the provided data"
                 }
               }
             }
@@ -810,7 +879,23 @@
         ],
         "responses": {
           "200": {
-            "description": "Statement for the period."
+            "description": "Statement for the period.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatementResponse"
+                },
+                "example": {
+                  "statementDaily": [],
+                  "totals": {
+                    "startBalance": 180000,
+                    "totalDebit": 0,
+                    "totalCredit": 0,
+                    "finalBalance": 180000
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "One or more entered parameters are incorrect.",
@@ -830,17 +915,17 @@
             }
           },
           "401": {
-            "description": "Access denied due to invalid or missing authentication token.",
+            "description": "Bearer token missing, invalid or expired. Keys are capitalised.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorModel"
+                  "$ref": "#/components/schemas/ErrorModelUnauthorized"
                 },
                 "example": {
                   "Status": 401,
                   "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
                   "Code": "UNAUTHORIZED",
-                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                  "TraceId": "b4480a88-5942-455c-99ac-68d3547aaccb"
                 }
               }
             }
@@ -934,17 +1019,17 @@
             }
           },
           "401": {
-            "description": "Access denied due to invalid or missing authentication token.",
+            "description": "Bearer token missing, invalid or expired. Keys are capitalised.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorModel"
+                  "$ref": "#/components/schemas/ErrorModelUnauthorized"
                 },
                 "example": {
                   "Status": 401,
                   "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
                   "Code": "UNAUTHORIZED",
-                  "TraceId": "84ec3ba3-6afc-4d22-8a0e-7113a59c82cc"
+                  "TraceId": "b4480a88-5942-455c-99ac-68d3547aaccb"
                 }
               }
             }
@@ -1014,31 +1099,29 @@
               }
             }
           },
-          "500": {
-            "description": "Request failed. See the error body.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorModel"
-                },
-                "example": [
-                  {
-                    "status": 500,
-                    "message": "Wrong credentials",
-                    "code": "AUTHENTICATION_FAILED",
-                    "traceId": "ab2002e6-50e7-4cea-a112-eadbddf83505",
-                    "details": null
-                  }
-                ]
-              }
-            }
-          },
           "default": {
             "description": "Error",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Wrong username or password.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                },
+                "example": {
+                  "status": 401,
+                  "message": "Wrong credentials",
+                  "code": "AUTHENTICATION_FAILED",
+                  "traceId": "8d489156-7b1c-4bfb-b88b-7a946c1b862e",
+                  "details": null
                 }
               }
             }
@@ -1455,7 +1538,9 @@
             "type": "string"
           },
           "signature": {
-            "type": "string"
+            "type": "string",
+            "nullable": true,
+            "description": "Internal value of the payment link (equals the s parameter of paymentLink); null in GET responses. Not a signature to verify."
           },
           "amount": {
             "type": "object",
@@ -1469,8 +1554,10 @@
               "amount": {
                 "type": "integer"
               },
-              "amountCurrency": {
-                "type": "integer"
+              "paidAmount": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Amount actually paid, minor units; null until the payment is paid."
               }
             }
           },
@@ -1583,6 +1670,169 @@
           },
           "moneyType": {
             "type": "string"
+          }
+        }
+      },
+      "ErrorModelUnauthorized": {
+        "type": "object",
+        "description": "401 for a missing, invalid or expired Bearer token. Note the capitalised keys.",
+        "required": [
+          "Status",
+          "Message",
+          "Code"
+        ],
+        "properties": {
+          "Status": {
+            "type": "integer"
+          },
+          "Message": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "string"
+          },
+          "TraceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ErrorInfoResponse": {
+        "type": "object",
+        "description": "400 when the request body cannot be read (invalid JSON, wrong types, missing required fields).",
+        "required": [
+          "errorInfo"
+        ],
+        "properties": {
+          "errorInfo": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "nullable": true
+              },
+              "title": {
+                "type": "string",
+                "nullable": true
+              },
+              "status": {
+                "type": "integer"
+              },
+              "detail": {
+                "type": "string",
+                "nullable": true
+              },
+              "instance": {
+                "type": "string",
+                "nullable": true
+              },
+              "ppResponseCodeEnum": {
+                "type": "string",
+                "nullable": true
+              },
+              "ppResponseCode": {
+                "type": "integer",
+                "nullable": true
+              },
+              "ppResponseCodeText": {
+                "type": "string",
+                "nullable": true
+              },
+              "errors": {
+                "type": "object",
+                "nullable": true,
+                "description": "Problem fields and messages."
+              },
+              "traceId": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        }
+      },
+      "RefundResponse": {
+        "type": "object",
+        "description": "Refund result (immediate; no notification is sent).",
+        "properties": {
+          "paymentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "saleAreaCode": {
+            "type": "string"
+          },
+          "customer": {
+            "type": "string",
+            "nullable": true
+          },
+          "eventDate": {
+            "type": "string",
+            "description": "Format DD.MM.YYYY HH:mm:ss"
+          },
+          "refundType": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "integer"
+          },
+          "amount": {
+            "type": "integer"
+          },
+          "merchant": {
+            "type": "string"
+          },
+          "cardMask": {
+            "type": "string",
+            "nullable": true
+          },
+          "cardLinkHash": {
+            "type": "string",
+            "nullable": true
+          },
+          "moneyType": {
+            "type": "string",
+            "nullable": true,
+            "description": "Processing code, e.g. CYBER_SOURCE (not the notification MoneyType)."
+          }
+        }
+      },
+      "PaymentSearchResponse": {
+        "type": "object",
+        "properties": {
+          "payments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentResponse"
+            }
+          }
+        }
+      },
+      "StatementResponse": {
+        "type": "object",
+        "properties": {
+          "statementDaily": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "startBalance": {
+                "type": "integer"
+              },
+              "totalDebit": {
+                "type": "integer"
+              },
+              "totalCredit": {
+                "type": "integer"
+              },
+              "finalBalance": {
+                "type": "integer"
+              }
+            }
           }
         }
       }

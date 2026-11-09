@@ -9,7 +9,7 @@
 | `401` | `UNAUTHORIZED` | Bearer token is missing, invalid or expired. | Call `/auth` again and retry once. |
 | `404` | `NOT_FOUND_RECORD` | No payment/record for the given ID. | Check the ID (`paymentId` vs your `Order`). |
 | `500` | `TECHNICAL_ERROR` | Error on Paynet side, **or** a repeated `Order` that cannot be reused (see below). | Check with `GET /api/order/merchant/{Order}` whether the order exists; if it is a real technical error, retry later with backoff. |
-| `500` | `AUTHENTICATION_FAILED` | `/auth` with wrong username or password. | Check credentials. |
+| `401` | `AUTHENTICATION_FAILED` | `/auth` with wrong username or password. | Check credentials. |
 
 ## Error body
 
@@ -31,7 +31,7 @@
 | `traceId` | Request ID. Send it to Paynet support when you report a problem. |
 | `details` | Extra information, e.g. the invalid parameter. |
 
-> **Note:** `401` responses use capitalised keys (`Status`, `Message`, `Code`, `TraceId`). Read error fields case-insensitively. `/auth` may return the error object inside an array.
+> **Note:** a `401` for a missing, invalid or expired token uses capitalised keys (`Status`, `Message`, `Code`, `TraceId`), while the `401` from `/auth` for a wrong password uses the usual ones (`status`, `message`…). Read error fields case-insensitively.
 
 ### Invalid JSON or missing required fields
 

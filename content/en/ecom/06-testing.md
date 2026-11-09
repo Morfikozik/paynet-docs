@@ -35,7 +35,7 @@ Test cards can only reproduce a successful payment: there are no cards for decli
 | # | Scenario | How | Expected |
 |---|---|---|---|
 | 1 | Authenticate | `POST /auth` with test credentials | `200`, `access_token` |
-| 2 | Wrong password | `POST /auth` with a wrong password | error `AUTHENTICATION_FAILED` |
+| 2 | Wrong password | `POST /auth` with a wrong password | `401`, `AUTHENTICATION_FAILED` |
 | 3 | Create order | `POST /api/order` | `200`, `paymentId`, `paymentLink`, `status` `1` |
 | 4 | Repeat the same request | send scenario 3 again unchanged | same `paymentId` and `paymentLink` |
 | 5 | Same `Order`, other amount | change `Amount`, keep `Order` | `500`, `TECHNICAL_ERROR` |
