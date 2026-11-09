@@ -74,7 +74,7 @@ for (const [lang, hash, name, action] of [
   await page.waitForTimeout(600);
   if (action === 'menu') await page.click('button[aria-label="Open menu"]');
   if (action === 'scroll-request') await page.locator('textarea').first().scrollIntoViewIfNeeded();
-  if (action === 'scroll-table') await page.locator('table:visible, .sm\\:hidden.space-y-2').first().scrollIntoViewIfNeeded();
+  if (action === 'scroll-table') await page.locator('table:visible, .sm\\:hidden.space-y-2, [data-param-list]').first().scrollIntoViewIfNeeded();
   await page.waitForTimeout(400);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   if (overflow > 0) log.push(`[${name}] horizontal overflow: ${overflow}px`);

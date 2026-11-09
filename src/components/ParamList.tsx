@@ -3,7 +3,7 @@ import React from 'react';
 // Parameter list (name, type, location, required, description) — readable on phones and wide screens.
 export type ParamItem = { name: string; type?: string; in?: string; required: boolean; description?: string };
 const ParamList: React.FC<{ items: ParamItem[]; labels: { required: string; optional: string } }> = ({ items, labels }) => (
-  <div className="divide-y divide-paynet-gray-200 border-y border-paynet-gray-200">
+  <div data-param-list className="divide-y divide-paynet-gray-200 border-y border-paynet-gray-200">
     {items.map((item, index) => (
       <div key={`${item.name}-${index}`} className="py-3">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
