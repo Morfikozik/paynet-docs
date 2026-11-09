@@ -44,4 +44,3 @@ npm run dev
 
 ## Открытые вопросы к Paynet
 
-Список вопросов, которые нужно подтвердить перед публикацией, — в [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md).
