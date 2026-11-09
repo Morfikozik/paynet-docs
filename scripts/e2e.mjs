@@ -223,7 +223,7 @@ const cardsStage = async (token) => {
   try {
     for (const moneyType of ['Card', 'All']) {
       const order = Date.now();
-      const created = await call('POST', '/api/order', orderBody(order, 200, { MoneyType: moneyType }), token);
+      const created = await call('POST', '/api/order', orderBody(order, 300, { MoneyType: moneyType }), token);
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(created.body.paymentLink, { waitUntil: 'networkidle', timeout: 60000 });
       const checkbox = await p.$$eval('input[type=checkbox]', (els) => els.map((e) => ({ name: e.name, checked: e.checked })));
@@ -239,7 +239,7 @@ const cardsStage = async (token) => {
         if (hash) {
           // Same customer + token → the payment page should offer the saved card.
           const sameOrder = order + 11;
-          const same = await call('POST', '/api/order', orderBody(sameOrder, 200, { CardLinkHash: hash }), token);
+          const same = await call('POST', '/api/order', orderBody(sameOrder, 300, { CardLinkHash: hash }), token);
           note('cards:same-customer', { http: same.status, cardLinkHash: same.body?.cardLinkHash, status: same.body?.status, message: same.body?.message ?? same.body?.details });
           if (same.body?.paymentLink) {
             const q = await browser.newPage({ viewport: { width: 1280, height: 900 } });
@@ -251,7 +251,7 @@ const cardsStage = async (token) => {
           }
           // Another customer + the same token → should be refused or not show the card.
           const otherOrder = order + 12;
-          const otherBody = orderBody(otherOrder, 200, { CardLinkHash: hash });
+          const otherBody = orderBody(otherOrder, 300, { CardLinkHash: hash });
           otherBody.Customer = { ...otherBody.Customer, Code: 'e2e-other-customer' };
           const other = await call('POST', '/api/order', otherBody, token);
           note('cards:other-customer', { http: other.status, body: other.body && { cardLinkHash: other.body.cardLinkHash, status: other.body.status, code: other.body.code, details: other.body.details } });
@@ -265,7 +265,7 @@ const cardsStage = async (token) => {
           }
           // Unknown token for the same customer.
           const fakeOrder = order + 13;
-          const fake = await call('POST', '/api/order', orderBody(fakeOrder, 200, { CardLinkHash: '0000000_00000000000000000000000000000000' }), token);
+          const fake = await call('POST', '/api/order', orderBody(fakeOrder, 300, { CardLinkHash: '0000000_00000000000000000000000000000000' }), token);
           note('cards:unknown-token', { http: fake.status, body: fake.body && { cardLinkHash: fake.body.cardLinkHash, code: fake.body.code, details: fake.body.details } });
         }
       }
