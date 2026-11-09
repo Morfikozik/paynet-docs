@@ -8,7 +8,7 @@ Funcționează doar la [integrarea server-to-server](#/guides/server-to-server).
 
 ## Activare
 
-Salvarea cardurilor se activează pentru `SaleAreaCode` dvs. pe partea Paynet: contactați managerul dvs. Paynet. Pentru zona de vânzare de test comună `onlidocumentation_md` ea nu este activată acum (pe pagina de plată nu există bifa, `CardLinkHash` nu vine). Pentru a testa scenariul, cereți activarea pentru zona dvs. de vânzare de test.
+Salvarea cardurilor se activează pentru `SaleAreaCode` dvs. pe partea Paynet: contactați managerul dvs. Paynet. Pentru zona de vânzare de test comună `onlidocumentation_md` ea este activată: puteți încerca scenariul cu accesele de test.
 
 ## Ce este `CardLinkHash`
 
@@ -97,6 +97,17 @@ O comandă nouă cu un `Order` nou, același `Customer` și `CardLinkHash` salva
 ```
 
 Restul este ca de obicei: trimiteți clientul la `paymentLink` și așteptați notificarea `PAID`.
+
+## Ce s-a verificat în mediul de test
+
+| Situație | Ce se întâmplă |
+|---|---|
+| Prima plată cu `Customer`, bifa păstrată | `CardLinkHash` vine în notificare și în răspunsul `GET /api/order/merchant/{Order}` (`cardLinkHash` și `customer.cardLinkHash`) |
+| Plata următoare: același `Customer` + `CardLinkHash` | Pagina Paynet afișează cardul salvat (masca și data expirării). Clientul îl poate alege, poate introduce alt card sau poate șterge cardul salvat |
+| Alt `Customer.Code` + același `CardLinkHash` | Comanda se creează (`200`), dar cardul salvat **nu se afișează** — clientul introduce cardul din nou |
+| `CardLinkHash` inexistent | Comanda se creează (`200`), pagina de plată este cea obișnuită |
+
+API-ul nu respinge un token nepotrivit la crearea comenzii: protecția funcționează pe pagina de plată. De aceea păstrați fiecare token strict în pereche cu clientul pentru care a fost emis.
 
 ## Reguli
 

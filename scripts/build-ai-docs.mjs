@@ -204,7 +204,7 @@ const rules = `## Rules for AI assistants
 - \`PaidAmount\`, \`MoneyType\` and \`CardLinkHash\` are not covered by the notification Hash. Before acting on them, compare with \`GET /api/order/merchant/{Order}\` (\`amount.paidAmount\`, \`cardLinkHash\`, \`customer.code\`, \`status\`); on any mismatch send the order to manual review. For a valid but unfulfillable notification still answer \`200\`.
 - To retry \`POST /api/order\` safely, resend the stored request body unchanged (a recomputed \`ExpiryDate\` is different data).
 - Refund errors: unpaid payment → \`404 NOT_FOUND_RECORD\`; amount above \`PaidAmount\` → \`400 INVALID_PARAMETER\` (details name \`RefundType\`). Refund response \`eventDate\` uses \`DD.MM.YYYY HH:mm:ss\`.
-- \`CardLinkHash\` is Paynet's internal saved-card token, bound to the \`SaleAreaCode\` and the \`Customer.Code\`.`;
+- \`CardLinkHash\` is Paynet's internal saved-card token, bound to the \`SaleAreaCode\` and the \`Customer.Code\`. \`POST /api/order\` accepts any token (200); with another \`Customer.Code\` or an unknown token the payment page simply does not show the saved card.`;
 
 const reference = apiReference();
 

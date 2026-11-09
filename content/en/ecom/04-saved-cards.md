@@ -8,7 +8,7 @@ This works only with the [server-to-server integration](#/guides/server-to-serve
 
 ## Enabling
 
-Card saving is enabled for your `SaleAreaCode` on the Paynet side: contact your Paynet manager. For the shared test sale area `onlidocumentation_md` it is currently not enabled (no checkbox on the payment page, no `CardLinkHash`). To test the flow, ask to enable it for your own test sale area.
+Card saving is enabled for your `SaleAreaCode` on the Paynet side: contact your Paynet manager. It is enabled for the shared test sale area `onlidocumentation_md`: you can try the flow with the test credentials.
 
 ## What `CardLinkHash` is
 
@@ -97,6 +97,17 @@ A new order with a new `Order`, the same `Customer` and the saved `CardLinkHash`
 ```
 
 The rest is as usual: send the customer to `paymentLink` and wait for the `PAID` notification.
+
+## Checked on the test environment
+
+| Situation | What happens |
+|---|---|
+| First payment with `Customer`, checkbox kept | `CardLinkHash` arrives in the notification and in the `GET /api/order/merchant/{Order}` response (`cardLinkHash` and `customer.cardLinkHash`) |
+| Next payment: same `Customer` + `CardLinkHash` | The Paynet page shows the saved card (mask and expiry date). The customer can choose it, enter another card or delete the saved one |
+| Another `Customer.Code` + the same `CardLinkHash` | The order is created (`200`), but the saved card is **not shown** — the customer enters a card again |
+| Unknown `CardLinkHash` | The order is created (`200`), the payment page is the usual one |
+
+The API does not reject an unsuitable token when the order is created: the protection works on the payment page. So keep each token strictly paired with the customer it was issued for.
 
 ## Rules
 
