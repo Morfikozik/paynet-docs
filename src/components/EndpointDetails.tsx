@@ -1,11 +1,36 @@
 import React from 'react';
-import { AlertCircle, CheckCircle, Copy, Check, FileText } from 'lucide-react';
+import { Copy, Check, FileText } from 'lucide-react';
 import { Endpoint } from '../types/api';
 import { TranslationResources, Language } from '../types/language';
 import { AuthenticationBlock } from './AuthenticationBlock';
 import { AiMenu } from './AiMenu';
 import { getMethodTranslation } from '../utils/pathTranslations';
 import { translateOpenApiDescription } from '../utils/openApiDescriptionTranslations';
+
+// Parameter list (name, type, location, required, description) — readable on phones and wide screens.
+type ParamItem = { name: string; type?: string; in?: string; required: boolean; description?: string };
+const ParamList: React.FC<{ items: ParamItem[]; labels: { required: string; optional: string } }> = ({ items, labels }) => (
+  <div className="divide-y divide-paynet-gray-200 border-y border-paynet-gray-200">
+    {items.map((item, index) => (
+      <div key={`${item.name}-${index}`} className="py-3">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <code className="font-mono text-sm font-semibold text-paynet-gray-900 break-all">{item.name}</code>
+          {item.type && <span className="bg-paynet-gray-100 text-paynet-gray-700 px-1.5 py-0.5 rounded text-xs font-mono">{item.type}</span>}
+          {item.in && (
+            <span className={`px-1.5 py-0.5 text-xs rounded ${
+              item.in === 'path' ? 'bg-purple-100 text-purple-800' : item.in === 'query' ? 'bg-blue-100 text-blue-800' : 'bg-paynet-light text-paynet-dark'
+            }`}>{item.in}</span>
+          )}
+          <span className={`text-xs font-medium ${item.required ? 'text-paynet-error' : 'text-paynet-gray-500'}`}>
+            {item.required ? labels.required : labels.optional}
+          </span>
+        </div>
+        {item.description && <p className="mt-1 text-sm text-paynet-gray-600 break-words">{item.description}</p>}
+      </div>
+    ))}
+  </div>
+);
+
 
 interface EndpointDetailsProps {
   endpoint: Endpoint;
@@ -222,42 +247,15 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
   };
 
 
-  // Function to render schema properties as table rows
-  const renderSchemaProperties = (schema: any, parentKey = '') => {
-    if (!schema || !schema.properties) return null;
-    
-    return Object.entries(schema.properties).map(([key, prop]: [string, any]) => {
-      const fullKey = parentKey ? `${parentKey}.${key}` : key;
-      const isRequired = schema.required?.includes(key) || prop.required === true || false;
-      
-      return (
-        <tr key={fullKey} className="hover:bg-paynet-gray-50 transition-colors duration-150">
-          <td className="px-4 py-3 text-sm font-mono text-paynet-gray-900 font-semibold break-all">{fullKey}</td>
-          <td className="px-4 py-3 text-sm text-paynet-gray-600">
-            <span className="bg-paynet-gray-100 px-2 py-1 rounded-md text-xs font-mono font-semibold">
-              {prop.type || 'object'}
-            </span>
-          </td>
-          <td className="px-4 py-3 text-sm">
-            {isRequired ? (
-              <span className="flex items-center gap-1 text-paynet-error font-medium">
-                <AlertCircle className="w-4 h-4" />
-                {t.common.required}
-              </span>
-            ) : (
-              <span className="flex items-center gap-1 text-paynet-success">
-                <CheckCircle className="w-4 h-4" />
-                {t.common.optional}
-              </span>
-            )}
-          </td>
-          <td className="px-4 py-3 text-sm text-paynet-gray-600 break-words">
-            {translateOpenApiDescription(prop.description, language) || prop.example || t.common.description}
-          </td>
-        </tr>
-      );
-    });
-  };
+  // Schema properties as parameter-list items
+  const schemaItems = (schema: any): ParamItem[] =>
+    !schema || !schema.properties ? [] :
+    Object.entries(schema.properties).map(([key, prop]: [string, any]) => ({
+      name: key,
+      type: prop.type || 'object',
+      required: schema.required?.includes(key) || prop.required === true || false,
+      description: translateOpenApiDescription(prop.description, language) || (prop.example !== undefined ? String(prop.example) : ''),
+    }));
 
   return (
     <div className="w-full max-w-none">
@@ -287,7 +285,7 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
         </div>
         
         {/* Подробное описание метода из api_paths.json */}
-        <div className="bg-white p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
           <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary mb-3 sm:mb-4">
             {t.common.methodDescription}
           </h2>
@@ -298,7 +296,7 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
       </div>
 
       {/* Тип запроса и пример URL */}
-      <div className="mb-8 bg-white p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
+      <div className="mb-8 bg-white p-4 sm:p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
         <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary mb-3 sm:mb-4">
           {t.common.requestTypeAndUrl}
         </h2>
@@ -349,7 +347,7 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
 
       {/* Описание метода из OpenAPI (если есть) */}
       {endpoint.description && !methodTranslation.description && (
-        <div className="mb-8 bg-white p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
+        <div className="mb-8 bg-white p-4 sm:p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
           <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary mb-3 sm:mb-4 flex items-center gap-2">
             <span>OpenAPI {t.common.methodDescription}</span>
           </h2>
@@ -366,112 +364,38 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
       {((endpoint.parameters && endpoint.parameters.length > 0) || requestBodyDescriptionItems.length > 0) && (
         <div className="space-y-4 mb-8">
           {endpoint.parameters && endpoint.parameters.length > 0 && (
-            <div className="bg-white p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
               <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary mb-3 sm:mb-4">
                 {t.common.parameters}
               </h2>
-              <div className="overflow-x-auto rounded-lg border border-paynet-gray-200 w-full">
-                <table className="w-full">
-                  <thead className="bg-paynet-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.name}</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.type}</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.in}</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.required}</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.description}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-paynet-gray-200">
-                    {endpoint.parameters.map((param, index) => (
-                      <tr key={index} className="hover:bg-paynet-gray-50 transition-colors duration-150">
-                        <td className="px-4 py-3 text-sm font-mono text-paynet-gray-900 font-semibold break-all">{param.name}</td>
-                        <td className="px-4 py-3 text-sm text-paynet-gray-600">
-                          <span className="bg-paynet-gray-100 px-2 py-1 rounded-md text-xs font-mono font-semibold">
-                            {param.type}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            param.in === 'path' ? 'bg-purple-100 text-purple-800' :
-                            param.in === 'query' ? 'bg-blue-100 text-blue-800' :
-                            'bg-paynet-gray-100 text-paynet-gray-800'
-                          }`}>
-                            {param.in}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          {param.required ? (
-                            <span className="flex items-center gap-1 text-paynet-error font-medium">
-                              <AlertCircle className="w-4 h-4" />
-                              {t.common.required}
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-1 text-paynet-success">
-                              <CheckCircle className="w-4 h-4" />
-                              {t.common.optional}
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-paynet-gray-600 break-words">
-                          {translateOpenApiDescription(param.description, language) || t.common.description}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ParamList
+                items={endpoint.parameters.map((param) => ({
+                  name: param.name,
+                  type: param.type,
+                  in: param.in,
+                  required: !!param.required,
+                  description: translateOpenApiDescription(param.description, language) || '',
+                }))}
+                labels={{ required: t.common.required, optional: t.common.optional }}
+              />
             </div>
           )}
 
           {requestBodyDescriptionItems.length > 0 && (
-            <div className="bg-white p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
               <h3 className="text-lg sm:text-xl font-semibold text-paynet-primary mb-3 sm:mb-4">
                 {t.common.parameters} - {t.common.description}
               </h3>
-              <div className="overflow-x-auto rounded-lg border border-paynet-gray-200 w-full">
-                <table className="w-full">
-                  <thead className="bg-paynet-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.name}</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.type}</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.in}</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.required}</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.description}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-paynet-gray-200">
-                    {requestBodyDescriptionItems.map((param, index) => (
-                      <tr key={`${param.name}-${index}`} className="hover:bg-paynet-gray-50 transition-colors duration-150">
-                        <td className="px-4 py-3 text-sm font-mono text-paynet-gray-900 font-semibold break-all">{param.name}</td>
-                        <td className="px-4 py-3 text-sm text-paynet-gray-600">
-                          <span className="bg-paynet-gray-100 px-2 py-1 rounded-md text-xs font-mono font-semibold">
-                            {param.type}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                            {param.in}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          {param.required ? (
-                            <span className="flex items-center gap-1 text-paynet-error font-medium">
-                              <AlertCircle className="w-4 h-4" />
-                              {t.common.required}
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-1 text-paynet-success">
-                              <CheckCircle className="w-4 h-4" />
-                              {t.common.optional}
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-paynet-gray-600 break-words">{param.description}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ParamList
+                items={requestBodyDescriptionItems.map((param) => ({
+                  name: param.name,
+                  type: param.type,
+                  in: param.in,
+                  required: !!param.required,
+                  description: param.description,
+                }))}
+                labels={{ required: t.common.required, optional: t.common.optional }}
+              />
             </div>
           )}
         </div>
@@ -479,7 +403,7 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
 
       {/* Request Body */}
       {requestBody && (
-        <div className="mb-8 bg-white p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
+        <div className="mb-8 bg-white p-4 sm:p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
           <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary mb-3 sm:mb-4">
             Request Body
           </h2>
@@ -549,21 +473,7 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
               return (
                 <div key={contentType} className="mb-4">
                   <span className="text-sm font-medium text-paynet-gray-600 block mb-3">Schema Properties:</span>
-                  <div className="overflow-x-auto rounded-lg border border-paynet-gray-200 w-full">
-                    <table className="w-full">
-                      <thead className="bg-paynet-gray-50">
-                        <tr>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.name}</th>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.type}</th>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.required}</th>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">{t.common.description}</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-paynet-gray-200">
-                        {renderSchemaProperties(content.schema)}
-                      </tbody>
-                    </table>
-                  </div>
+                  <ParamList items={schemaItems(content.schema)} labels={{ required: t.common.required, optional: t.common.optional }} />
                 </div>
               );
             }
@@ -573,7 +483,7 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
         </div>
       )}
       {/* Responses */}
-      <div className="mb-8 bg-white p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
+      <div className="mb-8 bg-white p-4 sm:p-6 rounded-lg shadow-paynet-lg border border-paynet-gray-200 w-full">
         <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary mb-3 sm:mb-4">{t.common.responses}</h2>
         
         {/* Response Code Tabs */}
