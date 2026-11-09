@@ -166,8 +166,8 @@ Authorization: Bearer <access_token>
 | Операция | Запрос | Примечание |
 |---|---|---|
 | Поиск платежей | `GET /api/order/search?from=…&to=…` | Дата-время ISO 8601, например `2026-03-09T06:40:05.010Z`. |
-| Возврат | `POST /api/order/refund` | Тело: `paymentId`, `saleAreaCode`, `refundType` (`full` или `partial`), `amount`, `currency`, `reason`. |
-| Удалить сохранённую карту | `POST /api/linked-cards/unlink` | Тело: `cardLinkHash`, `saleAreaCode`, `customerCode`. |
+| Возврат | `POST /api/order/refund` | Тело: `PaymentId`, `SaleAreaCode`, `RefundType` (`full` или `partial`), `Amount`, `Currency`, `Reason`. |
+| Удалить сохранённую карту | `POST /api/linked-cards/unlink` | Тело: `CardLinkHash`, `SaleAreaCode`, `CustomerCode`. |
 | Выписка | `GET /api/statement?dateStart=…&dateFinish=…` | Даты вида `2026-03-01`. Необязательный `accountId`. |
 | Выписка (Excel) | `GET /api/statement/download?dateStart=…&dateFinish=…` | Возвращает файл `.xlsx`. Период не более 31 дня. |
 

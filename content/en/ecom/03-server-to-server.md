@@ -166,8 +166,8 @@ Both return the same payment object. Use them before shipping goods and whenever
 | Operation | Request | Notes |
 |---|---|---|
 | Search payments | `GET /api/order/search?from=…&to=…` | ISO 8601 date-time, e.g. `2026-03-09T06:40:05.010Z`. |
-| Refund | `POST /api/order/refund` | Body: `paymentId`, `saleAreaCode`, `refundType` (`full` or `partial`), `amount`, `currency`, `reason`. |
-| Unlink a saved card | `POST /api/linked-cards/unlink` | Body: `cardLinkHash`, `saleAreaCode`, `customerCode`. |
+| Refund | `POST /api/order/refund` | Body: `PaymentId`, `SaleAreaCode`, `RefundType` (`full` or `partial`), `Amount`, `Currency`, `Reason`. |
+| Unlink a saved card | `POST /api/linked-cards/unlink` | Body: `CardLinkHash`, `SaleAreaCode`, `CustomerCode`. |
 | Statement | `GET /api/statement?dateStart=…&dateFinish=…` | Dates like `2026-03-01`. Optional `accountId`. |
 | Statement (Excel) | `GET /api/statement/download?dateStart=…&dateFinish=…` | Returns an `.xlsx` file. Period of at most 31 days. |
 

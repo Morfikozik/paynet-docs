@@ -166,8 +166,8 @@ Ambele returnează același obiect de plată. Folosiți-le înainte de livrare �
 | Operațiune | Cerere | Note |
 |---|---|---|
 | Căutare plăți | `GET /api/order/search?from=…&to=…` | Dată-oră ISO 8601, de ex. `2026-03-09T06:40:05.010Z`. |
-| Rambursare | `POST /api/order/refund` | Corp: `paymentId`, `saleAreaCode`, `refundType` (`full` sau `partial`), `amount`, `currency`, `reason`. |
-| Deconectarea unui card salvat | `POST /api/linked-cards/unlink` | Corp: `cardLinkHash`, `saleAreaCode`, `customerCode`. |
+| Rambursare | `POST /api/order/refund` | Corp: `PaymentId`, `SaleAreaCode`, `RefundType` (`full` sau `partial`), `Amount`, `Currency`, `Reason`. |
+| Deconectarea unui card salvat | `POST /api/linked-cards/unlink` | Corp: `CardLinkHash`, `SaleAreaCode`, `CustomerCode`. |
 | Extras | `GET /api/statement?dateStart=…&dateFinish=…` | Date de forma `2026-03-01`. `accountId` opțional. |
 | Extras (Excel) | `GET /api/statement/download?dateStart=…&dateFinish=…` | Returnează un fișier `.xlsx`. Perioadă de cel mult 31 de zile. |
 
