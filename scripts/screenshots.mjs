@@ -63,6 +63,8 @@ for (const [lang, hash, name, action] of [
   ['ru', '#/api/post-api-order', 'm05-api-request', 'scroll-request'],
   ['ru', '#/guides/errors-and-statuses', 'm06-table', 'scroll-table'],
   ['ru', '#/page/notification-simulator', 'm07-simulator', null],
+  ['ru', '#/api/post-api-order', 'm08-api-params', 'scroll-table'],
+  ['ru', '#/guides/saved-cards', 'm09-saved-cards-table', 'scroll-table'],
 ]) {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
   await context.addInitScript((l) => localStorage.setItem('tps-api-language', l), lang);
@@ -72,7 +74,7 @@ for (const [lang, hash, name, action] of [
   await page.waitForTimeout(600);
   if (action === 'menu') await page.click('button[aria-label="Open menu"]');
   if (action === 'scroll-request') await page.locator('textarea').first().scrollIntoViewIfNeeded();
-  if (action === 'scroll-table') await page.locator('table').first().scrollIntoViewIfNeeded();
+  if (action === 'scroll-table') await page.locator('table:visible, .sm\\:hidden.space-y-2').first().scrollIntoViewIfNeeded();
   await page.waitForTimeout(400);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   if (overflow > 0) log.push(`[${name}] horizontal overflow: ${overflow}px`);

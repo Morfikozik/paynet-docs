@@ -296,7 +296,32 @@ export const Markdown: React.FC<MarkdownProps> = ({ source, onNavigate }) => {
             return <CodeBlock key={index} code={block.code} lang={block.lang} />;
           case 'table':
             return (
-              <div key={index} className="overflow-x-auto mb-5 border border-paynet-gray-200 rounded-paynet">
+              <React.Fragment key={index}>
+              {/* Phones: each row as a card (first cell = title, other cells = "header: value"). */}
+              <div className="sm:hidden mb-5 space-y-2">
+                {block.rows.map((row, rowIndex) => (
+                  <div key={rowIndex} className="border border-paynet-gray-200 rounded-paynet bg-white px-3 py-2.5 text-sm">
+                    <div className="font-semibold text-paynet-gray-900 mb-1 break-words">
+                      <Inline text={row[0] || ''} onNavigate={onNavigate} />
+                    </div>
+                    {row.slice(1).map((cell, cellIndex) =>
+                      cell.trim() && cell.trim() !== '—' ? (
+                        <div key={cellIndex} className="mt-1 break-words">
+                          {block.header[cellIndex + 1] && (
+                            <span className="text-paynet-gray-500 text-xs uppercase tracking-wide block">
+                              <Inline text={block.header[cellIndex + 1]} onNavigate={onNavigate} />
+                            </span>
+                          )}
+                          <span className="text-paynet-gray-800">
+                            <Inline text={cell} onNavigate={onNavigate} />
+                          </span>
+                        </div>
+                      ) : null
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="hidden sm:block overflow-x-auto mb-5 border border-paynet-gray-200 rounded-paynet">
                 <table className="min-w-full text-sm">
                   <thead className="bg-paynet-light">
                     <tr>
@@ -320,6 +345,7 @@ export const Markdown: React.FC<MarkdownProps> = ({ source, onNavigate }) => {
                   </tbody>
                 </table>
               </div>
+              </React.Fragment>
             );
           case 'quote':
             return (
