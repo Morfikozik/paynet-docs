@@ -21,6 +21,9 @@ const pages = [
   ['ru', '#/page/order-request-v05', '10-legacy-redirect'],
   ['ru', '#/api/post-auth', '12-ru-api-auth'],
   ['en', '#/api/post-api-linked-cards-unlink', '13-api-unlink'],
+  ['ru', '#/guides/errors-and-statuses', '18-ru-statuses'],
+  ['ru', '#/guides/saved-cards', '19-ru-saved-cards'],
+  ['ro', '#/guides/faq', '20-ro-faq'],
 ];
 
 const browser = await chromium.launch();
@@ -71,7 +74,7 @@ for (const [hash, name, action] of [
   await page.screenshot({ path: path.join(outDir, `${name}.png`) });
   await context.close();
 }
-for (const file of ['docs/ru/signatures.md', 'docs/ro/testing.md', 'docs/api/post-api-order.md', 'docs/api/get-api-order-id.md',
+for (const file of ['docs/saved-cards.md', 'docs/ru/faq.md', 'docs/ru/signatures.md', 'docs/ro/testing.md', 'docs/api/post-api-order.md', 'docs/api/get-api-order-id.md',
   'llms.txt', 'llms-full.txt', 'llms-ecom.txt', 'openapi.json', 'docs/signatures.md', 'legacy/']) {
   const res = await fetch(baseUrl + file);
   log.push(`GET ${file} → ${res.status} (${(await res.text()).length} bytes)`);

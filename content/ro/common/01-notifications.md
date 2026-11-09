@@ -63,7 +63,7 @@ Cererea are doar două antete: `Content-Type` și `Hash`. Nu există antet `Auth
 | `Payment.Merchant` | string | Codul dvs. de comerciant. |
 | `Payment.MoneyType` | string | Cum a plătit clientul: `CARD`, `APPLEPAY`, `GOOGLEPAY`, `MIA_QR`, `PAYNET`, `CASH_INVOICE`. |
 | `Payment.CardMask`, `CardExpireMonth`, `CardExpireYear`, `CardIssuer` | string | Datele cardului. Completate pentru `CARD`, precum și pentru `APPLEPAY` și `GOOGLEPAY` (cardul din portofel); `null` pentru alte metode de plată. |
-| `Payment.CardLinkHash` | string | Hash-ul cardului salvat; poate fi `null`. |
+| `Payment.CardLinkHash` | string | Tokenul cardului salvat: vine dacă pentru `SaleAreaCode` este activată [salvarea cardurilor](#/guides/saved-cards) și clientul a păstrat bifa; altfel `null`. |
 | `Payment.PayerName`, `PayerSurname`, `PayerIDNP` | string | Datele plătitorului; pot fi `null`. |
 | `Payment.RRN` | string | Retrieval reference number. |
 | `Hash` (antet HTTP) | string | Semnătura notificării. |
@@ -158,9 +158,12 @@ echo json_encode(['ResultCode' => 'SUCCESS']);
 ## Răspuns și reîncercări
 
 - Răspundeți HTTP `200` **după** ce ați verificat hash-ul și ați salvat rezultatul.
-- Orice alt status (sau un timeout) este considerat eșec: Paynet reîncearcă notificarea **de până la 3 ori**, apoi se oprește.
+- Răspundeți repede: salvați notificarea, returnați `200`, iar procesarea grea faceți-o după răspuns.
+- Orice alt răspuns (sau lipsa răspunsului) este considerat eșec, iar Paynet trimite notificarea din nou. Exemplu dintr-un log real: 7 încercări în circa 9 minute, în două serii, după care trimiterea s-a oprit. Programul exact nu este garantat — nu vă bazați pe el.
 - Din cauza reîncercărilor aceeași notificare poate sosi de mai multe ori. Procesați fiecare `Payment.Id` o singură dată.
-- Dacă nu ați primit notificarea, folosiți `GET /api/order/{paymentId}` sau `GET /api/order/merchant/{Order}`.
+- Dacă notificarea nu a sosit (de exemplu, serverul a fost indisponibil mai mult decât toate încercările), verificați statusul cu `GET /api/order/{paymentId}` sau `GET /api/order/merchant/{Order}`. Retrimiterea o puteți cere la suportul Paynet.
+- Dacă serverul dvs. este protejat de firewall, adresele IP de la care vin notificările le puteți obține de la suportul Paynet.
+- `PAID` este final: antifrauda acționează înainte de confirmarea plății, deci nu va anula ulterior această plată. Doar [rambursarea](#/guides/errors-and-statuses) dvs. schimbă o plată achitată.
 
 ## Simulatorul de notificări pe acest portal
 

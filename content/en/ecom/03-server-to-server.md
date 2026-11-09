@@ -89,10 +89,10 @@ Content-Type: application/json
 | `Services` | array | yes | At least one service, see below. |
 | `MoneyType` | string | yes | `All`, `Card`, `Paynet`, `MIA` or `CashInvoice` (see below). |
 | `Lang` | string | yes | Payment page language: `RO`, `RU` or `EN`. |
-| `Customer` | object | no | Customer data. Required in full if `CardLinkHash` is sent. |
+| `Customer` | object | no | Customer data. Required to [save a card](#/guides/saved-cards) or to pay with a saved card. |
 | `Customer.Code` | string | yes, if `Customer` is sent | Customer ID in your system. |
 | `Customer.NameFirst`, `NameLast`, `email`, `PhoneNumber` | string | no | Customer details. Note the lowercase `email`. |
-| `CardLinkHash` | string | no | Hash of a saved card of this customer (one-click payment). |
+| `CardLinkHash` | string | no | Saved card token of this customer, received in a notification. Send it together with the same `Customer`. See [Saved cards](#/guides/saved-cards). |
 
 `Services[]`:
 

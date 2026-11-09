@@ -34,12 +34,14 @@ const SECTIONS = [
 const SUMMARIES = {
   notifications: 'webhook sent when a payment is paid: request format, fields, Hash verification, retries, Amount vs PaidAmount',
   signatures: 'how to compute and verify signatures (MD5 + Base64, UTF-8) with worked test vectors',
-  'errors-and-statuses': 'HTTP codes, error body, repeated Order rules, payment status, date/time formats, refunds',
+  'errors-and-statuses': 'HTTP codes, error body, repeated Order rules, payment status values (1/3/4/5/6), failed payment and retry, date/time formats, refund rules',
   'ai-assistants': 'files and prompt template for integrating with an AI assistant',
   'integration-options': 'what e-commerce offers and how to choose: server-to-server API, hosted checkout form or CMS plugins',
   'getting-started': 'environments, test credentials and a first test payment step by step',
   'server-to-server': 'create an order via API, redirect the customer, handle the notification, check status; fields and code samples',
   'hosted-checkout': 'signed HTML form posted from the browser to Paynet; fields, signature and code samples',
+  'saved-cards': 'saving a card (CardLinkHash) on the first payment and paying with it next time; server-to-server only',
+  faq: 'frequent integration questions: keys, missing or repeated notifications, declined payments, refunds, signatures',
   testing: 'test environment, test card, rules and test scenarios with expected results',
   'go-live': 'checklist before switching to production',
 };
@@ -192,6 +194,11 @@ const rules = `## Rules for AI assistants
 - \`PaidAmount\` must equal \`Amount\` unless the merchant has an agreed promotion with Paynet; otherwise do not fulfil the order automatically.
 - Errors come in two formats: usually \`status\` / \`message\` / \`code\` / \`traceId\` / \`details\` (capitalised keys on \`401\`), but invalid JSON or missing required fields return \`400\` with an \`errorInfo\` object. Handle both.
 - Never treat the redirect to \`LinkUrlSuccess\` as proof of payment. Use a verified notification or the status API.
+- Payment \`status\`: \`1\` registered (not paid), \`3\` pending (bank processing), \`4\` paid, \`5\` cancelled (declined, antifraud or full refund), \`6\` partially refunded. \`5\` and \`6\` are final; \`2\` is not used; there is no expired status (an expired unpaid order stays \`1\`). Paid = verified \`PAID\` notification or \`status\` \`4\`.
+- After a declined payment (\`status\` \`5\`) create a new order with a new \`Order\`. If the order is still \`1\`, the customer can reuse the same \`paymentLink\`. While it is \`3\`, do not create a new order.
+- Paynet retries a notification while your server does not answer \`200\` (observed: 7 attempts in about 9 minutes, then it stops; the schedule is not guaranteed). Answer \`200\` fast, process each \`Payment.Id\` once, and poll the status API as a fallback.
+- Refunds: one refund per payment (full or partial), within 180 days, not for \`CASH_INVOICE\`, at most \`PaidAmount\`; the result is in the refund response (no callback); it fails if the merchant's Paynet balance is empty.
+- Saved cards (server-to-server only): send \`Customer\` to get \`Payment.CardLinkHash\` in the \`PAID\` notification (it may be \`null\`); next time send \`CardLinkHash\` with the same \`Customer\`. The customer still confirms on the Paynet page; it is not a silent charge.
 - Sections marked **Draft** are not confirmed by Paynet yet.`;
 
 const reference = apiReference();

@@ -63,7 +63,7 @@ The request has only two headers: `Content-Type` and `Hash`. There is no `Author
 | `Payment.Merchant` | string | Your merchant code. |
 | `Payment.MoneyType` | string | How the customer paid: `CARD`, `APPLEPAY`, `GOOGLEPAY`, `MIA_QR`, `PAYNET`, `CASH_INVOICE`. |
 | `Payment.CardMask`, `CardExpireMonth`, `CardExpireYear`, `CardIssuer` | string | Card details. Filled for `CARD`, and also for `APPLEPAY` and `GOOGLEPAY` (the card behind the wallet); `null` for other payment methods. |
-| `Payment.CardLinkHash` | string | Saved card hash; may be `null`. |
+| `Payment.CardLinkHash` | string | Saved card token: sent when [card saving](#/guides/saved-cards) is enabled for your `SaleAreaCode` and the customer kept the checkbox; otherwise `null`. |
 | `Payment.PayerName`, `PayerSurname`, `PayerIDNP` | string | Payer details; may be `null`. |
 | `Payment.RRN` | string | Retrieval reference number. |
 | `Hash` (HTTP header) | string | Signature of the notification. |
@@ -158,9 +158,12 @@ echo json_encode(['ResultCode' => 'SUCCESS']);
 ## Respond and retries
 
 - Answer HTTP `200` **after** you have verified the hash and saved the result.
-- Any other status (or a timeout) is treated as a failure: Paynet retries the notification **up to 3 times** and then stops.
+- Answer fast: store the notification, return `200`, and do heavy processing after the response.
+- Any other response (or no response) is treated as a failure, and Paynet sends the notification again. Example from a real log: 7 attempts within about 9 minutes, in two series, after which sending stopped. The exact schedule is not guaranteed — do not rely on it.
 - Because of retries the same notification can arrive more than once. Process each `Payment.Id` only once.
-- If you did not receive a notification, use `GET /api/order/{paymentId}` or `GET /api/order/merchant/{Order}`.
+- If a notification did not arrive (for example, your server was down longer than all attempts), check the status with `GET /api/order/{paymentId}` or `GET /api/order/merchant/{Order}`. You can ask Paynet support to send it again.
+- If your server is behind a firewall, ask Paynet support for the IP addresses notifications come from.
+- `PAID` is final: antifraud acts before the payment is confirmed, so it will not cancel this payment later. Only your own [refund](#/guides/errors-and-statuses) changes a paid payment.
 
 ## Notification simulator on this portal
 

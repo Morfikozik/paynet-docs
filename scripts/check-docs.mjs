@@ -45,6 +45,15 @@ for (const lang of languages) {
   }
 }
 
+// 1c. Facts confirmed by Paynet that must not regress.
+for (const lang of languages) {
+  for (const file of files[lang]) {
+    const text = read(lang, file);
+    if (/up to 3 times|до 3 раз|până la 3 ori/.test(text)) fail(`content/${lang}/${file}: notifications are retried more than 3 times (7 attempts observed)`);
+    if (/description of all `status` values will be published later|описание всех значений `status` будет опубликовано позже|descrierea tuturor valorilor `status` va fi publicată/.test(text)) fail(`content/${lang}/${file}: status values are confirmed, remove the draft note`);
+  }
+}
+
 // 2. Internal links point to existing guides.
 for (const lang of languages) {
   for (const file of files[lang]) {

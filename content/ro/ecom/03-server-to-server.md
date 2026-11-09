@@ -89,10 +89,10 @@ Content-Type: application/json
 | `Services` | array | da | Cel puțin un serviciu, vezi mai jos. |
 | `MoneyType` | string | da | `All`, `Card`, `Paynet`, `MIA` sau `CashInvoice` (vezi mai jos). |
 | `Lang` | string | da | Limba paginii de plată: `RO`, `RU` sau `EN`. |
-| `Customer` | object | nu | Datele clientului. Obligatorii integral dacă se trimite `CardLinkHash`. |
+| `Customer` | object | nu | Datele clientului. Obligatoriu pentru a [salva cardul](#/guides/saved-cards) sau a plăti cu un card salvat. |
 | `Customer.Code` | string | da, dacă se trimite `Customer` | ID-ul clientului în sistemul dvs. |
 | `Customer.NameFirst`, `NameLast`, `email`, `PhoneNumber` | string | nu | Datele clientului. Atenție: `email` cu literă mică. |
-| `CardLinkHash` | string | nu | Hash-ul cardului salvat al acestui client (plată cu un clic). |
+| `CardLinkHash` | string | nu | Tokenul cardului salvat al acestui client, primit într-o notificare. Trimiteți-l împreună cu același `Customer`. Vezi [Salvarea cardurilor](#/guides/saved-cards). |
 
 `Services[]`:
 

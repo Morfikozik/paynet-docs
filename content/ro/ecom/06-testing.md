@@ -48,7 +48,11 @@ Trebuie testată doar plata reușită. Nu există carduri de test pentru plăți
 | 12 | Hash greșit | trimiteți o notificare cu `Amount` modificat | handler-ul o respinge |
 | 13 | Notificare duplicată | trimiteți aceeași notificare de două ori | handler-ul o procesează o singură dată |
 | 14 | Hosted checkout | **Formular checkout (încercați)** | se deschide pagina de plată de test Paynet |
-| 15 | Rambursare | `POST /api/order/refund` pentru o plată achitată | `200` |
+| 15 | Rambursare | `POST /api/order/refund` pentru o plată achitată | `200`; `status` devine `5` (integrală) sau `6` (parțială) |
+| 16 | A doua rambursare | repetați scenariul 15 pentru aceeași plată | eroare: este posibilă o singură rambursare |
+| 17 | Salvarea cardului | `POST /api/order` cu `Customer`, plătiți păstrând bifa „salvează cardul” | notificarea `PAID` conține `CardLinkHash` |
+| 18 | Plata cu card salvat | `POST /api/order` cu `CardLinkHash` și același `Customer` | pagina Paynet afișează cardul salvat |
+| 19 | Clientul a plecat fără să plătească | deschideți `paymentLink`, închideți pagina, deschideți linkul din nou | `status` rămâne `1`, plata e încă posibilă |
 
 ## Testare de pe acest portal
 

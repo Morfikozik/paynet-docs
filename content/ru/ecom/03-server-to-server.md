@@ -89,10 +89,10 @@ Content-Type: application/json
 | `Services` | array | да | Минимум одна услуга, см. ниже. |
 | `MoneyType` | string | да | `All`, `Card`, `Paynet`, `MIA` или `CashInvoice` (см. ниже). |
 | `Lang` | string | да | Язык платёжной страницы: `RO`, `RU` или `EN`. |
-| `Customer` | object | нет | Данные покупателя. Обязательны полностью, если передан `CardLinkHash`. |
+| `Customer` | object | нет | Данные покупателя. Обязателен, чтобы [сохранить карту](#/guides/saved-cards) или оплатить сохранённой картой. |
 | `Customer.Code` | string | да, если передан `Customer` | ID покупателя в вашей системе. |
 | `Customer.NameFirst`, `NameLast`, `email`, `PhoneNumber` | string | нет | Данные покупателя. Обратите внимание: `email` с маленькой буквы. |
-| `CardLinkHash` | string | нет | Хэш сохранённой карты этого покупателя (оплата в один клик). |
+| `CardLinkHash` | string | нет | Токен сохранённой карты этого покупателя, полученный в уведомлении. Передавайте вместе с тем же `Customer`. См. [Сохранение карт](#/guides/saved-cards). |
 
 `Services[]`:
 

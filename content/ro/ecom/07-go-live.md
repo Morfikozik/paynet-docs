@@ -4,7 +4,8 @@
 
 **Acces și configurare**
 
-- [ ] Ați primit de la Paynet: utilizatorul API de producție, codul comerciantului, codul zonei de vânzare și **două** chei secrete (pentru semnătura hosted checkout și pentru notificări).
+- [ ] Ați primit de la Paynet: utilizatorul API de producție, codul comerciantului, codul zonei de vânzare și **două** chei secrete (pentru semnătura hosted checkout și pentru notificări). Accesele de producție sunt trimise pe emailul administratorului companiei dvs.; durează de la 5 minute la câteva zile, în funcție de funcțiile conectate.
+- [ ] Toate valorile de test sunt înlocuite cu cele de producție: **cheile și accesele de producție diferă de cele de test**.
 - [ ] Codul folosește adresele de producție: API `https://ecom-api.paynet.md`, formularul hosted checkout `https://paynet.md/ecom/checkout`.
 - [ ] Secretele sunt păstrate în configurația serverului (variabile de mediu, vault), nu în cod sau în front-end.
 - [ ] URL-ul dvs. de callback (HTTPS) este înregistrat la Paynet.

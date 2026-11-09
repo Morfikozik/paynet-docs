@@ -4,7 +4,8 @@
 
 **Credentials and configuration**
 
-- [ ] You received from Paynet: production API user, merchant code, sale area code and **two** secret keys (hosted checkout signature and notifications).
+- [ ] You received from Paynet: production API user, merchant code, sale area code and **two** secret keys (hosted checkout signature and notifications). Production access is sent to your company administrator's email; it takes from 5 minutes to several days depending on the features you connect.
+- [ ] All test values are replaced with production ones: **production keys and credentials differ from the test ones**.
 - [ ] Your code uses the production URLs: API `https://ecom-api.paynet.md`, hosted checkout form `https://paynet.md/ecom/checkout`.
 - [ ] Secrets are stored in server configuration (environment variables, vault), not in code or front-end.
 - [ ] Your callback URL (HTTPS) is registered with Paynet.

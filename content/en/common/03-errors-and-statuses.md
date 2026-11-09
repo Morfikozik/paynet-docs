@@ -86,9 +86,34 @@ The payment object (`POST /api/order`, `GET /api/order/{id}`, `GET /api/order/me
 
 A newly created order has `status` = `1` and `paidDate` = `null`.
 
-> **Draft:** the description of all `status` values will be published later. Until then, treat a payment as paid when you received a verified `PAID` notification, or when `paidDate` is set.
+| `status` | Meaning | What to do |
+|---|---|---|
+| `1` | Registered: the order exists, no payment yet | Wait for payment. If the customer left the page, you can send them to the same `paymentLink` again. |
+| `3` | Pending: the customer pressed "Pay", the bank has not answered yet | Do not create the order again and do not cancel it. Check the status later. |
+| `4` | Paid | Fulfil the order. |
+| `5` | Cancelled: declined by the bank, cancelled by antifraud, or fully refunded | Final. A new payment attempt needs an order with a new `Order`. |
+| `6` | Partially refunded | Final. |
 
-A failed payment does not produce a notification: the customer is redirected to `LinkUrlCancel`, and the order stays unpaid until it expires (`ExpiryDate`).
+```
+1 ──► 3 ──► 4 ──► 5  (full refund / полный возврат / rambursare totală)
+      │      └──► 6  (partial refund / частичный возврат / rambursare parțială)
+      └──► 5  (declined, antifraud / отказ, антифрод / refuz, antifraudă)
+```
+
+- `5` and `6` are final: nothing changes after them. The value `2` is not used.
+- There is no separate "expired" status: if `ExpiryDate` has passed without payment, the order stays `1`, but it can no longer be paid.
+- Antifraud acts before the payment is confirmed. Once you have received a verified `PAID` notification, antifraud will not cancel that payment; status `5` on a paid order means a full refund only.
+- Treat a payment as paid when you received a verified `PAID` notification or `status` = `4`.
+
+### Failed payment and another attempt
+
+A failed payment does not produce a notification: the customer returns to `LinkUrlCancel`. Check the status with `GET /api/order/merchant/{Order}`:
+
+| `status` | What happened | How to let the customer pay again |
+|---|---|---|
+| `1` | The customer did not pay (for example, closed the page) | Send them to the same `paymentLink`. |
+| `3` | The payment is still being processed | Wait and check the status again. Do not create a new order. |
+| `5` | The bank declined the payment | The order is closed. Create a new order with a **new** `Order` and send the customer to the new `paymentLink`. |
 
 ## Dates and formats
 
@@ -119,6 +144,13 @@ Chișinău local time is the `Europe/Chisinau` time zone: UTC+2 in winter, UTC+3
 }
 ```
 
-- `RefundType`: `full` or `partial`.
-- `Amount` in minor units; for `partial` it is the amount to return.
-- Only payments that were paid can be refunded.
+| Rule | Value |
+|---|---|
+| What can be refunded | Only a paid payment (`status` = `4`). |
+| How many times | **One** refund per payment: full (`full`) or partial (`partial`). A second refund of the same payment is not possible. |
+| Amount | `Amount` in minor units; at most the payment's `PaidAmount` (lower than the order amount when a promotion applied). |
+| Deadline | 180 days after payment. |
+| Payment methods | All except `CASH_INVOICE`. |
+| Result | Immediately in the `POST /api/order/refund` response. No callback notification is sent for refunds. |
+| Status afterwards | `5` after a full refund, `6` after a partial one. Both are final. |
+| Merchant balance | If there is no money on the merchant's Paynet account, the refund does not go through. |

@@ -86,9 +86,34 @@ Obiectul plății (`POST /api/order`, `GET /api/order/{id}`, `GET /api/order/mer
 
 O comandă nou creată are `status` = `1` și `paidDate` = `null`.
 
-> **Ciornă:** descrierea tuturor valorilor `status` va fi publicată mai târziu. Până atunci, considerați plata achitată când ați primit o notificare `PAID` verificată sau când `paidDate` este completat.
+| `status` | Semnificație | Ce faceți |
+|---|---|---|
+| `1` | Înregistrată: comanda există, încă nu e plătită | Așteptați plata. Dacă clientul a părăsit pagina, îl puteți trimite din nou la același `paymentLink`. |
+| `3` | În procesare: clientul a apăsat „Plătește”, banca încă nu a răspuns | Nu creați comanda din nou și nu o anulați. Verificați statusul mai târziu. |
+| `4` | Achitată | Onorați comanda. |
+| `5` | Anulată: refuzată de bancă, anulată de antifraudă sau rambursată integral | Final. O nouă încercare de plată necesită o comandă cu un `Order` nou. |
+| `6` | Rambursată parțial | Final. |
 
-O plată eșuată nu generează notificare: clientul este redirecționat la `LinkUrlCancel`, iar comanda rămâne neplătită până la expirarea `ExpiryDate`.
+```
+1 ──► 3 ──► 4 ──► 5  (full refund / полный возврат / rambursare totală)
+      │      └──► 6  (partial refund / частичный возврат / rambursare parțială)
+      └──► 5  (declined, antifraud / отказ, антифрод / refuz, antifraudă)
+```
+
+- `5` și `6` sunt finale: după ele nu se mai schimbă nimic. Valoarea `2` nu se folosește.
+- Nu există un status separat „expirată”: dacă `ExpiryDate` a trecut fără plată, comanda rămâne `1`, dar nu mai poate fi plătită.
+- Antifrauda acționează înainte de confirmarea plății. După ce ați primit o notificare `PAID` verificată, antifrauda nu va anula acea plată; statusul `5` la o comandă plătită înseamnă doar rambursare integrală.
+- Considerați plata achitată când ați primit o notificare `PAID` verificată sau `status` = `4`.
+
+### Plată eșuată și o nouă încercare
+
+O plată eșuată nu generează notificare: clientul revine la `LinkUrlCancel`. Verificați statusul cu `GET /api/order/merchant/{Order}`:
+
+| `status` | Ce s-a întâmplat | Cum îi permiteți clientului să plătească din nou |
+|---|---|---|
+| `1` | Clientul nu a plătit (de exemplu, a închis pagina) | Trimiteți-l la același `paymentLink`. |
+| `3` | Plata este încă în procesare | Așteptați și verificați statusul din nou. Nu creați o comandă nouă. |
+| `5` | Banca a refuzat plata | Comanda este închisă. Creați o comandă nouă cu un `Order` **nou** și trimiteți clientul la noul `paymentLink`. |
 
 ## Date și formate
 
@@ -119,6 +144,13 @@ Ora locală Chișinău este fusul orar `Europe/Chisinau`: UTC+2 iarna, UTC+3 var
 }
 ```
 
-- `RefundType`: `full` sau `partial`.
-- `Amount` în unități minime; pentru `partial` este suma de returnat.
-- Se pot rambursa doar plățile achitate.
+| Regulă | Valoare |
+|---|---|
+| Ce se poate rambursa | Doar o plată achitată (`status` = `4`). |
+| De câte ori | **O singură** rambursare per plată: integrală (`full`) sau parțială (`partial`). A doua rambursare a aceleiași plăți nu este posibilă. |
+| Suma | `Amount` în unități minime; maximum `PaidAmount` al plății (mai mic decât suma comenzii când s-a aplicat o promoție). |
+| Termen | 180 de zile după plată. |
+| Metode de plată | Toate, cu excepția `CASH_INVOICE`. |
+| Rezultat | Imediat în răspunsul `POST /api/order/refund`. Pentru rambursări nu se trimite notificare pe callback. |
+| Statusul după | `5` după rambursarea integrală, `6` după cea parțială. Ambele sunt finale. |
+| Soldul comerciantului | Dacă în contul comerciantului din Paynet nu sunt bani, rambursarea nu trece. |
