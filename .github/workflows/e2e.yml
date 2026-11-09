@@ -1,0 +1,41 @@
+name: End-to-end check on the test API (manual)
+
+# Real test payments and refunds on the Paynet TEST environment (merchant 265505).
+# Runs only when started by hand — never on push.
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'explore | full'
+        required: true
+        default: 'explore'
+
+permissions:
+  contents: write   # to publish results to the ci/e2e branch
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1.49.1
+          npx playwright install --with-deps chromium
+      - name: Run
+        run: node scripts/e2e.mjs "${{ github.event.inputs.stage }}" e2e-out || echo "E2E_FAILED=1" >> $GITHUB_ENV
+      - name: Publish results to ci/e2e
+        run: |
+          cd e2e-out
+          git init -q
+          git config user.email "ci@paynet-docs"
+          git config user.name "CI"
+          git checkout -q -b ci/e2e
+          git add -A
+          git commit -qm "E2E ${{ github.event.inputs.stage }} ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" ci/e2e
+      - if: env.E2E_FAILED == '1'
+        run: exit 1
