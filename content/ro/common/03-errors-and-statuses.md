@@ -163,7 +163,7 @@ Ora locală Chișinău este fusul orar `Europe/Chisinau`: UTC+2 iarna, UTC+3 var
 | Rambursare efectuată | `200`, corpul mai jos |
 | Plata nu este achitată | `404 NOT_FOUND_RECORD` |
 | Suma depășește suma plătită | `400 INVALID_PARAMETER`, `details`: „The invalid parameter is: RefundType”. Câmpul din `details` este indicat greșit: cauza este suma |
-| Rambursare integrală după una parțială | `400 INVALID_PARAMETER`, `details`: „The invalid parameter is: RefundType” |
+| O nouă rambursare a aceleiași plăți (de exemplu, integrală după parțială) | `400 INVALID_PARAMETER`, `details`: „The invalid parameter is: RefundType” |
 
 ```json
 {
@@ -184,5 +184,3 @@ Ora locală Chișinău este fusul orar `Europe/Chisinau`: UTC+2 iarna, UTC+3 var
 - `eventDate` în răspunsul la rambursare are formatul `DD.MM.YYYY HH:mm:ss`.
 - `moneyType` aici este codul de procesare (de exemplu `CYBER_SOURCE`), nu valoarea din notificare (`CARD`…).
 - După rambursare `paidDate` al plății rămâne completat.
-
-> **Important:** mediul de test a acceptat o a doua rambursare parțială pentru aceeași plată. Regula Paynet este o singură rambursare per plată; nu vă bazați pe rambursări repetate în producție.

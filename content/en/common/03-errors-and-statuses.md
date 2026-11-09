@@ -163,7 +163,7 @@ Chișinău local time is the `Europe/Chisinau` time zone: UTC+2 in winter, UTC+3
 | Refund done | `200`, body below |
 | Payment not paid | `404 NOT_FOUND_RECORD` |
 | Amount above the paid amount | `400 INVALID_PARAMETER`, `details`: "The invalid parameter is: RefundType". The field named in `details` is misleading: the cause is the amount |
-| Full refund after a partial one | `400 INVALID_PARAMETER`, `details`: "The invalid parameter is: RefundType" |
+| Another refund of the same payment (for example, full after partial) | `400 INVALID_PARAMETER`, `details`: "The invalid parameter is: RefundType" |
 
 ```json
 {
@@ -184,5 +184,3 @@ Chișinău local time is the `Europe/Chisinau` time zone: UTC+2 in winter, UTC+3
 - `eventDate` in the refund response uses the format `DD.MM.YYYY HH:mm:ss`.
 - `moneyType` here is the processing code (for example `CYBER_SOURCE`), not the notification value (`CARD`…).
 - After a refund the payment's `paidDate` stays filled.
-
-> **Important:** the test environment accepted a second partial refund of the same payment. Paynet's rule is one refund per payment; do not rely on repeated refunds in production.
