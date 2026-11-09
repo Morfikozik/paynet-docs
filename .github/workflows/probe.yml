@@ -1,0 +1,20 @@
+name: One-off API probe (read-only)
+on:
+  push:
+    branches: ['probe/**']
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe test API
+        run: |
+          B=https://ecom-api-test.paynet.md
+          echo "== 401 without token"; curl -s -i "$B/api/order/1" | sed -n '1p;/^content-type/Ip;$p'; echo
+          TOKEN=$(curl -s -X POST "$B/auth" -H 'Content-Type: application/json' -d '{"grantType":"password","username":"771064","password":"sLgMnGWJ"}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["access_token"])')
+          echo "token length ${#TOKEN}"
+          H="Authorization: Bearer $TOKEN"
+          FAKE=0000000_00000000000000000000000000000000
+          echo "== unlink PascalCase"; curl -s -w '\nHTTP %{http_code}\n' -X POST "$B/api/linked-cards/unlink" -H "$H" -H 'Content-Type: application/json' -d "{\"CardLinkHash\":\"$FAKE\",\"SaleAreaCode\":\"onlidocumentation_md\",\"CustomerCode\":\"probe_customer\"}"
+          echo "== unlink camelCase"; curl -s -w '\nHTTP %{http_code}\n' -X POST "$B/api/linked-cards/unlink" -H "$H" -H 'Content-Type: application/json' -d "{\"cardLinkHash\":\"$FAKE\",\"saleAreaCode\":\"onlidocumentation_md\",\"customerCode\":\"probe_customer\"}"
+          echo "== unlink empty body"; curl -s -w '\nHTTP %{http_code}\n' -X POST "$B/api/linked-cards/unlink" -H "$H" -H 'Content-Type: application/json' -d '{}'
+          echo "== 400/404 format: order by unknown merchant order"; curl -s -w '\nHTTP %{http_code}\n' "$B/api/order/merchant/1" -H "$H"
