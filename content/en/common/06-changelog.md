@@ -4,7 +4,7 @@
 
 - **Example shop in Node.js** — a complete integration with no dependencies. Checked by an end-to-end test on the test environment: purchase, payment, notification, refund. See [Example shop](#/guides/example-shop).
 - **Mock responses for failure tests**: statuses `3`, `5`, `6`, refund errors, `401`, `errorInfo`, signed notifications. See [Testing](#/guides/testing).
-- **API specification checked against real responses** of the test environment `/auth` with a wrong password returns `401` (not `500`);; the token `401` format and the `errorInfo` format are described;; `amount.paidAmount` is added;; refund, search and statement response schemas are added.
+- **API specification checked against real responses** of the test environment: `/auth` with a wrong password returns `401` (not `500`); the token `401` format and the `errorInfo` format are described; `amount.paidAmount` is added; refund, search and statement response schemas are added.
 - **Saved cards checked on the test environment:** the same customer sees the card, another customer does not. See [Saved cards](#/guides/saved-cards).
 - **Complete notification handlers** in Node.js and PHP; the Node.js logic is tested on every build.
 
