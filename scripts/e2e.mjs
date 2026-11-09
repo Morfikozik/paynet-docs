@@ -231,6 +231,7 @@ const cardsStage = async (token) => {
       if (moneyType === 'All') {
         await fillAndPay(p, 'cards-pay');
         await p.waitForURL(/morfikozik\.github\.io/, { timeout: 90000 }).catch(() => {});
+        await snap(p, 'cards-after-pay');
         let paid = await getPayment(order);
         for (let i = 0; i < 20 && paid.status !== 4; i++) { await new Promise((r) => setTimeout(r, 3000)); paid = await getPayment(order); }
         note('cards:after-pay', { status: paid.status, cardLinkHash: paid.cardLinkHash, customerCardLinkHash: paid.customer?.cardLinkHash });
