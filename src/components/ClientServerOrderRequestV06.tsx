@@ -549,7 +549,8 @@ Amount, LinkUrlCancel, LinkUrlSuccess, Lang, MoneyType`}
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Request Body (JSON)</label>
                     <textarea
-                      rows={12}
+                      rows={Math.max(4, payloadText.split('\n').length)}
+                      spellCheck={false}
                       value={payloadText}
                       onChange={(e) => {
                         setPayloadText(e.target.value);
@@ -557,7 +558,7 @@ Amount, LinkUrlCancel, LinkUrlSuccess, Lang, MoneyType`}
                         setSignedPayloadText('');
                         setSignature('');
                       }}
-                      className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm font-mono"
+                      className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm font-mono leading-5 resize-y"
                     />
                   </div>
 

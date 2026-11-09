@@ -325,9 +325,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       {guide.slug === 'notifications' && toolItem(ui.notificationSimulator, 'notification-simulator')}
                       {guide.slug === 'server-to-server' && apiMethodsBlock}
                       {guide.slug === 'hosted-checkout' && toolItem(ui.checkoutForm, 'checkout-form')}
-                      {guide.slug === 'hosted-checkout' && navItem(ui.plugins, isPage('plugins'), () => navigate('#/page/plugins'))}
                     </React.Fragment>
                   ))}
+                  {section.id === 'ecom' && navItem(ui.plugins, isPage('plugins'), () => navigate('#/page/plugins'))}
                 </div>
               </div>
             ))}

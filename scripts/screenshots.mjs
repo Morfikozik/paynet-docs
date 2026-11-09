@@ -19,6 +19,8 @@ const pages = [
   ['ru', '#/', '08-ru-home'],
   ['ro', '#/guides/hosted-checkout', '09-ro-hosted-checkout'],
   ['ru', '#/page/order-request-v05', '10-legacy-redirect'],
+  ['ru', '#/api/post-auth', '12-ru-api-auth'],
+  ['en', '#/api/get-api-order-id-', '13-api-get-by-id'],
 ];
 
 const browser = await chromium.launch();
@@ -46,7 +48,30 @@ for (const [language, hash, name] of pages) {
   await page.screenshot({ path: path.join(outDir, '11-ru-search.png') });
   await context.close();
 }
-for (const file of ['llms.txt', 'llms-full.txt', 'llms-ecom.txt', 'openapi.json', 'docs/signatures.md', 'legacy/']) {
+// AI menu opened on a guide and on an API method; code tab of an API method.
+for (const [hash, name, action] of [
+  ['#/guides/signatures', '14-ru-ai-menu-guide', 'menu'],
+  ['#/api/post-api-order', '15-ru-ai-menu-api', 'menu'],
+  ['#/api/post-api-order', '16-ru-api-code-tab', 'php'],
+]) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 1100 } });
+  await context.addInitScript(() => localStorage.setItem('tps-api-language', 'ru'));
+  const page = await context.newPage();
+  page.on('pageerror', (err) => log.push(`[${name}] pageerror: ${err.message}`));
+  await page.goto(baseUrl + hash, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(600);
+  if (action === 'menu') await page.click('button[aria-haspopup="menu"]');
+  if (action === 'php') {
+    await page.fill('textarea', '{\n  "Order": 42,\n  "MoneyType": "Card"\n}');
+    await page.waitForTimeout(500);
+    await page.click('button:text-is("PHP")');
+  }
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: path.join(outDir, `${name}.png`) });
+  await context.close();
+}
+for (const file of ['docs/ru/signatures.md', 'docs/ro/testing.md', 'docs/api/post-api-order.md', 'docs/api/get-api-order-id.md',
+  'llms.txt', 'llms-full.txt', 'llms-ecom.txt', 'openapi.json', 'docs/signatures.md', 'legacy/']) {
   const res = await fetch(baseUrl + file);
   log.push(`GET ${file} → ${res.status} (${(await res.text()).length} bytes)`);
 }

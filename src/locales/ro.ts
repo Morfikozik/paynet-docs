@@ -35,6 +35,8 @@ export const ro: TranslationResources = {
     enterJsonRequestBody: 'Introduceți corpul cererii JSON',
     formatJson: 'Formatează JSON',
     updateCodeExamples: 'Actualizează Exemplele de Cod',
+    codeSyncHint: 'Filele cu cod (cURL, JavaScript, PHP…) se generează automat din această cerere.',
+    editTab: 'Editează',
     testApiRequest: 'Testează Cererea API',
     testing: 'Se testează...',
     generating: 'Se generează...',

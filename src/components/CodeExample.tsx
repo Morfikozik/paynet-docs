@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, Check, Play, Settings, Send, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { Copy, Check, Send, Loader2, CheckCircle, XCircle, Pencil } from 'lucide-react';
 import { Endpoint } from '../types/api';
 import { TranslationResources } from '../types/language';
 import { generateCodeSnippets } from '../utils/codeGenerator';
@@ -21,7 +21,6 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
   const [isLoading, setIsLoading] = useState(true);
   const [parameterValues, setParameterValues] = useState<Record<string, Record<string, string>>>({});
   const [requestBodyValue, setRequestBodyValue] = useState<Record<string, string>>({});
-  const [showParameterInput, setShowParameterInput] = useState(true);
   const [isTestingApi, setIsTestingApi] = useState(false);
   const [testResponses, setTestResponses] = useState<Record<string, ApiTestResponse>>({});
   const [showTestResponse, setShowTestResponse] = useState<Record<string, boolean>>({});
@@ -123,29 +122,48 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
     }
   }, [endpoint.id, hasJsonRequestBody, requestBody]);
 
-  // Generate code snippets when component mounts or endpoint changes
+  const hasEditor = hasParameters || !!hasFormUrlencodedBody || !!hasRequestBody;
+  const EDIT_TAB = 'edit';
+
+  // Build code snippets from the current request (debounced while typing).
+  // Only the first build shows a loader, so the editor keeps focus while typing.
+  const firstBuildDone = React.useRef(false);
   React.useEffect(() => {
-    const generateCode = async () => {
-      setIsLoading(true);
+    if (!spec) return;
+    if (hasJsonRequestBody && !currentRequestBodyValue) return; // wait for the editor to initialise
+    let cancelled = false;
+    const build = async () => {
       try {
-        if (spec) {
-          const snippets = await generateCodeSnippets({ endpoint, baseUrl, spec });
-          setCodeSnippets(snippets);
-        }
+        const snippets = await generateCodeSnippets({
+          endpoint: { ...endpoint, customParameterValues: currentParameterValues, customRequestBody: currentRequestBodyValue } as any,
+          baseUrl,
+          spec,
+        });
+        if (!cancelled) setCodeSnippets(snippets);
       } catch (error) {
         console.error('Failed to generate code snippets:', error);
-        // Fallback to empty snippets
-        setCodeSnippets({});
+        if (!cancelled) setCodeSnippets({});
       } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          firstBuildDone.current = true;
+          setIsLoading(false);
+        }
       }
     };
+    const timer = setTimeout(build, firstBuildDone.current ? 300 : 0);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [endpoint.id, baseUrl, spec, currentRequestBodyValue, JSON.stringify(currentParameterValues)]);
 
-    generateCode();
-  }, [endpoint.id, baseUrl, spec]);
-
-  // Set initial active language if not set or not available
+  // When the method changes, open the editable request first.
   React.useEffect(() => {
+    setActiveLanguage(hasEditor ? EDIT_TAB : 'curl');
+  }, [endpoint.id]);
+
+  React.useEffect(() => {
+    if (activeLanguage === EDIT_TAB) return;
     if (availableLanguages.length > 0 && !availableLanguages.includes(activeLanguage)) {
       setActiveLanguage(availableLanguages[0]);
     }
@@ -176,30 +194,6 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
       ...prev,
       [endpoint.id]: value
     }));
-  };
-
-  const regenerateCodeWithCustomValues = async () => {
-    setIsLoading(true);
-    try {
-      if (spec) {
-        // Create modified endpoint with custom values
-        const modifiedEndpoint = {
-          ...endpoint,
-          customParameterValues: currentParameterValues,
-          customRequestBody: currentRequestBodyValue
-        };
-        const snippets = await generateCodeSnippets({ 
-          endpoint: modifiedEndpoint, 
-          baseUrl, 
-          spec 
-        });
-        setCodeSnippets(snippets);
-      }
-    } catch (error) {
-      console.error('Failed to regenerate code snippets:', error);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleTestApi = async () => {
@@ -257,7 +251,7 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
       </div>
     );
   }
-  
+
   if (availableLanguages.length === 0) {
     return (
       <div className="text-center py-8">
@@ -266,47 +260,84 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
     );
   }
 
+  const formUrlencodedProps: [string, any][] = hasFormUrlencodedBody
+    ? Object.entries(requestBody.content['application/x-www-form-urlencoded']?.schema?.properties || {})
+    : [];
+  const formUrlencodedRequired: string[] = hasFormUrlencodedBody
+    ? requestBody.content['application/x-www-form-urlencoded']?.schema?.required || []
+    : [];
+  const bodyLines = Math.max(3, currentRequestBodyValue.split('\n').length);
+  const isEditTab = activeLanguage === EDIT_TAB;
+  const copySource = isEditTab ? currentRequestBodyValue : codeSnippets[activeLanguage]?.source || '';
+
+  const inputRow = (
+    key: string,
+    label: React.ReactNode,
+    value: string,
+    placeholder: string,
+    description?: string,
+  ) => (
+    <div key={key} className="grid grid-cols-1 sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)] gap-1 sm:gap-3 items-center">
+      <label className="text-xs font-medium text-gray-700 font-mono break-all" title={description}>
+        {label}
+      </label>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => handleParameterChange(key, e.target.value)}
+        placeholder={placeholder}
+        title={description}
+        className="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-mono focus:ring-2 focus:ring-paynet-primary focus:border-transparent"
+      />
+    </div>
+  );
+
   return (
     <div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t.common.codeExamples}</h3>
-      
-      {/* Token Status Display */}
-      <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${currentToken ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-            <span className="text-sm font-medium text-gray-700">
-              Auth Token: {currentToken ? 'Active' : 'Not Set'}
-            </span>
-          </div>
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <h3 className="text-lg font-semibold text-gray-900">{t.common.codeExamples}</h3>
+        <div className="flex items-center gap-2 text-xs text-gray-600">
+          <span className={`w-2 h-2 rounded-full ${currentToken ? 'bg-green-500' : 'bg-gray-400'}`}></span>
+          <span title={currentToken ? `${currentToken.substring(0, 20)}…` : undefined}>
+            Auth Token: {currentToken ? 'Active' : 'Not Set'}
+          </span>
           {currentToken && (
             <button
               onClick={() => {
                 clearAuthToken();
                 setCurrentToken(null);
               }}
-              className="text-xs text-red-600 hover:text-red-800 font-medium"
+              className="text-red-600 hover:text-red-800 font-medium"
             >
-              Clear Token
+              Clear
             </button>
           )}
         </div>
-        {currentToken && (
-          <div className="mt-2 text-xs text-gray-500 font-mono break-all">
-            {currentToken.substring(0, 20)}...{currentToken.substring(currentToken.length - 10)}
-          </div>
-        )}
       </div>
-      
+
       <div className="border border-gray-200 rounded-lg overflow-hidden">
-        <div className="flex border-b border-gray-200 bg-gray-50">
+        <div className="flex flex-wrap border-b border-gray-200 bg-gray-50">
+          {hasEditor && (
+            <button
+              key={EDIT_TAB}
+              onClick={() => setActiveLanguage(EDIT_TAB)}
+              className={`px-4 py-2 text-sm font-medium transition-colors inline-flex items-center gap-1.5 ${
+                isEditTab
+                  ? 'bg-white text-paynet-primary border-b-2 border-paynet-primary'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              {hasRequestBody ? 'JSON' : t.common.parameters}
+            </button>
+          )}
           {availableLanguages.map((key) => (
             <button
               key={key}
               onClick={() => setActiveLanguage(key)}
               className={`px-4 py-2 text-sm font-medium transition-colors ${
                 activeLanguage === key
-                  ? 'bg-white text-blue-600 border-b-2 border-blue-600'
+                  ? 'bg-white text-paynet-primary border-b-2 border-paynet-primary'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
@@ -314,168 +345,116 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
             </button>
           ))}
         </div>
-        
-        <div className="relative">
-          <pre className="bg-gray-900 text-gray-100 p-4 overflow-x-auto text-sm">
+
+        {isEditTab ? (
+          <div className="p-4 bg-white space-y-3">
+            {(allParameters.length > 0 || formUrlencodedProps.length > 0) && (
+              <div className="space-y-2">
+                {allParameters.map((param) =>
+                  inputRow(
+                    param.name,
+                    <>
+                      {param.name}
+                      <span className="text-gray-400 font-sans"> ({param.in})</span>
+                      {(param.required || param.in === 'path') && <span className="text-red-500 ml-0.5">*</span>}
+                    </>,
+                    currentParameterValues[param.name] || '',
+                    param.name === 'from'
+                      ? '2026-03-01'
+                      : param.name === 'to'
+                        ? '2026-03-31'
+                        : t.common.enterParameter.replace('{parameter}', param.name),
+                    param.description,
+                  ),
+                )}
+                {formUrlencodedProps.map(([propName, propSchema]) =>
+                  inputRow(
+                    propName,
+                    <>
+                      {propName}
+                      {formUrlencodedRequired.includes(propName) && <span className="text-red-500 ml-0.5">*</span>}
+                    </>,
+                    currentParameterValues[propName] || '',
+                    t.common.enterParameter.replace('{parameter}', propName),
+                    propSchema?.description,
+                  ),
+                )}
+              </div>
+            )}
+
+            {hasRequestBody && (
+              <div>
+                <textarea
+                  value={currentRequestBodyValue}
+                  onChange={(e) => handleRequestBodyChange(e.target.value)}
+                  placeholder={t.common.enterJsonRequestBody}
+                  rows={bodyLines}
+                  spellCheck={false}
+                  aria-label={t.common.requestBody}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono leading-5 resize-y focus:ring-2 focus:ring-paynet-primary focus:border-transparent"
+                />
+                <div className="flex justify-between items-center mt-1 gap-3">
+                  <span className="text-xs text-gray-500">
+                    {t.common.contentType}: {Object.keys(requestBody.content)[0]}
+                  </span>
+                  <button
+                    onClick={() => {
+                      try {
+                        handleRequestBodyChange(JSON.stringify(JSON.parse(currentRequestBodyValue), null, 2));
+                      } catch (e) {
+                        // Invalid JSON, keep as typed
+                      }
+                    }}
+                    className="text-xs text-paynet-primary hover:underline"
+                  >
+                    {t.common.formatJson}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <p className="text-xs text-gray-500">{t.common.codeSyncHint}</p>
+          </div>
+        ) : (
+          <pre className="bg-gray-900 text-gray-100 p-4 overflow-x-auto text-sm m-0">
             <code className="whitespace-pre-wrap break-words">
               {codeSnippets[activeLanguage]?.source || 'Code not available'}
             </code>
           </pre>
+        )}
+
+        <div className="flex items-center gap-2 p-3 border-t border-gray-200 bg-gray-50">
           <button
-            onClick={() => handleCopy(codeSnippets[activeLanguage]?.source || '', activeLanguage)}
-            className="absolute top-4 right-4 p-2 bg-gray-800 hover:bg-gray-700 rounded-md transition-colors"
+            onClick={handleTestApi}
+            disabled={isTestingApi}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white text-sm font-medium rounded-md transition-colors"
+          >
+            {isTestingApi ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {t.common.testing}
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4" />
+                {t.common.testApiRequest}
+              </>
+            )}
+          </button>
+          <button
+            onClick={() => handleCopy(copySource, activeLanguage)}
+            className="p-2 border border-gray-300 bg-white hover:bg-gray-100 rounded-md transition-colors"
             title={t.common.copyToClipboard}
+            aria-label={t.common.copyToClipboard}
           >
             {copiedCode === activeLanguage ? (
-              <Check className="w-4 h-4 text-green-400" />
+              <Check className="w-4 h-4 text-green-600" />
             ) : (
-              <Copy className="w-4 h-4 text-gray-300" />
+              <Copy className="w-4 h-4 text-gray-600" />
             )}
           </button>
         </div>
       </div>
-
-      {/* Interactive Parameter/Request Body Input */}
-      {(hasParameters || hasFormUrlencodedBody || hasRequestBody) && (
-        <div className="mt-6">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="text-md font-semibold text-gray-900 flex items-center gap-2">
-              <Settings className="w-4 h-4" />
-              {t.common.customizeRequest}
-            </h4>
-            <button
-              onClick={() => setShowParameterInput(!showParameterInput)}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              {showParameterInput ? t.common.hideInput : t.common.showInput}
-            </button>
-          </div>
-
-          {showParameterInput && (
-            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-              {/* Parameters Input */}
-              {(allParameters.length > 0 || hasFormUrlencodedBody) && (
-                <div className="mb-4">
-                  <h5 className="text-sm font-semibold text-gray-700 mb-3">{t.common.parameters}:</h5>
-                  <div className="space-y-3">
-                    {allParameters.map((param) => (
-                      <div key={param.name} className="flex flex-col">
-                        <label className="text-xs font-medium text-gray-600 mb-1">
-                          {param.name} 
-                          <span className="text-gray-400">({param.in})</span>
-                          {(param.required || param.in === 'path') && <span className="text-red-500 ml-1">*</span>}
-                        </label>
-                        <input
-                          type="text"
-                          value={currentParameterValues[param.name] || ''}
-                          onChange={(e) => handleParameterChange(param.name, e.target.value)}
-                          placeholder={
-                            param.name === 'from'
-                              ? '2026-03-01'
-                              : param.name === 'to'
-                                ? '2026-03-31'
-                                : t.common.enterParameter.replace('{parameter}', param.name)
-                          }
-                          className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                        {(param.description || (param as any).description) && (
-                          <span className="text-xs text-gray-500 mt-1">{param.description || (param as any).description}</span>
-                        )}
-                      </div>
-                    ))}
-                    
-                    {/* Form-urlencoded body parameters */}
-                    {hasFormUrlencodedBody && (() => {
-                      const content = requestBody.content['application/x-www-form-urlencoded'];
-                      const schema = content.schema;
-                      if (!schema || !schema.properties) return null;
-                      
-                      return Object.entries(schema.properties).map(([propName, propSchema]: [string, any]) => (
-                        <div key={propName} className="flex flex-col">
-                          <label className="text-xs font-medium text-gray-600 mb-1">
-                            {propName} 
-                            <span className="text-gray-400">({t.common.bodyParameter})</span>
-                            {schema.required?.includes(propName) && <span className="text-red-500 ml-1">*</span>}
-                          </label>
-                          <input
-                            type="text"
-                            value={currentParameterValues[propName] || ''}
-                            onChange={(e) => handleParameterChange(propName, e.target.value)}
-                            placeholder={t.common.enterParameter.replace('{parameter}', propName)}
-                            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          />
-                          {propSchema.description && (
-                            <span className="text-xs text-gray-500 mt-1">{propSchema.description}</span>
-                          )}
-                        </div>
-                      ));
-                    })()}
-                  </div>
-                </div>
-              )}
-
-              {/* Request Body Input */}
-              {hasRequestBody && (
-                <div className="mb-4">
-                  <h5 className="text-sm font-semibold text-gray-700 mb-3">{t.common.requestBody}:</h5>
-                  <textarea
-                    value={currentRequestBodyValue}
-                    onChange={(e) => handleRequestBodyChange(e.target.value)}
-                    placeholder={t.common.enterJsonRequestBody}
-                    rows={14}
-                    className="w-full min-h-[22rem] px-3 py-2 border border-gray-300 rounded-md text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-xs text-gray-500">
-                      {t.common.contentType}: {Object.keys(requestBody.content)[0]}
-                    </span>
-                    <button
-                      onClick={() => {
-                        try {
-                          const formatted = JSON.stringify(JSON.parse(currentRequestBodyValue), null, 2);
-                          handleRequestBodyChange(formatted);
-                        } catch (e) {
-                          // Invalid JSON, do nothing
-                        }
-                      }}
-                      className="text-xs text-blue-600 hover:text-blue-800"
-                    >
-                      {t.common.formatJson}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Generate Button */}
-              <button
-                onClick={regenerateCodeWithCustomValues}
-                disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm font-medium rounded-md transition-colors"
-              >
-                <Play className="w-4 h-4" />
-                {isLoading ? t.common.generating : t.common.updateCodeExamples}
-              </button>
-              <button
-                onClick={handleTestApi}
-                disabled={isTestingApi}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white text-sm font-medium rounded-md transition-colors mt-2"
-              >
-                {isTestingApi ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    {t.common.testing}
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    {t.common.testApiRequest}
-                  </>
-                )}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* API Test Response */}
       {currentShowTestResponse && currentTestResponse && (
@@ -503,7 +482,6 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
           </div>
 
           <div className="border border-gray-200 rounded-lg overflow-hidden">
-            {/* Response Status */}
             <div className={`px-4 py-3 text-sm font-medium ${
               currentTestResponse.error ? 'bg-red-50 text-red-800' :
               currentTestResponse.status >= 200 && currentTestResponse.status < 300 ? 'bg-green-50 text-green-800' :
@@ -516,8 +494,7 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
                 `${currentTestResponse.status} ${currentTestResponse.statusText} • ${currentTestResponse.responseTime}ms`
               )}
             </div>
-            
-            {/* Response Body */}
+
             <div className="relative">
               <pre className="bg-gray-900 text-gray-100 p-4 overflow-x-auto text-sm max-h-96">
                 <code className="whitespace-pre-wrap break-words">

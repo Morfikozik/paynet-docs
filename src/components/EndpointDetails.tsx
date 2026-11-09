@@ -3,6 +3,7 @@ import { AlertCircle, CheckCircle, Copy, Check, FileText } from 'lucide-react';
 import { Endpoint } from '../types/api';
 import { TranslationResources, Language } from '../types/language';
 import { AuthenticationBlock } from './AuthenticationBlock';
+import { AiMenu } from './AiMenu';
 import { getMethodTranslation } from '../utils/pathTranslations';
 import { translateOpenApiDescription } from '../utils/openApiDescriptionTranslations';
 
@@ -16,9 +17,10 @@ interface EndpointDetailsProps {
   t: TranslationResources;
   language: Language;
   spec?: any; // Add spec prop to access full OpenAPI specification
+  onNavigate?: (href: string) => void;
 }
 
-export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, baseUrl, servers = [], t, language, spec = {} }) => {
+export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, baseUrl, servers = [], t, language, spec = {}, onNavigate = (href) => { window.location.hash = href; } }) => {
   const [activeServerTab, setActiveServerTab] = React.useState(() => {
     // Find sandbox server index, default to 0 if not found
     const sandboxIndex = servers.findIndex(server => 
@@ -261,7 +263,7 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
     <div className="w-full max-w-none">
       {/* Название метода */}
       <div className="mb-4 sm:mb-8">
-        <div className="flex items-center gap-3 mb-2 sm:mb-3">
+        <div className="flex flex-wrap items-center gap-3 mb-2 sm:mb-3">
           <span className={`text-xs font-mono px-2 py-1 rounded ${
             endpoint.method === 'GET' ? 'bg-green-100 text-green-700' :
             endpoint.method === 'POST' ? 'bg-blue-100 text-blue-700' :
@@ -273,6 +275,15 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-paynet-primary">
             {methodTranslation.name}
           </h1>
+          <div className="ml-auto">
+            <AiMenu
+              language={language}
+              title={`${endpoint.method} ${endpoint.path} — ${methodTranslation.name}`}
+              markdownPath={`docs/api/${endpoint.id.replace(/^-+|-+$/g, '')}.md`}
+              markdownLanguage="EN"
+              onNavigate={onNavigate}
+            />
+          </div>
         </div>
         
         {/* Подробное описание метода из api_paths.json */}

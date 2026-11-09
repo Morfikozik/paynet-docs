@@ -1,5 +1,6 @@
 import React from 'react';
-import { ArrowLeft, ArrowRight, Bot, Check, FileText } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { AiMenu } from './AiMenu';
 import { Markdown } from './Markdown';
 import { Guide, getGuides, guideUiText } from '../content/guides';
 import { Language } from '../types/language';
@@ -12,45 +13,22 @@ interface GuidePageProps {
 
 export const GuidePage: React.FC<GuidePageProps> = ({ guide, language, onNavigate }) => {
   const ui = guideUiText[language];
-  const [copied, setCopied] = React.useState(false);
   const guides = getGuides(language).filter((item) => item.section === guide.section);
   const index = guides.findIndex((item) => item.slug === guide.slug);
   const previous = index > 0 ? guides[index - 1] : null;
   const next = index >= 0 && index < guides.length - 1 ? guides[index + 1] : null;
 
-  const copyForAi = async () => {
-    const pageUrl = window.location.href;
-    const text = `${guide.source}\n\n---\nSource: ${pageUrl}\nFull documentation for AI assistants: ${new URL('llms-full.txt', window.location.href.split('#')[0]).href}\n`;
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
-  };
-
   return (
     <article className="max-w-4xl">
       <div className="flex flex-wrap items-center justify-end gap-2 mb-4">
-        <button
-          type="button"
-          onClick={copyForAi}
-          className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-paynet border border-paynet-primary text-paynet-primary bg-white hover:bg-paynet-light transition-colors"
-          title={ui.forAiHint}
-        >
-          {copied ? <Check className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-          {copied ? ui.copied : ui.copyForAi}
-        </button>
-        <a
-          href={`docs/${guide.slug}.md`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-paynet border border-paynet-gray-300 text-paynet-gray-600 bg-white hover:bg-paynet-gray-50 transition-colors"
-        >
-          <FileText className="w-4 h-4" />
-          {ui.openMarkdown} (EN)
-        </a>
+        <AiMenu
+          language={language}
+          title={guide.title}
+          markdownPath={language === 'en' ? `docs/${guide.slug}.md` : `docs/${language}/${guide.slug}.md`}
+          markdownLanguage={language.toUpperCase()}
+          markdown={guide.source}
+          onNavigate={onNavigate}
+        />
       </div>
 
       <Markdown source={guide.source} onNavigate={onNavigate} />

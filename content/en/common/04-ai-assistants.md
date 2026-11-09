@@ -10,11 +10,25 @@ You can hand this documentation to any AI coding assistant (Claude, ChatGPT, Gem
 | [`llms-ecom.txt`](llms-ecom.txt) | E-commerce only, plus the general topics it needs (notifications, signatures, errors) | When you integrate only e-commerce payments. |
 | [`llms.txt`](llms.txt) | Short index with links to every page | For assistants that browse links themselves. |
 | [`openapi.json`](openapi.json) | OpenAPI 3 specification of the server-to-server API | For code generators and typed clients. |
-| `docs/<page>.md` | Each guide as a separate Markdown file | When you need only one topic. |
+| `docs/<page>.md`, `docs/ru/<page>.md`, `docs/ro/<page>.md` | Each guide as a separate Markdown file (English, Russian, Romanian) | When you need only one topic. |
+| `docs/api/<method>.md` | Each API method as a separate Markdown file | When you work on one endpoint. |
 
-Every guide page on this portal also has a **Copy for AI** button that copies the page as Markdown.
+Every guide and API method page has a **Copy for AI** button. It copies the page as Markdown; its menu (the arrow next to it) also opens the page as Markdown or in ChatGPT, Claude or Gemini with a ready question.
 
 > **Note:** most assistants cannot read this portal by opening its address, because the pages are rendered with JavaScript. Give them `llms-full.txt` or `llms-ecom.txt` (upload the file or paste its link). The AI files are in English, the language models work with best; the assistant can answer you in any language.
+
+## Connect an assistant in your editor
+
+Coding assistants in the editor work best when the documentation is part of the project or added as a source:
+
+| Assistant | How to add the documentation |
+|---|---|
+| Cursor | Chat → `@Docs` → *Add new doc* → paste the `llms-full.txt` link. Then mention `@Docs` in your requests. |
+| VS Code (GitHub Copilot) | In the chat, use `#fetch` with the `llms-ecom.txt` link, or save the file into the project and attach it. |
+| Claude Code | Save `llms-ecom.txt` into the project (for example `docs/paynet.md`) and add to `CLAUDE.md`: *Paynet integration: follow docs/paynet.md*. |
+| Codex | Save `llms-ecom.txt` into the project and reference it in `AGENTS.md` the same way. |
+
+Keeping the file in the project also lets you see in code review which version of the documentation was used. Download it again when the documentation changes.
 
 ## Prompt template
 

@@ -35,6 +35,8 @@ export const en: TranslationResources = {
     enterJsonRequestBody: 'Enter JSON request body',
     formatJson: 'Format JSON',
     updateCodeExamples: 'Update Code Examples',
+    codeSyncHint: 'Code tabs (cURL, JavaScript, PHP…) are built from this request automatically.',
+    editTab: 'Edit',
     testApiRequest: 'Test API Request',
     testing: 'Testing...',
     generating: 'Generating...',

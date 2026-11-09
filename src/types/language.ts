@@ -35,6 +35,8 @@ export interface TranslationResources {
     enterJsonRequestBody: string;
     formatJson: string;
     updateCodeExamples: string;
+    codeSyncHint: string;
+    editTab: string;
     testApiRequest: string;
     testing: string;
     generating: string;

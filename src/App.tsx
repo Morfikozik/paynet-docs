@@ -112,6 +112,7 @@ function App() {
           t={t}
           language={language}
           spec={currentSpec}
+          onNavigate={navigate}
         />
       ) : null;
     }

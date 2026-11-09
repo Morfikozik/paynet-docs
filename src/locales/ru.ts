@@ -35,6 +35,8 @@ export const ru: TranslationResources = {
     enterJsonRequestBody: 'Введите JSON тело запроса',
     formatJson: 'Форматировать JSON',
     updateCodeExamples: 'Обновить Примеры Кода',
+    codeSyncHint: 'Вкладки с кодом (cURL, JavaScript, PHP…) собираются из этого запроса автоматически.',
+    editTab: 'Изменить',
     testApiRequest: 'Тестировать API Запрос',
     testing: 'Тестирование...',
     generating: 'Генерация...',

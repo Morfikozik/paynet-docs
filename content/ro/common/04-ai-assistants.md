@@ -10,11 +10,25 @@ Puteți da această documentație oricărui asistent AI de programare (Claude, C
 | [`llms-ecom.txt`](llms-ecom.txt) | Doar E-commerce și subiectele generale de care are nevoie (notificări, semnături, erori) | Când integrați doar plățile e-commerce. |
 | [`llms.txt`](llms.txt) | Cuprins scurt cu linkuri către toate paginile | Pentru asistenții care navighează singuri prin linkuri. |
 | [`openapi.json`](openapi.json) | Specificația OpenAPI 3 a API-ului server-to-server | Pentru generatoare de cod și clienți tipizați. |
-| `docs/<page>.md` | Fiecare ghid ca fișier Markdown separat | Când aveți nevoie de un singur subiect. |
+| `docs/<page>.md`, `docs/ru/<page>.md`, `docs/ro/<page>.md` | Fiecare ghid ca fișier Markdown separat (engleză, rusă, română) | Când aveți nevoie de un singur subiect. |
+| `docs/api/<method>.md` | Fiecare metodă API ca fișier Markdown separat | Când lucrați cu o singură metodă. |
 
-Fiecare pagină de ghid are un buton **Copiază pentru AI**, care copiază pagina în format Markdown.
+Fiecare pagină de ghid și de metodă API are un buton **Copiază pentru AI**. El copiază pagina în Markdown; meniul lui (săgeata de lângă) deschide pagina și ca Markdown sau în ChatGPT, Claude și Gemini cu o întrebare pregătită.
 
 > **Notă:** majoritatea asistenților nu pot citi portalul deschizând adresa lui, deoarece paginile sunt generate cu JavaScript. Dați-le `llms-full.txt` sau `llms-ecom.txt` (încărcați fișierul sau lipiți linkul). Fișierele pentru AI sunt în engleză, limba cu care modelele lucrează cel mai bine; vă pot răspunde în orice limbă.
+
+## Conectarea asistentului în editorul de cod
+
+Asistenții din editor lucrează cel mai bine când documentația se află în proiect sau este adăugată ca sursă:
+
+| Asistent | Cum adăugați documentația |
+|---|---|
+| Cursor | Chat → `@Docs` → *Add new doc* → lipiți linkul către `llms-full.txt`. Apoi menționați `@Docs` în cereri. |
+| VS Code (GitHub Copilot) | În chat folosiți `#fetch` cu linkul către `llms-ecom.txt` sau salvați fișierul în proiect și atașați-l. |
+| Claude Code | Salvați `llms-ecom.txt` în proiect (de exemplu `docs/paynet.md`) și adăugați în `CLAUDE.md`: *Integrare Paynet: urmează docs/paynet.md*. |
+| Codex | Salvați `llms-ecom.txt` în proiect și indicați-l la fel în `AGENTS.md`. |
+
+Fișierul din proiect arată și la code review după ce versiune a documentației s-a făcut integrarea. Descărcați-l din nou când documentația se schimbă.
 
 ## Șablon de cerere
 

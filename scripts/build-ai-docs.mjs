@@ -113,6 +113,11 @@ const findBodySchema = (example) => {
 
 const json = (value) => '```json\n' + JSON.stringify(value, null, 2) + '\n```';
 
+/** Per-method Markdown files (docs/api/<id>.md), ids as in the portal router. */
+const methodFiles = [];
+const methodId = (method, apiPath) =>
+  `${method}-${apiPath}`.replace(/[{}\/]/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+
 const apiReference = () => {
   const base = spec.servers?.[0]?.url || '';
   const out = [
@@ -124,6 +129,7 @@ const apiReference = () => {
   for (const [apiPath, ops] of Object.entries(spec.paths)) {
     for (const [method, op] of Object.entries(ops)) {
       const info = englishInfo(apiPath, method);
+      const sectionStart = out.length;
       out.push(`## ${method.toUpperCase()} ${apiPath} — ${(info.name || op.summary || '').replace(/\.$/, '')}`, '');
       if (info.description || op.description) out.push(info.description || op.description, '');
       if (op.parameters?.length) {
@@ -146,6 +152,20 @@ const apiReference = () => {
         out.push(`Response \`${code}\`${response.description ? ` — ${response.description}` : ''}:`, '');
         if (example && !(typeof example === 'object' && Object.keys(example).length === 0)) out.push(json(example), '');
       }
+      const section = out.slice(sectionStart).join('\n').replace(/^## /, '# ');
+      methodFiles.push({
+        id: methodId(method, apiPath),
+        markdown: [
+          section,
+          '',
+          '---',
+          '',
+          `Base URL: test \`${base}\`, production \`https://ecom-api.paynet.md\` (same paths). All endpoints except \`/auth\` require \`Authorization: Bearer <access_token>\`.`,
+          '',
+          `Full API reference with all schemas: ${siteUrl}docs/api-reference.md. Complete documentation: ${siteUrl}llms-full.txt.`,
+          '',
+        ].join('\n'),
+      });
     }
   }
   out.push('## Schemas', '');
@@ -246,9 +266,27 @@ const index = [
 fs.mkdirSync(docsOut, { recursive: true });
 for (const g of guides) fs.writeFileSync(path.join(docsOut, `${g.slug}.md`), rewriteLinks(g.source, 'file'));
 fs.writeFileSync(path.join(docsOut, 'api-reference.md'), reference);
+fs.mkdirSync(path.join(docsOut, 'api'), { recursive: true });
+for (const m of methodFiles) fs.writeFileSync(path.join(docsOut, 'api', `${m.id}.md`), m.markdown);
+
+// Guides in Russian and Romanian for the "View as Markdown" menu (links stay within the language).
+for (const lang of ['ru', 'ro']) {
+  const langDir = path.join(root, 'content', lang);
+  fs.mkdirSync(path.join(docsOut, lang), { recursive: true });
+  for (const section of SECTIONS) {
+    const dir = path.join(langDir, section.id);
+    if (!fs.existsSync(dir)) continue;
+    for (const file of fs.readdirSync(dir).filter((f) => /^\d+-.+\.md$/.test(f))) {
+      const slug = file.replace(/^\d+-/, '').replace(/\.md$/, '');
+      const source = fs.readFileSync(path.join(dir, file), 'utf8')
+        .replace(/\]\(#\/guides\/([a-z0-9-]+)\)/g, (_, target) => `](${siteUrl}docs/${lang}/${target}.md)`);
+      fs.writeFileSync(path.join(docsOut, lang, `${slug}.md`), source);
+    }
+  }
+}
 fs.writeFileSync(path.join(publicDir, 'llms.txt'), index);
 fs.writeFileSync(path.join(publicDir, 'llms-full.txt'), full);
 fs.writeFileSync(path.join(publicDir, 'llms-ecom.txt'), ecom);
 fs.copyFileSync(path.join(root, 'src/openapi/openapi.json'), path.join(publicDir, 'openapi.json'));
 
-console.log(`✓ AI docs: ${guides.length} guides, llms.txt (${index.length} B), llms-full.txt (${full.length} B), llms-ecom.txt (${ecom.length} B)`);
+console.log(`✓ AI docs: ${guides.length} guides (+ ru/ro), ${methodFiles.length} API method files, llms.txt (${index.length} B), llms-full.txt (${full.length} B), llms-ecom.txt (${ecom.length} B)`);
