@@ -3,12 +3,16 @@
   "info": {
     "title": "Paynet E-commerce API",
     "version": "v1",
-    "description": "Server-to-server API for Paynet e-commerce payments (Moldova): create orders, redirect the customer to the Paynet payment page, check payment status, refund, unlink saved cards and download statements.\n\nAuthentication: call POST /auth, then send `Authorization: Bearer <access_token>`.\nAmounts are integers in minor units (100 = 1.00 MDL). Currency is ISO 4217 numeric (498 = MDL).\n`Order` must be unique per payment; `ExpiryDate` must be in the future (YYYY-MM-DDTHH:mm:ss).\n\nGuides, hosted checkout (client-server) and notification (webhook) signatures: see llms-full.txt next to this file."
+    "description": "Server-to-server API for Paynet e-commerce payments (Moldova): create orders, redirect the customer to the Paynet payment page, check payment status, refund, unlink saved cards and download statements.\n\nAuthentication: call POST /auth, then send `Authorization: Bearer <access_token>`.\nAmounts are integers in minor units (100 = 1.00 MDL). Currency is ISO 4217 numeric (498 = MDL).\nOne shop order = one `Order`: repeating it with the same data returns the same payment; with different data or after payment it fails with 500 TECHNICAL_ERROR.\n`ExpiryDate` is YYYY-MM-DDTHH:mm:ss in Chisinau local time (Europe/Chisinau) and must be in the future.\n\nGuides, hosted checkout form and notification (webhook) signatures: see llms-full.txt next to this file."
   },
   "servers": [
     {
       "url": "https://ecom-api-test.paynet.md",
       "description": "Test environment"
+    },
+    {
+      "url": "https://ecom-api.paynet.md",
+      "description": "Production environment"
     }
   ],
   "paths": {
@@ -1233,7 +1237,7 @@
           },
           "ExpiryDate": {
             "type": "string",
-            "description": "The expiration date and time for this payment request.",
+            "description": "The expiration date and time for this payment request. Format YYYY-MM-DDTHH:mm:ss, Chisinau local time (Europe/Chisinau); must be in the future.",
             "format": "date-time"
           },
           "Services": {
@@ -1253,7 +1257,7 @@
               "CashInvoice"
             ],
             "type": "string",
-            "description": "Payment method type: \"Card\" for Visa & Mastercard; \"Paynet\" for Paynet Wallet; \"MIA\" for MIA instant payments; \"CashInvoice\" for cash invoice; \"All\" for all methods enabled for the merchant."
+            "description": "Payment methods shown to the customer: \"All\" — all methods enabled for the merchant; \"Card\" — card (Visa/Mastercard), Apple Pay, Google Pay; \"Paynet\" — Paynet wallet; \"MIA\" — MIA instant payments; \"CashInvoice\" — cash invoice."
           },
           "Lang": {
             "type": "string",

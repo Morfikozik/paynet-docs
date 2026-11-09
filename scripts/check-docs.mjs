@@ -11,22 +11,39 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { checkoutRawData, checkoutSignature, notificationPreparedString, notificationHash } from './lib/signatures.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const languages = ['en', 'ru', 'ro'];
+const languages = (process.env.CHECK_LANGS || 'en,ru,ro').split(',');
 const CHECKOUT_KEY = 'F90D6485-9CCC-458B-96A3-8958AF9B4458';
 const NOTIFICATION_KEY = 'D9873689-E5F8-4272-A67F-0D8BA3F9BAA7';
 const errors = [];
 const fail = (message) => errors.push(message);
 
+// Guides live in content/<lang>/<section>/NN-slug.md; "file" below is "<section>/NN-slug.md".
 const read = (lang, file) => fs.readFileSync(path.join(root, 'content', lang, file), 'utf8');
-const files = Object.fromEntries(
-  languages.map((lang) => [lang, fs.readdirSync(path.join(root, 'content', lang)).filter((f) => /^\d+-.+\.md$/.test(f)).sort()])
-);
+const listGuides = (lang) =>
+  fs.readdirSync(path.join(root, 'content', lang), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .flatMap((dir) =>
+      fs.readdirSync(path.join(root, 'content', lang, dir.name))
+        .filter((f) => /^\d+-.+\.md$/.test(f))
+        .map((f) => `${dir.name}/${f}`)
+    )
+    .sort();
+const files = Object.fromEntries(languages.map((lang) => [lang, listGuides(lang)]));
 
 // 1. Same set of guides in every language.
 for (const lang of languages) {
   if (files[lang].join() !== files.en.join()) fail(`content/${lang} has different guide files than content/en`);
 }
-const slugs = new Set(files.en.map((f) => f.replace(/^\d+-/, '').replace(/\.md$/, '')));
+const slugOf = (f) => f.split('/').pop().replace(/^\d+-/, '').replace(/\.md$/, '');
+const slugs = new Set(files.en.map(slugOf));
+if (slugs.size !== files.en.length) fail('guide slugs must be unique across sections');
+
+// 1b. No mentions of the retired v0.5 protocol.
+for (const lang of languages) {
+  for (const file of files[lang]) {
+    if (/v0\.5|SetEcom|SignVersion|\bv05\b/.test(read(lang, file))) fail(`content/${lang}/${file}: mentions the retired v0.5 protocol`);
+  }
+}
 
 // 2. Internal links point to existing guides.
 for (const lang of languages) {
@@ -88,6 +105,14 @@ for (const lang of languages) {
   const notificationFile = files[lang].find((f) => f.endsWith('-notifications.md'));
   const notificationDoc = read(lang, notificationFile);
   if (!notificationDoc.includes(`Hash: ${expectedNotification}`)) fail(`content/${lang}/${notificationFile}: example Hash header should be ${expectedNotification}`);
+}
+
+// 5. Notification code samples must use the real key spelling (Id / ExternalId).
+for (const lang of languages) {
+  for (const file of files[lang]) {
+    const code = [...read(lang, file).matchAll(/```[a-z]*\n([\s\S]*?)```/g)].map((m) => m[1]).join('\n');
+    if (/\bExternalID\b|\.ID\b|\['ID'\]|"ID"\s*:|get\("ID"\)/.test(code)) fail(`content/${lang}/${file}: code uses ID/ExternalID instead of Id/ExternalId`);
+  }
 }
 
 if (errors.length) {

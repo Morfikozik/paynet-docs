@@ -34,8 +34,8 @@ export const notificationPreparedString = (n) =>
   normalize(n.EventType) +
   normalize(n.Payment?.Amount) +
   normalize(n.Payment?.Customer) +
-  normalize(n.Payment?.ExternalID) +
-  normalize(n.Payment?.ID) +
+  normalize(n.Payment?.ExternalId) +
+  normalize(n.Payment?.Id) +
   normalize(n.Payment?.Merchant) +
   normalize(n.Payment?.StatusDate);
 

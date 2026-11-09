@@ -377,7 +377,7 @@ export const ClientServerOrderRequestV06: React.FC<ClientServerOrderRequestV06Pr
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Paynet Ecom Checkout Form (v0.6)</title>
+  <title>Paynet Ecom Checkout Form</title>
 </head>
 <body>
   <form method="POST" action="${escapeHtml(requestUrl)}">
@@ -400,14 +400,14 @@ ${inputs}
       <div className="mb-4 sm:mb-8">
         <div className="flex items-center gap-3 mb-2 sm:mb-3">
           <span className="text-xs font-mono px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">POST</span>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Order request v0.6</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{tDesc('Hosted checkout form', 'Форма hosted checkout', 'Formular hosted checkout')}</h1>
         </div>
       </div>
 
       <div className="bg-gradient-to-r from-paynet-light to-paynet-gray-50 rounded-paynet border border-paynet-gray-200 overflow-hidden w-full max-w-none">
         <div className="w-full p-4 sm:p-6 flex items-center gap-3">
           <FileText className="w-5 h-5 text-paynet-primary" />
-          <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary">Order request v0.6</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary">{tDesc('Hosted checkout form', 'Форма hosted checkout', 'Formular hosted checkout')}</h2>
         </div>
 
         <div className="p-4 sm:p-6 pt-0">
@@ -417,9 +417,9 @@ ${inputs}
               <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Method Description</h3>
               <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed">
                 {tDesc(
-                  'Creates a hosted checkout (client-server) payment request for `/ecom/checkout` (protocol v0.6), signs it with the secret key and opens the Paynet test payment page in a new tab. See the Hosted checkout and Signatures guides for the algorithm and test vectors.',
-                  'Создаёт платёжный запрос hosted checkout (client-server) для `/ecom/checkout` (протокол v0.6), подписывает его секретным ключом и открывает тестовую страницу оплаты Paynet в новой вкладке. Алгоритм и тестовые векторы — в руководствах «Hosted checkout» и «Подписи».',
-                  'Creează o cerere de plată hosted checkout (client-server) pentru `/ecom/checkout` (protocolul v0.6), o semnează cu cheia secretă și deschide pagina de plată de test Paynet într-un tab nou. Algoritmul și vectorii de test sunt în ghidurile „Hosted checkout” și „Semnături”.',
+                  'Creates a hosted checkout (client-server) payment request for `/ecom/checkout`, signs it with the secret key and opens the Paynet test payment page in a new tab. See the Hosted checkout and Signatures guides for the algorithm and test vectors.',
+                  'Создаёт платёжный запрос hosted checkout (client-server) для `/ecom/checkout`, подписывает его секретным ключом и открывает тестовую страницу оплаты Paynet в новой вкладке. Алгоритм и тестовые векторы — в руководствах «Hosted checkout» и «Подписи».',
+                  'Creează o cerere de plată hosted checkout (client-server) pentru `/ecom/checkout`, o semnează cu cheia secretă și deschide pagina de plată de test Paynet într-un tab nou. Algoritmul și vectorii de test sunt în ghidurile „Hosted checkout” și „Semnături”.',
                 )}
               </p>
             </div>
@@ -515,9 +515,9 @@ Signature = Base64(MD5(RawData + SecretKey))`}
               </pre>
               <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed mb-2">
                 {tDesc(
-                  'Signing fields used in v0.6:',
-                  'Поля, используемые для подписи в v0.6:',
-                  'Câmpurile folosite la semnare în v0.6:',
+                  'Signing fields:',
+                  'Поля, используемые для подписи:',
+                  'Câmpurile folosite la semnare:',
                 )}
               </p>
               <pre className="bg-paynet-gray-900 text-paynet-gray-100 p-3 rounded-md text-xs sm:text-sm overflow-x-auto mb-3 whitespace-pre-wrap">

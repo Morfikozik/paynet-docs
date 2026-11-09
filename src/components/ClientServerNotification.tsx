@@ -26,8 +26,8 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
       ro: 'Identificator unic al evenimentului callback pentru trasabilitate și deduplicare.',
     },
     EventType: {
-      ru: 'Тип бизнес-события (например: Paid, Fail).',
-      ro: 'Tipul evenimentului business (de exemplu: Paid, Fail).',
+      ru: 'Всегда PAID: уведомления приходят только об успешных платежах.',
+      ro: 'Mereu PAID: se notifică doar plățile reușite.',
     },
     Message: {
       ru: 'Текстовое сообщение о результате обработки в контексте callback.',
@@ -37,11 +37,11 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
       ru: 'Время создания уведомления в Paynet (ISO 8601).',
       ro: 'Momentul creării notificării în Paynet (ISO 8601).',
     },
-    'Payment.ID': {
+    'Payment.Id': {
       ru: 'Идентификатор платежа в Paynet; используйте как idempotency key.',
       ro: 'Identificatorul plății în Paynet; folosește-l ca cheie de idempotență.',
     },
-    'Payment.ExternalID': {
+    'Payment.ExternalId': {
       ru: 'Идентификатор заказа мерчанта, изначально отправленный вашей системой.',
       ro: 'Identificatorul comenzii merchantului trimis inițial de sistemul tău.',
     },
@@ -62,8 +62,12 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
       ro: 'Momentul în care plata a atins statusul raportat.',
     },
     'Payment.Amount': {
-      ru: 'Итоговая сумма платежа в минимальных единицах (целое число).',
-      ro: 'Suma finală a plății în unități minore (format întreg).',
+      ru: 'Сумма заказа в минимальных единицах, как её передал мерчант.',
+      ro: 'Suma comenzii în unități minime, așa cum a trimis-o comerciantul.',
+    },
+    'Payment.PaidAmount': {
+      ru: 'Фактически оплаченная сумма. Должна совпадать с Amount, кроме согласованных с Paynet акций.',
+      ro: 'Suma plătită efectiv. Trebuie să fie egală cu Amount, cu excepția promoțiilor convenite cu Paynet.',
     },
     'Payment.CardMask': {
       ru: 'Маскированный PAN для карточных платежей.',
@@ -86,8 +90,8 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
       ro: 'Hash-ul cardului legat pentru scenarii linked-card.',
     },
     'Payment.MoneyType': {
-      ru: 'Тип/канал платежа (пример: CARD, All).',
-      ro: 'Tipul/canalul plății (exemplu: CARD, All).',
+      ru: 'Чем заплатил покупатель: CARD, APPLEPAY, GOOGLEPAY, MIA_QR, PAYNET, CASH_INVOICE.',
+      ro: 'Cum a plătit clientul: CARD, APPLEPAY, GOOGLEPAY, MIA_QR, PAYNET, CASH_INVOICE.',
     },
     'Payment.PayerName': {
       ru: 'Имя плательщика из данных карты/платежа.',
@@ -142,22 +146,23 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
   const [copiedVerifierCode, setCopiedVerifierCode] = React.useState(false);
   const fieldRows: NotificationFieldRow[] = [
     { name: 'Eventid', type: 'long', input: 'body', required: true, description: 'Unique callback event identifier for traceability and deduplication.' },
-    { name: 'EventType', type: 'string', input: 'body', required: true, description: 'Business event type (for example: Paid, Fail).' },
+    { name: 'EventType', type: 'string', input: 'body', required: true, description: 'Always PAID: only successful payments are notified.' },
     { name: 'Message', type: 'string', input: 'body', required: false, description: 'Human-readable processing message for callback context.' },
     { name: 'EventDate', type: 'datetime', input: 'body', required: true, description: 'When Paynet created this notification event (ISO 8601).' },
-    { name: 'Payment.ID', type: 'long', input: 'body', required: true, description: 'Paynet payment identifier; use as idempotency key on your side.' },
-    { name: 'Payment.ExternalID', type: 'long', input: 'body', required: true, description: 'Merchant order identifier originally sent by your system.' },
+    { name: 'Payment.Id', type: 'long', input: 'body', required: true, description: 'Paynet payment identifier; use as idempotency key on your side.' },
+    { name: 'Payment.ExternalId', type: 'long', input: 'body', required: true, description: 'Merchant order identifier originally sent by your system.' },
     { name: 'Payment.SaleAreaCode', type: 'string', input: 'body', required: false, description: 'Sale area code associated with the payment.' },
     { name: 'Payment.Merchant', type: 'string', input: 'body', required: true, description: 'Merchant code that owns this payment operation.' },
     { name: 'Payment.Customer', type: 'string', input: 'body', required: false, description: 'Customer reference from your system, if provided at order creation.' },
     { name: 'Payment.StatusDate', type: 'datetime', input: 'body', required: true, description: 'Timestamp when payment reached the reported status.' },
-    { name: 'Payment.Amount', type: 'long', input: 'body', required: true, description: 'Final payment amount in minor units (integer format).' },
+    { name: 'Payment.Amount', type: 'long', input: 'body', required: true, description: 'Order amount in minor units, as sent by the merchant.' },
+    { name: 'Payment.PaidAmount', type: 'long', input: 'body', required: false, description: 'Amount actually paid. Must equal Amount unless a promotion is agreed with Paynet.' },
     { name: 'Payment.CardMask', type: 'string', input: 'body', required: false, description: 'Masked PAN returned for card payments.' },
     { name: 'Payment.CardExpireMonth', type: 'string', input: 'body', required: false, description: 'Card expiration month (if available).' },
     { name: 'Payment.CardExpireYear', type: 'string', input: 'body', required: false, description: 'Card expiration year (if available).' },
     { name: 'Payment.CardIssuer', type: 'string', input: 'body', required: false, description: 'Card issuer name or identifier.' },
     { name: 'Payment.CardLinkHash', type: 'string', input: 'body', required: false, description: 'Card link hash for linked-card scenarios.' },
-    { name: 'Payment.MoneyType', type: 'string', input: 'body', required: false, description: 'Payment channel/type (example: CARD, All).' },
+    { name: 'Payment.MoneyType', type: 'string', input: 'body', required: false, description: 'How the customer paid: CARD, APPLEPAY, GOOGLEPAY, MIA_QR, PAYNET, CASH_INVOICE.' },
     { name: 'Payment.PayerName', type: 'string', input: 'body', required: false, description: 'Payer first name from card/payment data.' },
     { name: 'Payment.PayerSurname', type: 'string', input: 'body', required: false, description: 'Payer surname from card/payment data.' },
     { name: 'Payment.PayerIDNP', type: 'string', input: 'body', required: false, description: 'Payer personal identifier when provided.' },
@@ -195,6 +200,18 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
     setSentPreparedString('');
 
     const resolvedStatus = paymentStatusResult || resolvePaymentStatus(paymentInfoForNotification);
+    if (resolvedStatus !== 'paid') {
+      // Paynet notifies only paid payments; the simulator behaves the same way.
+      setNotificationError(
+        tDesc(
+          'This order is not paid. Paynet sends notifications only for paid payments (EventType = PAID), so nothing is sent.',
+          'Этот заказ не оплачен. Paynet отправляет уведомления только об оплаченных платежах (EventType = PAID), поэтому ничего не отправлено.',
+          'Această comandă nu este plătită. Paynet trimite notificări doar pentru plățile achitate (EventType = PAID), deci nu se trimite nimic.'
+        )
+      );
+      setIsSendingNotification(false);
+      return;
+    }
     const firstDefined = (...values: any[]) => values.find((value) => value !== undefined && value !== null);
     const paymentData = firstDefined(paymentInfoForNotification?.payment, paymentInfoForNotification?.Payment) ?? {};
     const payerData = firstDefined(paymentInfoForNotification?.payer, paymentInfoForNotification?.Payer, paymentData?.payer, paymentData?.Payer) ?? {};
@@ -275,14 +292,13 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
 
     const mockNotification = {
       Eventid: eventId,
-      EventType: resolvedStatus === 'paid' ? 'PAID' : 'FAIL',
-      Message: 'Request was processed successfully.',
+      EventType: 'PAID',
+      Message: 'Request processed successfully',
       EventDate: eventDate,
       Payment: {
-        // Field names follow the Paynet notification spec (ID / ExternalID), so the
-        // verifier samples on this page validate the simulated callback correctly.
-        ID: normalizedPaymentId,
-        ExternalID: normalizedExternalId,
+        // Same key spelling as real Paynet notifications (Id / ExternalId).
+        Id: normalizedPaymentId,
+        ExternalId: normalizedExternalId,
         SaleAreaCode: String(
           firstDefined(paymentData?.SaleAreaCode, paymentData?.saleAreaCode, paymentInfoForNotification?.saleAreaCode, 'onlidocumentation_md')
         ),
@@ -290,6 +306,7 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
         Customer: paymentCustomer,
         StatusDate: paymentStatusDate,
         Amount: paymentAmount,
+        PaidAmount: paymentAmount,
         CardMask:
           firstDefined(
             paymentData?.CardMask,
@@ -380,8 +397,8 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
       normalize(mockNotification.EventType) +
       normalize(mockNotification.Payment.Amount) +
       normalize(mockNotification.Payment.Customer) +
-      normalize(mockNotification.Payment.ExternalID) +
-      normalize(mockNotification.Payment.ID) +
+      normalize(mockNotification.Payment.ExternalId) +
+      normalize(mockNotification.Payment.Id) +
       normalize(mockNotification.Payment.Merchant) +
       normalize(mockNotification.Payment.StatusDate);
     const hash = CryptoJS.enc.Base64.stringify(CryptoJS.MD5(preparedString + notificationSecretKey.trim()));
@@ -492,8 +509,8 @@ function buildPreparedString($notification) {
     normalize($notification['EventType'] ?? null) .
     normalize($notification['Payment']['Amount'] ?? null) .
     normalize($notification['Payment']['Customer'] ?? null) .
-    normalize($notification['Payment']['ExternalID'] ?? null) .
-    normalize($notification['Payment']['ID'] ?? null) .
+    normalize($notification['Payment']['ExternalId'] ?? null) .
+    normalize($notification['Payment']['Id'] ?? null) .
     normalize($notification['Payment']['Merchant'] ?? null) .
     normalize($notification['Payment']['StatusDate'] ?? null);
 }
@@ -516,8 +533,8 @@ function buildPreparedString(notification) {
     normalize(notification.EventType) +
     normalize(notification.Payment?.Amount) +
     normalize(notification.Payment?.Customer) +
-    normalize(notification.Payment?.ExternalID) +
-    normalize(notification.Payment?.ID) +
+    normalize(notification.Payment?.ExternalId) +
+    normalize(notification.Payment?.Id) +
     normalize(notification.Payment?.Merchant) +
     normalize(notification.Payment?.StatusDate)
   );
@@ -659,9 +676,9 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
                     )}
                   </p>
                   <ul className="list-disc pl-5 space-y-2 text-sm sm:text-base text-paynet-gray-700">
-                    <li>{tDesc('Paynet sends callback after processing events (for example payment approved/failed).', 'Paynet отправляет callback после обработки события (например, платеж успешен/неуспешен).', 'Paynet trimite callback după procesarea evenimentului (de exemplu plată aprobată/eșuată).')}</li>
+                    <li>{tDesc('Paynet sends a callback only when a payment is paid (EventType = PAID). A failed payment produces no callback: the customer is redirected to LinkUrlCancel.', 'Paynet отправляет callback только когда платёж оплачен (EventType = PAID). При неуспешной оплате callback нет: покупатель перенаправляется на LinkUrlCancel.', 'Paynet trimite callback doar când plata este achitată (EventType = PAID). La o plată eșuată nu există callback: clientul este redirecționat la LinkUrlCancel.')}</li>
                     <li>{tDesc('Flow is server-to-server, so callback endpoint must be implemented on backend side.', 'Поток server-to-server, поэтому callback endpoint должен быть реализован на backend.', 'Fluxul este server-to-server, deci endpoint-ul de callback trebuie implementat pe backend.')}</li>
-                    <li>{tDesc('Use `Payment.ID` as idempotency key to prevent duplicate business processing.', 'Используйте `Payment.ID` как ключ идемпотентности, чтобы избежать повторной бизнес-обработки.', 'Folosește `Payment.ID` ca cheie de idempotență pentru a preveni procesarea dublă.')}</li>
+                    <li>{tDesc('Use `Payment.Id` as idempotency key to prevent duplicate business processing. Keys are case-sensitive: `Id`, `ExternalId`.', 'Используйте `Payment.Id` как ключ идемпотентности, чтобы избежать повторной обработки. Ключи чувствительны к регистру: `Id`, `ExternalId`.', 'Folosește `Payment.Id` ca cheie de idempotență pentru a preveni procesarea dublă. Cheile țin cont de majuscule: `Id`, `ExternalId`.')}</li>
                     <li>{tDesc('Return HTTP `200` only after signature validation and successful internal processing.', 'Возвращайте HTTP `200` только после проверки подписи и успешной внутренней обработки.', 'Returnează HTTP `200` doar după validarea semnăturii și procesarea internă cu succes.')}</li>
                   </ul>
                 </div>
@@ -735,7 +752,7 @@ Accept notification only if ExpectedHash === Header.Hash`}
                   <pre className="bg-paynet-gray-900 text-paynet-gray-100 p-3 rounded-md text-xs sm:text-sm overflow-x-auto mb-3 whitespace-pre-wrap">
 {`PreparedString =
 EventDate + Eventid + EventType + Payment.Amount + Payment.Customer +
-Payment.ExternalID + Payment.ID + Payment.Merchant + Payment.StatusDate`}
+Payment.ExternalId + Payment.Id + Payment.Merchant + Payment.StatusDate`}
                   </pre>
                   <p className="text-xs sm:text-sm text-paynet-gray-600 mb-3">
                     {tDesc(

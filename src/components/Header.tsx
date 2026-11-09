@@ -11,9 +11,10 @@ interface HeaderProps {
     title: string;
     description: string;
   };
+  onHome?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange, apiInfo }) => {
+export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange, apiInfo, onHome }) => {
   return (
     <header className="bg-white border-b border-paynet-gray-200 px-6 py-4 shadow-paynet-lg">
       <div className="flex items-center justify-between">
@@ -38,12 +39,16 @@ export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange, apiI
               <span className="text-white font-bold text-lg">PN</span>
             </div>
           </a>
-          <div className="ml-3 flex flex-col justify-end leading-none -translate-y-1.5">
+          <button
+            type="button"
+            onClick={onHome}
+            className="ml-3 flex flex-col justify-end leading-none -translate-y-1.5 text-left hover:opacity-80"
+          >
             <span className="text-xs bg-paynet-orange text-white px-2 py-0.5 rounded-full font-medium w-fit mb-0.5">API</span>
-            <p className="text-sm text-paynet-gray-500 font-normal leading-none">
+            <span className="text-sm text-paynet-gray-500 font-normal leading-none">
               {apiInfo?.title || 'API Documentation Portal'}
-            </p>
-          </div>
+            </span>
+          </button>
         </div>
         
         <div className="flex items-center gap-3">

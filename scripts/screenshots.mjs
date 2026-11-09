@@ -9,16 +9,16 @@ const [baseUrl = 'http://localhost:4173/', outDir = 'screenshots'] = process.arg
 fs.mkdirSync(outDir, { recursive: true });
 
 const pages = [
-  ['en', '', '01-home'],
-  ['en', '#/guides/getting-started', '02-getting-started'],
-  ['en', '#/guides/hosted-checkout', '03-hosted-checkout'],
-  ['en', '#/guides/signatures', '04-signatures'],
-  ['en', '#/guides/statuses-and-errors', '05-statuses'],
-  ['en', '#/api/post-api-order', '06-api-create-order'],
-  ['en', '#/page/notifications', '07-notifications-tool'],
-  ['en', '#/page/order-request-v06', '08-order-request-v06'],
-  ['ru', '#/guides/getting-started', '09-ru-getting-started'],
-  ['ro', '#/guides/notifications', '10-ro-notifications'],
+  ['en', '#/', '01-home'],
+  ['en', '#/guides/getting-started', '02-quick-start'],
+  ['en', '#/guides/notifications', '03-notifications'],
+  ['en', '#/guides/errors-and-statuses', '04-errors'],
+  ['en', '#/api/post-api-order', '05-api-create-order'],
+  ['en', '#/page/notification-simulator', '06-notification-simulator'],
+  ['en', '#/page/checkout-form', '07-checkout-form'],
+  ['ru', '#/', '08-ru-home'],
+  ['ro', '#/guides/hosted-checkout', '09-ro-hosted-checkout'],
+  ['ru', '#/page/order-request-v05', '10-legacy-redirect'],
 ];
 
 const browser = await chromium.launch();
@@ -34,7 +34,19 @@ for (const [language, hash, name] of pages) {
   await page.screenshot({ path: path.join(outDir, `${name}.png`) });
   await context.close();
 }
-for (const file of ['llms.txt', 'llms-full.txt', 'openapi.json', 'docs/signatures.md', 'legacy/']) {
+// Full-text search: type a field name that appears only inside guide texts.
+{
+  const context = await browser.newContext({ viewport: { width: 1440, height: 1100 } });
+  await context.addInitScript(() => localStorage.setItem('tps-api-language', 'ru'));
+  const page = await context.newPage();
+  page.on('pageerror', (err) => log.push(`[search] pageerror: ${err.message}`));
+  await page.goto(baseUrl, { waitUntil: 'networkidle' });
+  await page.fill('input[type="search"]', 'PaidAmount');
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: path.join(outDir, '11-ru-search.png') });
+  await context.close();
+}
+for (const file of ['llms.txt', 'llms-full.txt', 'llms-ecom.txt', 'openapi.json', 'docs/signatures.md', 'legacy/']) {
   const res = await fetch(baseUrl + file);
   log.push(`GET ${file} → ${res.status} (${(await res.text()).length} bytes)`);
 }

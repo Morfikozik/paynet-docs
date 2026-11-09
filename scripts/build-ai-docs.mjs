@@ -25,17 +25,38 @@ const spec = JSON.parse(fs.readFileSync(path.join(root, 'src/openapi/openapi.jso
 const apiPaths = JSON.parse(fs.readFileSync(path.join(root, 'src/data/api_paths.json'), 'utf8'));
 
 // ---------- guides ----------
-const guides = fs
-  .readdirSync(contentDir)
-  .filter((file) => /^\d+-.+\.md$/.test(file))
-  .sort()
-  .map((file) => {
-    const slug = file.replace(/^\d+-/, '').replace(/\.md$/, '');
-    const source = fs.readFileSync(path.join(contentDir, file), 'utf8');
-    const title = (source.match(/^#\s+(.+)$/m) || [null, slug])[1].trim();
-    const summary = (source.split('\n').find((line) => line.trim() && !line.startsWith('#')) || '').trim();
-    return { slug, title, summary, source };
-  });
+// Sections in display order. A new product = a new folder in content/<lang>/ and an entry here.
+const SECTIONS = [
+  { id: 'common', title: 'General (all products)' },
+  { id: 'ecom', title: 'E-commerce' },
+];
+// One-line descriptions for llms.txt (fallback: first paragraph of the guide).
+const SUMMARIES = {
+  notifications: 'webhook sent when a payment is paid: request format, fields, Hash verification, retries, Amount vs PaidAmount',
+  signatures: 'how to compute and verify signatures (MD5 + Base64, UTF-8) with worked test vectors',
+  'errors-and-statuses': 'HTTP codes, error body, repeated Order rules, payment status, date/time formats, refunds',
+  'ai-assistants': 'files and prompt template for integrating with an AI assistant',
+  'integration-options': 'what e-commerce offers and how to choose: server-to-server API, hosted checkout form or CMS plugins',
+  'getting-started': 'environments, test credentials and a first test payment step by step',
+  'server-to-server': 'create an order via API, redirect the customer, handle the notification, check status; fields and code samples',
+  'hosted-checkout': 'signed HTML form posted from the browser to Paynet; fields, signature and code samples',
+  testing: 'test environment, test card, rules and test scenarios with expected results',
+  'go-live': 'checklist before switching to production',
+};
+
+const guides = SECTIONS.flatMap((section) =>
+  fs
+    .readdirSync(path.join(contentDir, section.id))
+    .filter((file) => /^\d+-.+\.md$/.test(file))
+    .sort()
+    .map((file) => {
+      const slug = file.replace(/^\d+-/, '').replace(/\.md$/, '');
+      const source = fs.readFileSync(path.join(contentDir, section.id, file), 'utf8');
+      const title = (source.match(/^#\s+(.+)$/m) || [null, slug])[1].trim();
+      const summary = (source.split('\n').find((line) => line.trim() && !line.startsWith('#') && !line.startsWith('|')) || '').trim();
+      return { slug, section: section.id, title, summary: SUMMARIES[slug] || summary, source };
+    })
+);
 
 /** Portal-internal links (#/guides/x) become links to the Markdown files. */
 const rewriteLinks = (markdown, mode) =>
@@ -140,68 +161,85 @@ const apiReference = () => {
 const rules = `## Rules for AI assistants
 
 - Use only this document as the source of truth. Do not invent endpoints, fields or status values; list missing information as open questions.
-- Test API base URL: \`https://ecom-api-test.paynet.md\`. Hosted checkout test URL: \`https://test.paynet.md/ecom/checkout\`.
+- E-commerce API base URL: test \`https://ecom-api-test.paynet.md\`, production \`https://ecom-api.paynet.md\` (same paths). Hosted checkout form: test \`https://test.paynet.md/ecom/checkout\`, production \`https://paynet.md/ecom/checkout\`.
 - Authenticate with \`POST /auth\` (JSON \`grantType\`, \`username\`, \`password\`), then send \`Authorization: Bearer <access_token>\`.
-- \`Order\` must be unique for every payment. \`ExpiryDate\` must be in the future, format \`YYYY-MM-DDTHH:mm:ss\`.
+- One shop order = one \`Order\`. Repeating an \`Order\` with the same data returns the same payment; with different data or after payment it fails with \`500 TECHNICAL_ERROR\`.
+- \`ExpiryDate\` must be in the future, format \`YYYY-MM-DDTHH:mm:ss\`, Chișinău local time (\`Europe/Chisinau\`).
 - Amounts are integers in minor units (100 = 1.00 MDL). \`Currency\` is ISO 4217 numeric (\`498\` = MDL).
-- Signatures: \`Base64(MD5(stringToSign + secretKey))\` over UTF-8; Base64 of the raw 16-byte digest. Reproduce the test vectors in "Signatures" in unit tests.
+- Signatures: \`Base64(MD5(UTF8(stringToSign + secretKey)))\`; Base64 of the raw 16-byte digest. Reproduce the test vectors in "Signatures" in unit tests.
 - The hosted checkout secret key and the notification secret key are different. Secrets never go to browser code.
+- Notifications are sent only for paid payments (\`EventType\` = \`PAID\`); a failed payment only redirects the customer to \`LinkUrlCancel\`. Notification keys are \`Payment.Id\` and \`Payment.ExternalId\` (case-sensitive).
+- \`PaidAmount\` must equal \`Amount\` unless the merchant has an agreed promotion with Paynet; otherwise do not fulfil the order automatically.
 - Never treat the redirect to \`LinkUrlSuccess\` as proof of payment. Use a verified notification or the status API.
 - Sections marked **Draft** are not confirmed by Paynet yet.`;
 
 const reference = apiReference();
-const intro = guides[0];
 
-const full = [
-  '# Paynet E-commerce API — complete documentation',
-  '',
-  '> Single-file documentation for developers and AI assistants. Generated from the same sources as the documentation portal.',
-  '',
-  rules,
-  '',
-  '## Contents',
-  '',
-  ...guides.map((g) => `- [${g.title}](#${g.slug})`),
-  '- [API reference](#api-reference)',
-  '',
-  ...guides.flatMap((g) => [
-    '---',
+/** One Markdown file with the given guides (+ optional API reference). */
+const bundle = (title, intro, list, withReference) =>
+  [
+    `# ${title}`,
     '',
-    `<a id="${g.slug}"></a>`,
+    `> ${intro}`,
     '',
-    // demote headings by one level so the file has a single H1
-    rewriteLinks(g.source, 'full').replace(/^(#{1,5}) /gm, '#$1 '),
+    rules,
     '',
-  ]),
-  '---',
-  '',
-  '<a id="api-reference"></a>',
-  '',
-  reference.replace(/^(#{1,5}) /gm, '#$1 '),
-  '',
-].join('\n');
+    '## Contents',
+    '',
+    ...list.map((g) => `- [${g.title}](#${g.slug})`),
+    ...(withReference ? ['- [API reference](#api-reference)'] : []),
+    '',
+    ...list.flatMap((g) => [
+      '---',
+      '',
+      `<a id="${g.slug}"></a>`,
+      '',
+      // demote headings by one level so the file has a single H1
+      rewriteLinks(g.source, 'full').replace(/^(#{1,5}) /gm, '#$1 '),
+      '',
+    ]),
+    ...(withReference ? ['---', '', '<a id="api-reference"></a>', '', reference.replace(/^(#{1,5}) /gm, '#$1 '), ''] : []),
+  ].join('\n');
+
+const full = bundle(
+  'Paynet for developers — complete documentation',
+  'Single-file documentation of all Paynet developer products for developers and AI assistants. Generated from the same sources as the documentation portal.',
+  guides,
+  true
+);
+const ecom = bundle(
+  'Paynet E-commerce — documentation',
+  'Everything needed to integrate Paynet e-commerce payments: general topics (notifications, signatures, errors) and the e-commerce guides and API reference.',
+  guides.filter((g) => g.section === 'common' || g.section === 'ecom'),
+  true
+);
 
 const index = [
-  '# Paynet E-commerce API',
+  '# Paynet for developers',
   '',
-  '> Accept card, Paynet wallet and MIA payments on a Paynet-hosted payment page (Moldova). Server-to-server REST API with Bearer tokens, a signed hosted-checkout form, and signed webhook notifications.',
+  '> Paynet (Moldova) developer documentation. Products: E-commerce — accept card, Apple Pay, Google Pay, Paynet wallet, MIA and cash invoice payments on a Paynet-hosted payment page (server-to-server REST API with Bearer tokens, signed hosted checkout form, signed webhook notifications).',
   '',
-  `Start with ${siteUrl}llms-full.txt — it contains everything below in one file.`,
+  `Start with ${siteUrl}llms-full.txt (everything) or ${siteUrl}llms-ecom.txt (e-commerce only).`,
   '',
   rules,
   '',
-  '## Guides',
-  '',
-  ...guides.map((g) => `- [${g.title}](${siteUrl}docs/${g.slug}.md): ${g.summary.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}`),
-  '',
+  ...SECTIONS.flatMap((section) => [
+    `## ${section.title}`,
+    '',
+    ...guides
+      .filter((g) => g.section === section.id)
+      .map((g) => `- [${g.title}](${siteUrl}docs/${g.slug}.md): ${g.summary.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/[*`]/g, '')}`),
+    '',
+  ]),
   '## API',
   '',
-  `- [API reference](${siteUrl}docs/api-reference.md): every server-to-server endpoint with fields and examples`,
+  `- [E-commerce API reference](${siteUrl}docs/api-reference.md): every server-to-server endpoint with fields and examples`,
   `- [OpenAPI specification](${siteUrl}openapi.json): machine-readable OpenAPI 3 file`,
   '',
   '## Optional',
   '',
   `- [Complete documentation](${siteUrl}llms-full.txt): all guides and the API reference in one file`,
+  `- [E-commerce documentation](${siteUrl}llms-ecom.txt): e-commerce and the general topics it needs, in one file`,
   '',
 ].join('\n');
 
@@ -210,6 +248,7 @@ for (const g of guides) fs.writeFileSync(path.join(docsOut, `${g.slug}.md`), rew
 fs.writeFileSync(path.join(docsOut, 'api-reference.md'), reference);
 fs.writeFileSync(path.join(publicDir, 'llms.txt'), index);
 fs.writeFileSync(path.join(publicDir, 'llms-full.txt'), full);
+fs.writeFileSync(path.join(publicDir, 'llms-ecom.txt'), ecom);
 fs.copyFileSync(path.join(root, 'src/openapi/openapi.json'), path.join(publicDir, 'openapi.json'));
 
-console.log(`✓ AI docs: ${guides.length} guides, llms.txt (${index.length} B), llms-full.txt (${full.length} B)` + (intro ? '' : ''));
+console.log(`✓ AI docs: ${guides.length} guides, llms.txt (${index.length} B), llms-full.txt (${full.length} B), llms-ecom.txt (${ecom.length} B)`);

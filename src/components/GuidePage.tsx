@@ -13,7 +13,7 @@ interface GuidePageProps {
 export const GuidePage: React.FC<GuidePageProps> = ({ guide, language, onNavigate }) => {
   const ui = guideUiText[language];
   const [copied, setCopied] = React.useState(false);
-  const guides = getGuides(language);
+  const guides = getGuides(language).filter((item) => item.section === guide.section);
   const index = guides.findIndex((item) => item.slug === guide.slug);
   const previous = index > 0 ? guides[index - 1] : null;
   const next = index >= 0 && index < guides.length - 1 ? guides[index + 1] : null;
