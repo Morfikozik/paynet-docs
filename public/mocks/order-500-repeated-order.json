@@ -1,0 +1,12 @@
+{
+  "endpoint": "POST /api/order",
+  "httpStatus": 500,
+  "description": "Same Order with different data, or already paid / processing / closed",
+  "body": {
+    "status": 500,
+    "message": "One or more errors occurred.",
+    "code": "TECHNICAL_ERROR",
+    "traceId": "665d3c07-2a73-45e0-b284-9e3c9d53fa73",
+    "details": "Please verify the transmitted data and try again, or contact support."
+  }
+}

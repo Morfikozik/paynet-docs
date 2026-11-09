@@ -1,0 +1,37 @@
+{
+  "description": "Valid Hash but PaidAmount changed (unsigned field): the API check must catch it",
+  "signedWith": "test notification key",
+  "request": {
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "Hash": "MWjLwGTctYgsNssU7lXsBA=="
+    },
+    "body": {
+      "Eventid": 8482869,
+      "EventType": "PAID",
+      "Message": "Request processed successfully",
+      "EventDate": "2026-11-09T18:17:10",
+      "Payment": {
+        "Id": 328731,
+        "ExternalId": 1762444800000,
+        "SaleAreaCode": "onlidocumentation_md",
+        "Customer": "4645XXX61",
+        "StatusDate": "2026-11-09T18:17:10",
+        "Amount": 300,
+        "PaidAmount": 1,
+        "Merchant": "265505",
+        "CardMask": "411111******1111",
+        "CardExpireMonth": "12",
+        "CardExpireYear": "27",
+        "CardIssuer": "TEST BANK",
+        "CardLinkHash": null,
+        "MoneyType": "CARD",
+        "PayerName": "Docs",
+        "PayerSurname": "Check",
+        "PayerIDNP": null,
+        "RRN": "000559440827"
+      }
+    }
+  }
+}

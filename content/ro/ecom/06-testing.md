@@ -54,6 +54,24 @@ Cardurile de test pot reproduce doar o plată reușită: nu există carduri pent
 | 18 | Plata cu card salvat (dacă este activată) | `POST /api/order` cu `CardLinkHash` și același `Customer` | pagina Paynet afișează cardul salvat |
 | 19 | Clientul a plecat fără să plătească | deschideți `paymentLink`, închideți pagina, deschideți linkul din nou | `status` rămâne `1`, plata e încă posibilă |
 
+## Răspunsuri simulate pentru testele de eșec
+
+Refuzul băncii, erorile de rambursare și notificările deteriorate nu pot fi reproduse cu cardul de test. Pentru testele automate ale integrării folosiți aceste răspunsuri gata — sunt luate din răspunsuri reale ale mediului de test, iar notificările sunt semnate cu cheia de test. Lista completă: [mocks/index.json](mocks/index.json).
+
+| Fișier | Ce simulează | Ce trebuie să facă codul dvs. |
+|---|---|---|
+| [payment-status-3.json](mocks/payment-status-3.json) | Plata este încă în procesare | Așteptați, nu creați o comandă nouă |
+| [payment-status-5-declined.json](mocks/payment-status-5-declined.json) | Refuzată de bancă | Oferiți o nouă încercare cu un `Order` nou |
+| [payment-status-5-refunded.json](mocks/payment-status-5-refunded.json), [payment-status-6.json](mocks/payment-status-6.json) | Rambursare integrală și parțială | Nu onorați comanda din nou |
+| [refund-400-amount-or-second.json](mocks/refund-400-amount-or-second.json), [refund-404-unpaid.json](mocks/refund-404-unpaid.json) | Erori de rambursare | Afișați o eroare clară, nu repetați automat |
+| [order-500-repeated-order.json](mocks/order-500-repeated-order.json), [order-400-errorinfo.json](mocks/order-400-errorinfo.json) | `Order` repetat, cerere ilizibilă | Tratați ambele formate de eroare |
+| [error-401-token.json](mocks/error-401-token.json) | Token expirat | Obțineți un token nou și repetați o dată |
+| [notification-paid.json](mocks/notification-paid.json) | Notificare `PAID` validă | Răspundeți `200`, onorați o singură dată |
+| [notification-paid-wrong-hash.json](mocks/notification-paid-wrong-hash.json) | `Hash` greșit | Răspundeți `400`, nu schimbați nimic |
+| [notification-paid-tampered-paidamount.json](mocks/notification-paid-tampered-paidamount.json) | `Hash` valid, dar `PaidAmount` nesemnat modificat | Confirmarea prin API trebuie să trimită comanda la verificare |
+
+`payment-status-5-declined.json` este construit: valoarea `status` este reală, celelalte câmpuri sunt ca la o plată neachitată.
+
 ## Testare de pe acest portal
 
 Butoanele „Test API Request” apelează API-ul de test direct din browserul dvs. Funcționează pe domeniul oficial al portalului. Dacă deschideți o copie a portalului de la altă adresă, browserul poate bloca apelurile (CORS) — folosiți atunci cURL sau Postman. Colecția Postman se descarcă din meniul lateral.

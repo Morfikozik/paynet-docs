@@ -1,0 +1,24 @@
+{
+  "endpoint": "POST /api/order",
+  "httpStatus": 400,
+  "description": "Body cannot be read (missing required field)",
+  "body": {
+    "errorInfo": {
+      "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+      "title": "One or more validation errors occurred.",
+      "status": 400,
+      "detail": null,
+      "instance": null,
+      "ppResponseCodeEnum": "TECHNICAL_ERROR",
+      "ppResponseCode": 1,
+      "ppResponseCodeText": "TECHNICAL_ERROR",
+      "ppResponseCodeDescription": null,
+      "errors": {
+        "$": [
+          "JSON deserialization for type 'PaymentRequest' was missing required properties including: 'services'."
+        ]
+      },
+      "traceId": "00-7c209d88f31e3e5cd2f7bd88ae2f23c2-ad167338e418068c-00"
+    }
+  }
+}

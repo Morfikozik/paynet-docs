@@ -1,0 +1,12 @@
+{
+  "endpoint": "POST /api/order/refund",
+  "httpStatus": 400,
+  "description": "Amount above PaidAmount, or another refund of the same payment",
+  "body": {
+    "status": 400,
+    "message": "One or more entered parameters are incorrect.",
+    "code": "INVALID_PARAMETER",
+    "traceId": "e353a049-9eca-44e9-bc17-e5c4816320da",
+    "details": "The invalid parameter is: RefundType"
+  }
+}

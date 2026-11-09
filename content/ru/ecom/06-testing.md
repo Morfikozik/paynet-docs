@@ -54,6 +54,24 @@
 | 18 | Оплата сохранённой картой (если включено) | `POST /api/order` с `CardLinkHash` и тем же `Customer` | на странице Paynet показана сохранённая карта |
 | 19 | Покупатель ушёл без оплаты | открыть `paymentLink` и закрыть страницу, затем открыть ссылку снова | `status` остаётся `1`, оплатить можно |
 
+## Имитированные ответы для тестов отказов
+
+Отказ банка, ошибки возврата и повреждённые уведомления не воспроизвести тестовой картой. Для автотестов вашей интеграции используйте готовые ответы — они взяты из реальных ответов тестовой среды, уведомления подписаны тестовым ключом. Полный список: [mocks/index.json](mocks/index.json).
+
+| Файл | Что имитирует | Что должен сделать ваш код |
+|---|---|---|
+| [payment-status-3.json](mocks/payment-status-3.json) | Оплата ещё обрабатывается | Ждать, не создавать новый заказ |
+| [payment-status-5-declined.json](mocks/payment-status-5-declined.json) | Банк отклонил оплату | Предложить новую попытку с новым `Order` |
+| [payment-status-5-refunded.json](mocks/payment-status-5-refunded.json), [payment-status-6.json](mocks/payment-status-6.json) | Полный и частичный возврат | Не выполнять заказ повторно |
+| [refund-400-amount-or-second.json](mocks/refund-400-amount-or-second.json), [refund-404-unpaid.json](mocks/refund-404-unpaid.json) | Ошибки возврата | Показать понятную ошибку, не повторять автоматически |
+| [order-500-repeated-order.json](mocks/order-500-repeated-order.json), [order-400-errorinfo.json](mocks/order-400-errorinfo.json) | Повтор `Order`, нечитаемый запрос | Обработать оба формата ошибок |
+| [error-401-token.json](mocks/error-401-token.json) | Просроченный токен | Получить новый токен и повторить запрос один раз |
+| [notification-paid.json](mocks/notification-paid.json) | Верное уведомление `PAID` | Ответить `200`, выполнить заказ один раз |
+| [notification-paid-wrong-hash.json](mocks/notification-paid-wrong-hash.json) | Неверный `Hash` | Ответить `400`, ничего не менять |
+| [notification-paid-tampered-paidamount.json](mocks/notification-paid-tampered-paidamount.json) | Верный `Hash`, но изменён неподписанный `PaidAmount` | Сверка через API должна отправить заказ на проверку |
+
+Ответ `payment-status-5-declined.json` собран вручную: значение `status` реальное, остальные поля — как у неоплаченного платежа.
+
 ## Тестирование с этого портала
 
 Кнопки «Test API Request» вызывают тестовый API прямо из вашего браузера. Это работает на официальном домене портала. Если открыть копию портала с другого адреса, браузер может заблокировать вызовы (CORS) — тогда используйте cURL или Postman. Коллекцию Postman можно скачать в боковом меню.

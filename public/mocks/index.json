@@ -1,0 +1,107 @@
+{
+  "generated": "from real test-environment responses",
+  "files": [
+    {
+      "file": "payment-status-1.json",
+      "endpoint": "GET /api/order/merchant/{Order}",
+      "httpStatus": 200,
+      "description": "Registered, not paid"
+    },
+    {
+      "file": "payment-status-3.json",
+      "endpoint": "GET /api/order/merchant/{Order}",
+      "httpStatus": 200,
+      "description": "Pending: the bank has not answered yet"
+    },
+    {
+      "file": "payment-status-4.json",
+      "endpoint": "GET /api/order/merchant/{Order}",
+      "httpStatus": 200,
+      "description": "Paid"
+    },
+    {
+      "file": "payment-status-5-declined.json",
+      "endpoint": "GET /api/order/merchant/{Order}",
+      "httpStatus": 200,
+      "description": "Declined by the bank (constructed: real status value, other fields as an unpaid payment)"
+    },
+    {
+      "file": "payment-status-5-refunded.json",
+      "endpoint": "GET /api/order/merchant/{Order}",
+      "httpStatus": 200,
+      "description": "Fully refunded (paidDate stays filled)"
+    },
+    {
+      "file": "payment-status-6.json",
+      "endpoint": "GET /api/order/merchant/{Order}",
+      "httpStatus": 200,
+      "description": "Partially refunded"
+    },
+    {
+      "file": "refund-200.json",
+      "endpoint": "POST /api/order/refund",
+      "httpStatus": 200,
+      "description": "Refund done"
+    },
+    {
+      "file": "refund-400-amount-or-second.json",
+      "endpoint": "POST /api/order/refund",
+      "httpStatus": 400,
+      "description": "Amount above PaidAmount, or another refund of the same payment"
+    },
+    {
+      "file": "refund-404-unpaid.json",
+      "endpoint": "POST /api/order/refund",
+      "httpStatus": 404,
+      "description": "Payment not paid or not found"
+    },
+    {
+      "file": "order-500-repeated-order.json",
+      "endpoint": "POST /api/order",
+      "httpStatus": 500,
+      "description": "Same Order with different data, or already paid / processing / closed"
+    },
+    {
+      "file": "order-400-errorinfo.json",
+      "endpoint": "POST /api/order",
+      "httpStatus": 400,
+      "description": "Body cannot be read (missing required field)"
+    },
+    {
+      "file": "error-401-token.json",
+      "endpoint": "any method with a token",
+      "httpStatus": 401,
+      "description": "Token missing, invalid or expired (capitalised keys)"
+    },
+    {
+      "file": "error-401-auth.json",
+      "endpoint": "POST /auth",
+      "httpStatus": 401,
+      "description": "Wrong username or password"
+    },
+    {
+      "file": "error-404-not-found.json",
+      "endpoint": "GET /api/order/{id}",
+      "httpStatus": 404,
+      "description": "Payment not found"
+    },
+    {
+      "file": "notification-paid.json",
+      "endpoint": "POST <your notification URL>",
+      "httpStatus": null,
+      "description": "Valid PAID notification: answer 200, fulfil once"
+    },
+    {
+      "file": "notification-paid-wrong-hash.json",
+      "endpoint": "POST <your notification URL>",
+      "httpStatus": null,
+      "description": "Wrong Hash: answer 400, change nothing"
+    },
+    {
+      "file": "notification-paid-tampered-paidamount.json",
+      "endpoint": "POST <your notification URL>",
+      "httpStatus": null,
+      "description": "Valid Hash but PaidAmount changed (unsigned field): the API check must catch it"
+    }
+  ]
+}

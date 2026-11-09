@@ -63,9 +63,11 @@ const guides = SECTIONS.flatMap((section) =>
 
 /** Portal-internal links (#/guides/x) become links to the Markdown files. */
 const rewriteLinks = (markdown, mode) =>
-  markdown.replace(/\]\(#\/guides\/([a-z0-9-]+)\)/g, (_, slug) =>
-    mode === 'full' ? `](#${slug})` : `](${siteUrl}docs/${slug}.md)`
-  );
+  markdown
+    .replace(/\]\(#\/guides\/([a-z0-9-]+)\)/g, (_, slug) =>
+      mode === 'full' ? `](#${slug})` : `](${siteUrl}docs/${slug}.md)`
+    )
+    .replace(/\]\(mocks\//g, `](${siteUrl}mocks/`);
 
 // ---------- API reference from OpenAPI ----------
 const resolveRef = (ref) => ref.replace('#/', '').split('/').reduce((node, key) => node?.[key], spec);
@@ -292,7 +294,8 @@ for (const lang of ['ru', 'ro']) {
     for (const file of fs.readdirSync(dir).filter((f) => /^\d+-.+\.md$/.test(f))) {
       const slug = file.replace(/^\d+-/, '').replace(/\.md$/, '');
       const source = fs.readFileSync(path.join(dir, file), 'utf8')
-        .replace(/\]\(#\/guides\/([a-z0-9-]+)\)/g, (_, target) => `](${siteUrl}docs/${lang}/${target}.md)`);
+        .replace(/\]\(#\/guides\/([a-z0-9-]+)\)/g, (_, target) => `](${siteUrl}docs/${lang}/${target}.md)`)
+        .replace(/\]\(mocks\//g, `](${siteUrl}mocks/`);
       fs.writeFileSync(path.join(docsOut, lang, `${slug}.md`), source);
     }
   }
@@ -303,3 +306,80 @@ fs.writeFileSync(path.join(publicDir, 'llms-ecom.txt'), ecom);
 fs.copyFileSync(path.join(root, 'src/openapi/openapi.json'), path.join(publicDir, 'openapi.json'));
 
 console.log(`✓ AI docs: ${guides.length} guides (+ ru/ro), ${methodFiles.length} API method files, llms.txt (${index.length} B), llms-full.txt (${full.length} B), llms-ecom.txt (${ecom.length} B)`);
+
+// ---------- Mock responses for testing failure paths (public/mocks) ----------
+// Bodies are copied from real test-environment responses (09.11.2026); only the status-specific
+// fields differ between the payment variants. Notifications are signed with the TEST key.
+{
+  const { notificationHash } = await import('./lib/signatures.mjs');
+  const TEST_NOTIFICATION_KEY = 'D9873689-E5F8-4272-A67F-0D8BA3F9BAA7';
+  const mocksDir = path.join(publicDir, 'mocks');
+  fs.mkdirSync(mocksDir, { recursive: true });
+  const ORDER = 1762444800000;
+  const basePayment = {
+    paymentId: 328731,
+    paymentLink: 'https://test.paynet.md/ecom/getecom',
+    cardLinkHash: null,
+    status: 1,
+    message: null,
+    order: ORDER,
+    merchantCode: '265505',
+    saleAreaCode: 'onlidocumentation_md',
+    linkUrlSuccess: 'https://shop.example/payment/success',
+    linkUrlCancel: 'https://shop.example/payment/cancel',
+    signature: null,
+    amount: { requestAmount: 300, requestCurrency: 498, amount: 300, paidAmount: null },
+    customer: { code: '464566161', nameFirst: 'First Name', nameLast: 'Last Name', email: 'customer@example.com', country: null, city: null, address: null, phoneNumber: '37360000000', cardLinkHash: null },
+    payer: null,
+    expiryDate: '2026-12-31 23:59:59',
+    registered: '2026-11-09 18:16:41',
+    paidDate: null,
+    services: [{ name: 'Demo eShop', description: `Order #${ORDER}`, amount: 300, products: [{ lineNo: 1, name: 'Demo eShop', description: `Order #${ORDER}`, unitPrice: 300, unitProduct: null, quantity: 100, amount: 300, totalAmount: 300 }] }],
+    moneyType: 'All',
+  };
+  const paid = { paidDate: '2026-11-09 18:17:10', amount: { ...basePayment.amount, paidAmount: 300 } };
+  const notificationBody = (payment) => ({
+    Eventid: 8482869, EventType: 'PAID', Message: 'Request processed successfully', EventDate: '2026-11-09T18:17:10',
+    Payment: {
+      Id: 328731, ExternalId: ORDER, SaleAreaCode: 'onlidocumentation_md', Customer: '4645XXX61', StatusDate: '2026-11-09T18:17:10',
+      Amount: 300, PaidAmount: 300, Merchant: '265505', CardMask: '411111******1111', CardExpireMonth: '12', CardExpireYear: '27',
+      CardIssuer: 'TEST BANK', CardLinkHash: null, MoneyType: 'CARD', PayerName: 'Docs', PayerSurname: 'Check', PayerIDNP: null, RRN: '000559440827',
+      ...payment,
+    },
+  });
+  const signed = (body, hash) => ({ request: { method: 'POST', headers: { 'Content-Type': 'application/json; charset=utf-8', Hash: hash ?? notificationHash(body, TEST_NOTIFICATION_KEY) }, body } });
+  const goodNotification = notificationBody({});
+  const tampered = notificationBody({ PaidAmount: 1 }); // unsigned field changed after signing
+  const mocks = {
+    'payment-status-1.json': ['GET /api/order/merchant/{Order}', 200, 'Registered, not paid', basePayment],
+    'payment-status-3.json': ['GET /api/order/merchant/{Order}', 200, 'Pending: the bank has not answered yet', { ...basePayment, status: 3 }],
+    'payment-status-4.json': ['GET /api/order/merchant/{Order}', 200, 'Paid', { ...basePayment, status: 4, ...paid }],
+    'payment-status-5-declined.json': ['GET /api/order/merchant/{Order}', 200, 'Declined by the bank (constructed: real status value, other fields as an unpaid payment)', { ...basePayment, status: 5 }],
+    'payment-status-5-refunded.json': ['GET /api/order/merchant/{Order}', 200, 'Fully refunded (paidDate stays filled)', { ...basePayment, status: 5, ...paid }],
+    'payment-status-6.json': ['GET /api/order/merchant/{Order}', 200, 'Partially refunded', { ...basePayment, status: 6, ...paid }],
+    'refund-200.json': ['POST /api/order/refund', 200, 'Refund done', { paymentId: 328731, saleAreaCode: 'onlidocumentation_md', customer: '464566161', eventDate: '09.11.2026 18:17:54', refundType: 'full', currency: 498, amount: 300, merchant: '265505', cardMask: '411111******1111', cardLinkHash: null, moneyType: 'CYBER_SOURCE' }],
+    'refund-400-amount-or-second.json': ['POST /api/order/refund', 400, 'Amount above PaidAmount, or another refund of the same payment', { status: 400, message: 'One or more entered parameters are incorrect.', code: 'INVALID_PARAMETER', traceId: 'e353a049-9eca-44e9-bc17-e5c4816320da', details: 'The invalid parameter is: RefundType' }],
+    'refund-404-unpaid.json': ['POST /api/order/refund', 404, 'Payment not paid or not found', { status: 404, message: 'Record not found', code: 'NOT_FOUND_RECORD', traceId: '72f97a7d-3a42-4c5f-9d8e-e98ee2aaa9ac', details: 'No records were found for the provided data' }],
+    'order-500-repeated-order.json': ['POST /api/order', 500, 'Same Order with different data, or already paid / processing / closed', { status: 500, message: 'One or more errors occurred.', code: 'TECHNICAL_ERROR', traceId: '665d3c07-2a73-45e0-b284-9e3c9d53fa73', details: 'Please verify the transmitted data and try again, or contact support.' }],
+    'order-400-errorinfo.json': ['POST /api/order', 400, 'Body cannot be read (missing required field)', { errorInfo: { type: 'https://tools.ietf.org/html/rfc9110#section-15.5.1', title: 'One or more validation errors occurred.', status: 400, detail: null, instance: null, ppResponseCodeEnum: 'TECHNICAL_ERROR', ppResponseCode: 1, ppResponseCodeText: 'TECHNICAL_ERROR', ppResponseCodeDescription: null, errors: { $: ["JSON deserialization for type 'PaymentRequest' was missing required properties including: 'services'."] }, traceId: '00-7c209d88f31e3e5cd2f7bd88ae2f23c2-ad167338e418068c-00' } }],
+    'error-401-token.json': ['any method with a token', 401, 'Token missing, invalid or expired (capitalised keys)', { Status: 401, Message: 'Access denied. The Bearer token is missing, invalid, or has expired.', Code: 'UNAUTHORIZED', TraceId: 'b4480a88-5942-455c-99ac-68d3547aaccb' }],
+    'error-401-auth.json': ['POST /auth', 401, 'Wrong username or password', { status: 401, message: 'Wrong credentials', code: 'AUTHENTICATION_FAILED', traceId: '8d489156-7b1c-4bfb-b88b-7a946c1b862e', details: null }],
+    'error-404-not-found.json': ['GET /api/order/{id}', 404, 'Payment not found', { status: 404, message: 'Record not found', code: 'NOT_FOUND_RECORD', traceId: '72f97a7d-3a42-4c5f-9d8e-e98ee2aaa9ac', details: 'No records were found for the provided data' }],
+  };
+  const index = [];
+  for (const [file, [endpoint, httpStatus, description, body]] of Object.entries(mocks)) {
+    fs.writeFileSync(path.join(mocksDir, file), JSON.stringify({ endpoint, httpStatus, description, body }, null, 2));
+    index.push({ file, endpoint, httpStatus, description });
+  }
+  const notifications = {
+    'notification-paid.json': ['Valid PAID notification: answer 200, fulfil once', signed(goodNotification)],
+    'notification-paid-wrong-hash.json': ['Wrong Hash: answer 400, change nothing', signed(goodNotification, 'AAAAAAAAAAAAAAAAAAAAAA==')],
+    'notification-paid-tampered-paidamount.json': ['Valid Hash but PaidAmount changed (unsigned field): the API check must catch it', signed(tampered, notificationHash(goodNotification, TEST_NOTIFICATION_KEY))],
+  };
+  for (const [file, [description, content]] of Object.entries(notifications)) {
+    fs.writeFileSync(path.join(mocksDir, file), JSON.stringify({ description, signedWith: 'test notification key', ...content }, null, 2));
+    index.push({ file, endpoint: 'POST <your notification URL>', httpStatus: null, description });
+  }
+  fs.writeFileSync(path.join(mocksDir, 'index.json'), JSON.stringify({ generated: 'from real test-environment responses', files: index }, null, 2));
+  console.log(`✓ Mocks: ${index.length} files in public/mocks`);
+}

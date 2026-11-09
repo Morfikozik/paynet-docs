@@ -1,0 +1,12 @@
+{
+  "endpoint": "POST /auth",
+  "httpStatus": 401,
+  "description": "Wrong username or password",
+  "body": {
+    "status": 401,
+    "message": "Wrong credentials",
+    "code": "AUTHENTICATION_FAILED",
+    "traceId": "8d489156-7b1c-4bfb-b88b-7a946c1b862e",
+    "details": null
+  }
+}

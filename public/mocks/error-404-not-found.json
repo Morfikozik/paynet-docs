@@ -1,0 +1,12 @@
+{
+  "endpoint": "GET /api/order/{id}",
+  "httpStatus": 404,
+  "description": "Payment not found",
+  "body": {
+    "status": 404,
+    "message": "Record not found",
+    "code": "NOT_FOUND_RECORD",
+    "traceId": "72f97a7d-3a42-4c5f-9d8e-e98ee2aaa9ac",
+    "details": "No records were found for the provided data"
+  }
+}

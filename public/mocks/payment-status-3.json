@@ -1,0 +1,59 @@
+{
+  "endpoint": "GET /api/order/merchant/{Order}",
+  "httpStatus": 200,
+  "description": "Pending: the bank has not answered yet",
+  "body": {
+    "paymentId": 328731,
+    "paymentLink": "https://test.paynet.md/ecom/getecom",
+    "cardLinkHash": null,
+    "status": 3,
+    "message": null,
+    "order": 1762444800000,
+    "merchantCode": "265505",
+    "saleAreaCode": "onlidocumentation_md",
+    "linkUrlSuccess": "https://shop.example/payment/success",
+    "linkUrlCancel": "https://shop.example/payment/cancel",
+    "signature": null,
+    "amount": {
+      "requestAmount": 300,
+      "requestCurrency": 498,
+      "amount": 300,
+      "paidAmount": null
+    },
+    "customer": {
+      "code": "464566161",
+      "nameFirst": "First Name",
+      "nameLast": "Last Name",
+      "email": "customer@example.com",
+      "country": null,
+      "city": null,
+      "address": null,
+      "phoneNumber": "37360000000",
+      "cardLinkHash": null
+    },
+    "payer": null,
+    "expiryDate": "2026-12-31 23:59:59",
+    "registered": "2026-11-09 18:16:41",
+    "paidDate": null,
+    "services": [
+      {
+        "name": "Demo eShop",
+        "description": "Order #1762444800000",
+        "amount": 300,
+        "products": [
+          {
+            "lineNo": 1,
+            "name": "Demo eShop",
+            "description": "Order #1762444800000",
+            "unitPrice": 300,
+            "unitProduct": null,
+            "quantity": 100,
+            "amount": 300,
+            "totalAmount": 300
+          }
+        ]
+      }
+    ],
+    "moneyType": "All"
+  }
+}

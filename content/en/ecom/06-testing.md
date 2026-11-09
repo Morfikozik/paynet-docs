@@ -54,6 +54,24 @@ Test cards can only reproduce a successful payment: there are no cards for decli
 | 18 | Pay with a saved card (if enabled) | `POST /api/order` with `CardLinkHash` and the same `Customer` | the Paynet page shows the saved card |
 | 19 | Customer left without paying | open `paymentLink`, close the page, open the link again | `status` stays `1`, payment is still possible |
 
+## Mock responses for failure tests
+
+A bank decline, refund errors and damaged notifications cannot be reproduced with the test card. For automated tests of your integration use these ready responses — they are taken from real test-environment responses, and the notifications are signed with the test key. Full list: [mocks/index.json](mocks/index.json).
+
+| File | What it mocks | What your code must do |
+|---|---|---|
+| [payment-status-3.json](mocks/payment-status-3.json) | Payment still processing | Wait, do not create a new order |
+| [payment-status-5-declined.json](mocks/payment-status-5-declined.json) | Declined by the bank | Offer a new attempt with a new `Order` |
+| [payment-status-5-refunded.json](mocks/payment-status-5-refunded.json), [payment-status-6.json](mocks/payment-status-6.json) | Full and partial refund | Do not fulfil the order again |
+| [refund-400-amount-or-second.json](mocks/refund-400-amount-or-second.json), [refund-404-unpaid.json](mocks/refund-404-unpaid.json) | Refund errors | Show a clear error, do not retry automatically |
+| [order-500-repeated-order.json](mocks/order-500-repeated-order.json), [order-400-errorinfo.json](mocks/order-400-errorinfo.json) | Repeated `Order`, unreadable request | Handle both error formats |
+| [error-401-token.json](mocks/error-401-token.json) | Expired token | Get a new token and retry once |
+| [notification-paid.json](mocks/notification-paid.json) | Valid `PAID` notification | Answer `200`, fulfil once |
+| [notification-paid-wrong-hash.json](mocks/notification-paid-wrong-hash.json) | Wrong `Hash` | Answer `400`, change nothing |
+| [notification-paid-tampered-paidamount.json](mocks/notification-paid-tampered-paidamount.json) | Valid `Hash`, but the unsigned `PaidAmount` changed | The API confirmation must send the order to review |
+
+`payment-status-5-declined.json` is constructed: the `status` value is real, the other fields are those of an unpaid payment.
+
 ## Testing from this portal
 
 The "Test API Request" buttons call the test API directly from your browser. This works on the official portal domain. If you open a copy of the portal from another address, the browser may block the calls (CORS); use cURL or Postman instead. A Postman collection can be downloaded from the sidebar.

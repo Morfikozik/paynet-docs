@@ -1,0 +1,11 @@
+{
+  "endpoint": "any method with a token",
+  "httpStatus": 401,
+  "description": "Token missing, invalid or expired (capitalised keys)",
+  "body": {
+    "Status": 401,
+    "Message": "Access denied. The Bearer token is missing, invalid, or has expired.",
+    "Code": "UNAUTHORIZED",
+    "TraceId": "b4480a88-5942-455c-99ac-68d3547aaccb"
+  }
+}
