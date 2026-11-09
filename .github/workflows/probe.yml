@@ -1,0 +1,13 @@
+name: One-off CORS probe (read-only)
+on:
+  push:
+    branches: ['probe/**']
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for O in https://example.com https://morfikozik.github.io https://docs.paynet.md https://chatgpt.com; do
+            echo "== Origin $O (preflight /auth)"
+            curl -s -o /dev/null -D - -X OPTIONS https://ecom-api-test.paynet.md/auth -H "Origin: $O" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: content-type,authorization" | grep -i "^HTTP\|access-control" 
+          done
