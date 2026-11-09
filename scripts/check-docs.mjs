@@ -204,6 +204,21 @@ for (const lang of languages) {
   }
 }
 
+// 4d. The example shop: its notification handler is the documented one, and every file parses.
+{
+  const exampleDir = path.join(root, 'examples', 'node-shop');
+  const docHandler = codeBlocks(read('en', files.en.find((f) => f.endsWith('-notifications.md'))), 'javascript').find((code) => code.includes('export function createPaynetHandler'));
+  const exampleHandler = fs.readFileSync(path.join(exampleDir, 'paynet-notifications.mjs'), 'utf8').trim();
+  if (docHandler && docHandler.trim() !== exampleHandler) fail('examples/node-shop/paynet-notifications.mjs differs from the handler in the Notifications guide');
+  for (const file of ['server.mjs', 'paynet-client.mjs', 'paynet-notifications.mjs', 'store.mjs', 'tools/send-test-notification.mjs']) {
+    try {
+      execFileSync(process.execPath, ['--check', path.join(exampleDir, file)], { stdio: 'pipe' });
+    } catch (error) {
+      fail(`examples/node-shop/${file} does not parse: ${String(error.stderr).split('\n').find((l) => l.includes('Error')) || ''}`);
+    }
+  }
+}
+
 // 5. Notification code samples must use the real key spelling (Id / ExternalId).
 for (const lang of languages) {
   for (const file of files[lang]) {

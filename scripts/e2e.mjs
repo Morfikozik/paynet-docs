@@ -72,11 +72,153 @@ const snap = async (page, name) => {
   note(`page:${name}`, { url: page.url(), frames, inputs });
 };
 
+
+// Fill the Paynet test payment page (card fields live in Cybersource iframes) and press Pay.
+const fillAndPay = async (p, name) => {
+  await p.waitForTimeout(2500);
+  const numberFrame = p.frames().find((f) => f.url().includes('microform') && f.url().includes('%22fieldType%22:%22number%22'));
+  const cvvFrame = p.frames().find((f) => f.url().includes('microform') && f.url().includes('securityCode'));
+  if (numberFrame) await numberFrame.fill('#number', CARD.number);
+  if (cvvFrame) await cvvFrame.fill('#securityCode', CARD.cvv);
+  await p.click('#CardExp');
+  await p.keyboard.type(CARD.month + CARD.year, { delay: 80 });
+  await p.waitForTimeout(800);
+  await snap(p, `${name}-filled`);
+  await p.click('#submit-default');
+};
+
+// ---- stage "shop": run examples/node-shop against the test API --------------------------
+import { spawn, execFileSync } from 'node:child_process';
+const shopStage = async () => {
+  const SHOP = 'http://localhost:3000';
+  const store = path.join(outDir, 'shop-data.json');
+  const shop = spawn(process.execPath, ['server.mjs'], {
+    cwd: path.join('examples', 'node-shop'),
+    env: { ...process.env, PORT: '3000', PUBLIC_URL: SHOP, STORE_FILE: path.resolve(store) },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  let shopLog = '';
+  shop.stdout.on('data', (d) => { shopLog += d; });
+  shop.stderr.on('data', (d) => { shopLog += d; });
+  await new Promise((r) => setTimeout(r, 1500));
+  const orders = async () => (await (await fetch(`${SHOP}/api/orders`)).json());
+  const browser = await chromium.launch();
+  try {
+    // 1. Buy and pay through the shop.
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await page.goto(SHOP);
+    await page.fill('input[name=customer]', 'e2e-shop-customer');
+    await page.click('button:has-text("Buy")');
+    await page.waitForURL(/paynet\.md/, { timeout: 60000 });
+    await page.waitForLoadState('networkidle');
+    note('shop:redirected-to-paynet', { url: page.url().split('?')[0] });
+    await fillAndPay(page, 'shop-pay');
+    await page.waitForURL(/localhost:3000\/return\/success/, { timeout: 90000 });
+    await page.waitForTimeout(1000);
+    await snap(page, 'shop-return-success');
+    const successText = await page.innerText('h1');
+    const order = (await orders()).orders[0];
+    note('shop:return-success', { order: order.order, heading: successText, state: order.state });
+
+    // 2. Signed PAID notification to the shop (Paynet cannot reach the runner).
+    const out = execFileSync(process.execPath, ['tools/send-test-notification.mjs', String(order.order), `${SHOP}/paynet/notification`], { cwd: path.join('examples', 'node-shop'), encoding: 'utf8' });
+    note('shop:notification', { output: out.trim() });
+    await new Promise((r) => setTimeout(r, 3000));
+    const afterNotification = (await orders());
+    note('shop:after-notification', { state: afterNotification.orders[0].state, paidAmount: afterNotification.orders[0].paidAmount, review: afterNotification.review });
+    await page.goto(`${SHOP}/return/success?order=${order.order}`);
+    await snap(page, 'shop-return-fulfilled');
+
+    // 3. Partial refund, then a second refund that the shop must block.
+    const refund1 = await fetch(`${SHOP}/orders/refund`, { method: 'POST', body: new URLSearchParams({ order: String(order.order), amount: '100' }) });
+    const refund2 = await fetch(`${SHOP}/orders/refund`, { method: 'POST', body: new URLSearchParams({ order: String(order.order) }) });
+    const after = (await orders()).orders[0];
+    note('shop:refunds', { first: refund1.status, second: refund2.status, state: after.state, refund: after.refund });
+
+    // 4. Cancel on the Paynet page → back to the shop's cancel page.
+    await page.goto(SHOP);
+    await page.fill('input[name=customer]', 'e2e-shop-customer');
+    await page.click('button:has-text("Buy")');
+    await page.waitForURL(/paynet\.md/, { timeout: 60000 });
+    await page.waitForTimeout(2500);
+    const cancel = page.locator('text=Cancel').first();
+    if (await cancel.count()) {
+      await cancel.click();
+      await page.waitForURL(/localhost:3000\/return\/cancel/, { timeout: 60000 }).catch(() => {});
+    }
+    await page.waitForTimeout(1000);
+    await snap(page, 'shop-return-cancel');
+    note('shop:cancel', { url: page.url().replace(/\?.*/, ''), heading: await page.innerText('h1').catch(() => '') });
+  } finally {
+    await browser.close();
+    shop.kill();
+    fs.writeFileSync(path.join(outDir, 'shop.log'), shopLog);
+  }
+};
+
+// ---- stage "contract": compare real test API responses with openapi.json ----------------
+const spec = JSON.parse(fs.readFileSync(path.join('src', 'openapi', 'openapi.json'), 'utf8'));
+const resolve = (schema) => (schema?.$ref ? schema.$ref.replace('#/', '').split('/').reduce((n, k) => n?.[k], spec) : schema);
+const typeOf = (v) => (v === null ? 'null' : Array.isArray(v) ? 'array' : Number.isInteger(v) ? 'integer' : typeof v);
+function validate(value, schemaIn, at, problems) {
+  const schema = resolve(schemaIn);
+  if (!schema) return;
+  if (value === null) {
+    if (!schema.nullable && schema.type) problems.push(`${at}: null, schema type ${schema.type} is not nullable`);
+    return;
+  }
+  const t = typeOf(value);
+  const ok = !schema.type || schema.type === t || (schema.type === 'number' && t === 'integer');
+  if (!ok) { problems.push(`${at}: ${t}, schema says ${schema.type}`); return; }
+  if (schema.enum && !schema.enum.includes(value)) problems.push(`${at}: ${JSON.stringify(value)} not in enum`);
+  if (t === 'object') {
+    for (const key of schema.required || []) if (!(key in value)) problems.push(`${at}.${key}: required by schema, missing in response`);
+    for (const [key, sub] of Object.entries(schema.properties || {})) if (key in value) validate(value[key], sub, `${at}.${key}`, problems);
+    const extra = Object.keys(value).filter((k) => schema.properties && !(k in schema.properties));
+    if (extra.length) problems.push(`${at}: fields not in schema: ${extra.join(', ')}`);
+  }
+  if (t === 'array' && schema.items) value.slice(0, 3).forEach((item, i) => validate(item, schema.items, `${at}[${i}]`, problems));
+}
+const check = (label, apiPath, method, response) => {
+  const op = spec.paths[apiPath]?.[method];
+  const documented = op?.responses?.[String(response.status)];
+  const problems = [];
+  if (!documented) problems.push(`HTTP ${response.status} is not documented for ${method.toUpperCase()} ${apiPath}`);
+  const schema = (documented || op?.responses?.default)?.content?.['application/json']?.schema;
+  if (schema) validate(response.body, schema, 'body', problems);
+  else if (documented) problems.push(`no JSON schema for HTTP ${response.status}`);
+  note(`contract:${label}`, { http: response.status, ok: problems.length === 0, problems, sample: JSON.stringify(response.body).slice(0, 300) });
+};
+
+const contractStage = async (token) => {
+  const order = Date.now();
+  const created = await call('POST', '/api/order', orderBody(order, 300), token);
+  check('create-order', '/api/order', 'post', created);
+  check('get-by-id', '/api/order/{id}', 'get', await call('GET', `/api/order/${created.body?.paymentId}`, null, token));
+  check('get-by-merchant', '/api/order/merchant/{id}', 'get', await call('GET', `/api/order/merchant/${order}`, null, token));
+  check('get-unknown', '/api/order/{id}', 'get', await call('GET', '/api/order/999999999', null, token));
+  check('no-token', '/api/order', 'post', await call('POST', '/api/order', orderBody(order + 1, 300)));
+  const noServices = orderBody(order + 2, 300); delete noServices.Services;
+  check('missing-services', '/api/order', 'post', await call('POST', '/api/order', noServices, token));
+  check('invalid-json-unlink', '/api/linked-cards/unlink', 'post', await call('POST', '/api/linked-cards/unlink', {}, token));
+  check('refund-unpaid', '/api/order/refund', 'post', await call('POST', '/api/order/refund', { PaymentId: created.body?.paymentId, SaleAreaCode: SALE_AREA, RefundType: 'full', Amount: 300, Currency: 498, Reason: 'contract check' }, token));
+  const to = new Date(); const from = new Date(Date.now() - 2 * 24 * 3600 * 1000);
+  check('search', '/api/order/search', 'get', await call('GET', `/api/order/search?from=${from.toISOString()}&to=${to.toISOString()}`, null, token));
+  const day = (d) => d.toISOString().slice(0, 10);
+  check('statement', '/api/statement', 'get', await call('GET', `/api/statement?dateStart=${day(from)}&dateFinish=${day(to)}`, null, token));
+  check('auth-wrong-password', '/auth', 'post', await call('POST', '/auth', { grantType: 'password', username: '771064', password: 'wrong' }));
+  const summary = log.filter((e) => e.step.startsWith('contract:'));
+  note('contract:summary', { checks: summary.length, failed: summary.filter((e) => !e.ok).map((e) => e.step) });
+};
+
 const main = async () => {
+  if (stage === 'shop') return shopStage();
   const auth = await call('POST', '/auth', { grantType: 'password', username: '771064', password: 'sLgMnGWJ' });
   const token = auth.body?.access_token;
   note('auth', { status: auth.status, tokenLength: token?.length });
   if (!token) throw new Error('no token');
+  check('auth', '/auth', 'post', auth);
+  if (stage === 'contract') return contractStage(token);
 
   const order1 = Date.now();
   const created = await call('POST', '/api/order', orderBody(order1, 300), token);
