@@ -549,7 +549,7 @@ Amount, LinkUrlCancel, LinkUrlSuccess, Lang, MoneyType`}
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-paynet-gray-700 mb-1">Request Body (JSON)</label>
                     <textarea
-                      rows={Math.max(4, payloadText.split('\n').length)}
+                      rows={Math.max(4, payloadText.split('\n').reduce((n, line) => n + Math.max(1, Math.ceil(line.length / 64)), 0))}
                       spellCheck={false}
                       value={payloadText}
                       onChange={(e) => {

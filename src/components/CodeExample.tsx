@@ -128,6 +128,14 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
   // Build code snippets from the current request (debounced while typing).
   // Only the first build shows a loader, so the editor keeps focus while typing.
   const firstBuildDone = React.useRef(false);
+  // The JSON editor grows to fit its content (wrapped long lines included).
+  const bodyEditorRef = React.useRef<HTMLTextAreaElement>(null);
+  React.useLayoutEffect(() => {
+    const el = bodyEditorRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight + 2}px`;
+  });
   React.useEffect(() => {
     if (!spec) return;
     if (hasJsonRequestBody && !currentRequestBodyValue) return; // wait for the editor to initialise
@@ -385,13 +393,14 @@ export const CodeExample: React.FC<CodeExampleProps> = ({ endpoint, baseUrl, spe
             {hasRequestBody && (
               <div>
                 <textarea
+                  ref={bodyEditorRef}
                   value={currentRequestBodyValue}
                   onChange={(e) => handleRequestBodyChange(e.target.value)}
                   placeholder={t.common.enterJsonRequestBody}
                   rows={bodyLines}
                   spellCheck={false}
                   aria-label={t.common.requestBody}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono leading-5 resize-y focus:ring-2 focus:ring-paynet-primary focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono leading-5 resize-none overflow-hidden focus:ring-2 focus:ring-paynet-primary focus:border-transparent"
                 />
                 <div className="flex justify-between items-center mt-1 gap-3">
                   <span className="text-xs text-gray-500">
