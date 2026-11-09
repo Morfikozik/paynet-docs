@@ -39,7 +39,7 @@ Test cards can only reproduce a successful payment: there are no cards for decli
 | 3 | Create order | `POST /api/order` | `200`, `paymentId`, `paymentLink`, `status` `1` |
 | 4 | Repeat the same request | send scenario 3 again unchanged | same `paymentId` and `paymentLink` |
 | 5 | Same `Order`, other amount | change `Amount`, keep `Order` | `500`, `TECHNICAL_ERROR` |
-| 6 | Invalid request | `POST /api/order` without `Services` | `400`, `INVALID_PARAMETER` |
+| 6 | Invalid request | `POST /api/order` without `Services` | `400` with an `errorInfo` object (the missing field in `errors`) |
 | 7 | No token | `POST /api/order` without `Authorization` | `401`, `UNAUTHORIZED` |
 | 8 | Pay | open `paymentLink`, pay with the test card | redirect to `LinkUrlSuccess` |
 | 9 | Status | `GET /api/order/merchant/{Order}` | payment with `paidDate` set |

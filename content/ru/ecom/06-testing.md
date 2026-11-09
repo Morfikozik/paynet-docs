@@ -39,7 +39,7 @@
 | 3 | Создание заказа | `POST /api/order` | `200`, `paymentId`, `paymentLink`, `status` `1` |
 | 4 | Повтор того же запроса | отправить сценарий 3 ещё раз без изменений | тот же `paymentId` и `paymentLink` |
 | 5 | Тот же `Order`, другая сумма | изменить `Amount`, оставить `Order` | `500`, `TECHNICAL_ERROR` |
-| 6 | Неверный запрос | `POST /api/order` без `Services` | `400`, `INVALID_PARAMETER` |
+| 6 | Неверный запрос | `POST /api/order` без `Services` | `400` с объектом `errorInfo` (недостающее поле в `errors`) |
 | 7 | Без токена | `POST /api/order` без `Authorization` | `401`, `UNAUTHORIZED` |
 | 8 | Оплата | открыть `paymentLink`, оплатить тестовой картой | возврат на `LinkUrlSuccess` |
 | 9 | Статус | `GET /api/order/merchant/{Order}` | платёж с заполненным `paidDate` |

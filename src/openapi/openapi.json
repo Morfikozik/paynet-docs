@@ -1746,6 +1746,10 @@
               "traceId": {
                 "type": "string",
                 "nullable": true
+              },
+              "ppResponseCodeDescription": {
+                "type": "string",
+                "nullable": true
               }
             }
           }

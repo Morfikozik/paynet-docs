@@ -39,7 +39,7 @@ Cardurile de test pot reproduce doar o plată reușită: nu există carduri pent
 | 3 | Creare comandă | `POST /api/order` | `200`, `paymentId`, `paymentLink`, `status` `1` |
 | 4 | Repetarea aceleiași cereri | trimiteți scenariul 3 din nou, nemodificat | același `paymentId` și `paymentLink` |
 | 5 | Același `Order`, altă sumă | modificați `Amount`, păstrați `Order` | `500`, `TECHNICAL_ERROR` |
-| 6 | Cerere invalidă | `POST /api/order` fără `Services` | `400`, `INVALID_PARAMETER` |
+| 6 | Cerere invalidă | `POST /api/order` fără `Services` | `400` cu obiectul `errorInfo` (câmpul lipsă în `errors`) |
 | 7 | Fără token | `POST /api/order` fără `Authorization` | `401`, `UNAUTHORIZED` |
 | 8 | Plată | deschideți `paymentLink`, plătiți cu cardul de test | revenire la `LinkUrlSuccess` |
 | 9 | Status | `GET /api/order/merchant/{Order}` | plată cu `paidDate` completat |
