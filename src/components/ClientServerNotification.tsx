@@ -1,8 +1,9 @@
 import React from 'react';
-import { Bell, ChevronDown, ChevronRight, AlertCircle, CheckCircle, Copy, Check, FileText } from 'lucide-react';
+import { Bell, ChevronDown, ChevronRight, Copy, Check, FileText } from 'lucide-react';
 import { getAuthToken, setAuthToken } from '../utils/apiTester';
 import CryptoJS from 'crypto-js';
 import { Language } from '../types/language';
+import ParamList from './ParamList';
 
 type NotificationFieldRow = {
   name: string;
@@ -697,44 +698,16 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
 
                 <div className="mt-6">
                   <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-1">Parameters - Description</h3>
-                  <div className="overflow-x-auto rounded-lg border border-paynet-gray-200 w-full">
-                    <table className="w-full">
-                      <thead className="bg-paynet-gray-50">
-                        <tr>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">Name</th>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">Type</th>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">In</th>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">Required</th>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-paynet-primary">Description</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-paynet-gray-200">
-                        {fieldRows.map((row) => (
-                          <tr key={row.name} className="hover:bg-paynet-gray-50 transition-colors duration-150">
-                            <td className="px-4 py-3 text-sm font-mono text-paynet-gray-900 break-all">{row.name}</td>
-                            <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.type}</td>
-                            <td className="px-4 py-3 text-sm text-paynet-gray-700">{row.input}</td>
-                            <td className="px-4 py-3 text-sm">
-                              {row.required ? (
-                                <span className="flex items-center gap-1 text-paynet-error font-medium">
-                                  <AlertCircle className="w-4 h-4" />
-                                  Required
-                                </span>
-                              ) : (
-                                <span className="flex items-center gap-1 text-paynet-success">
-                                  <CheckCircle className="w-4 h-4" />
-                                  Optional
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-4 py-3 text-sm text-paynet-gray-700">
-                              {getLocalizedParameterDescription(row.name, row.description)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  <ParamList
+                items={fieldRows.map((row) => ({
+                  name: row.name,
+                  type: row.type,
+                  in: row.input,
+                  required: !!row.required,
+                  description: String(getLocalizedParameterDescription(row.name, row.description) ?? ''),
+                }))}
+                labels={{ required: 'Required', optional: 'Optional' }}
+              />
                 </div>
 
                 <div className="mt-6 bg-white p-4 rounded-lg border border-paynet-gray-200">
