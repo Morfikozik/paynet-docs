@@ -43,6 +43,7 @@ const SUMMARIES = {
   'saved-cards': 'saving a card (CardLinkHash) on the first payment and paying with it next time; server-to-server only',
   faq: 'frequent integration questions: keys, missing or repeated notifications, declined payments, refunds, signatures',
   'example-shop': 'complete minimal Node.js shop (create order, return pages, notification handler, refund) checked by the end-to-end test',
+  changelog: 'what changed in each documentation version',
   testing: 'test environment, test card, rules and test scenarios with expected results',
   'go-live': 'checklist before switching to production',
 };
