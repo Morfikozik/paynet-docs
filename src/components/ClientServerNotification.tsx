@@ -642,7 +642,7 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
       <div className="mb-4 sm:mb-8">
         <div className="flex items-center gap-3 mb-2 sm:mb-3">
           <span className="text-xs font-mono px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">POST</span>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Notification</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{tDesc('Notification simulator', 'Симулятор уведомлений', 'Simulator notificări')}</h1>
         </div>
       </div>
 
@@ -653,7 +653,7 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
         >
           <div className="flex items-center gap-3">
             <Bell className="w-5 h-5 text-paynet-primary" />
-            <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary">Notification</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-paynet-primary">{tDesc('Notification simulator', 'Симулятор уведомлений', 'Simulator notificări')}</h2>
           </div>
           {isExpanded ? (
             <ChevronDown className="w-5 h-5 text-paynet-primary transition-transform" />
@@ -670,9 +670,9 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
                   <h3 className="text-base sm:text-lg font-semibold text-paynet-primary mb-2">Method Description</h3>
                   <p className="text-sm sm:text-base text-paynet-gray-700 leading-relaxed mb-3">
                     {tDesc(
-                      'Paynet sends callbacks when payment state changes. Notifications are server-to-server requests to your backend callback URL and must be processed reliably.',
-                      'Paynet отправляет callback при изменении статуса платежа. Уведомления приходят server-to-server на ваш callback URL и должны обрабатываться надежно.',
-                      'Paynet trimite callback-uri când statusul plății se schimbă. Notificările sunt cereri server-to-server către URL-ul tău de callback și trebuie procesate fiabil.',
+                      'Paynet sends a callback when a payment is paid. Notifications are server-to-server requests to your backend callback URL and must be processed reliably.',
+                      'Paynet отправляет callback, когда платёж оплачен. Уведомления — это server-to-server запросы на callback URL вашего бэкенда, их нужно обрабатывать надёжно.',
+                      'Paynet trimite un callback când plata este achitată. Notificările sunt cereri server-to-server către URL-ul de callback al backend-ului dvs. și trebuie procesate fiabil.',
                     )}
                   </p>
                   <ul className="list-disc pl-5 space-y-2 text-sm sm:text-base text-paynet-gray-700">

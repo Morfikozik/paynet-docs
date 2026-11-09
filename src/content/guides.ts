@@ -61,6 +61,7 @@ export const DEFAULT_GUIDE = 'getting-started';
 export const guidePlainText = (source: string) =>
   source
     .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/^\s*[-*]\s+\[[ x]\]\s+/gim, ' ')
     .replace(/[#>*`|]/g, ' ')
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
     .replace(/\s+/g, ' ')

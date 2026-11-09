@@ -237,7 +237,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             placeholder={ui.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-9 py-3 border border-paynet-gray-300 rounded-lg focus:ring-2 focus:ring-paynet-primary focus:border-transparent transition-all duration-200 bg-white text-sm"
+            className="w-full pl-10 pr-9 py-3 border border-paynet-gray-300 rounded-lg focus:ring-2 focus:ring-paynet-primary focus:border-transparent transition-all duration-200 bg-white text-sm [&::-webkit-search-cancel-button]:hidden"
           />
           {searchQuery && (
             <button
