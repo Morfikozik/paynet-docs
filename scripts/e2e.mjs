@@ -478,22 +478,24 @@ const sdkStage = async (token) => {
       entry.checks.push(...created.checks.map((c) => ({ ...c, phase: 'before payment' })));
       if (!created.paymentLink) throw new Error('no paymentLink');
 
+      // Keep the payment page open on the result screen while polling: closing it early
+      // has left test payments in status 3 ("Result in progress").
       const browser = await chromium.launch();
+      let status;
       try {
         const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
         await page.goto(created.paymentLink, { waitUntil: 'networkidle', timeout: 60000 });
         await fillAndPay(page, `sdk-${lang}-pay`);
         await page.waitForURL(/shop\.example|receipt/, { timeout: 120000 }).catch(() => {});
+        for (let i = 0; i < 60; i++) {
+          status = (await call('GET', `/api/order/merchant/${created.order}`, null, token)).body?.status;
+          if (status === 4) break;
+          await page.waitForTimeout(3000);
+        }
         entry.afterPayUrl = page.url();
         await snap(page, `sdk-${lang}-after-pay`);
       } finally {
         await browser.close();
-      }
-      let status;
-      for (let i = 0; i < 30; i++) {
-        status = (await call('GET', `/api/order/merchant/${created.order}`, null, token)).body?.status;
-        if (status === 4) break;
-        await new Promise((r) => setTimeout(r, 3000));
       }
       entry.paidStatus = status;
       if (status !== 4) {
