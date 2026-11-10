@@ -552,7 +552,222 @@ const searchProbeStage = async (token) => {
   }
 };
 
+// Full site audit of the PUBLISHED site: every route × 3 languages × desktop/mobile, links, files,
+// search, language switch, mobile menu, bundle secrets scan, npm audit. Writes site-audit.md + site-audit.json.
+const siteAuditStage = async () => {
+  const SITE = 'https://morfikozik.github.io/paynet-docs/';
+  const { execFileSync } = await import('node:child_process');
+  const LANGS = ['en', 'ru', 'ro'];
+  const results = { routes: [], links: {}, files: [], interactions: [], bundle: {}, npm: {}, timing: {} };
+  const problems = [];
+
+  // Routes: guides (from content/), tools, API methods (same id formula as the portal), home, legacy redirects.
+  const guideTitles = {};
+  for (const lang of LANGS) {
+    for (const section of fs.readdirSync(`content/${lang}`)) {
+      for (const f of fs.readdirSync(`content/${lang}/${section}`).filter((x) => /^\d+-.+\.md$/.test(x))) {
+        const slug = f.replace(/^\d+-/, '').replace(/\.md$/, '');
+        const title = (fs.readFileSync(`content/${lang}/${section}/${f}`, 'utf8').match(/^# (.+)$/m) || [])[1];
+        (guideTitles[slug] ||= {})[lang] = title;
+      }
+    }
+  }
+  const spec = JSON.parse(fs.readFileSync('src/openapi/openapi.json', 'utf8'));
+  const apiIds = {};
+  for (const [p, ops] of Object.entries(spec.paths)) for (const m of Object.keys(ops)) apiIds[`${m}-${p}`.replace(/[{}\/]/g, '-').replace(/-+/g, '-')] = { method: m.toUpperCase(), path: p };
+  const tools = ['plugins', 'checkout-form', 'notification-simulator'];
+  const routes = [{ hash: '#/', kind: 'home' }]
+    .concat(Object.keys(guideTitles).map((slug) => ({ hash: `#/guides/${slug}`, kind: 'guide', slug })))
+    .concat(tools.map((t) => ({ hash: `#/page/${t}`, kind: 'tool' })))
+    .concat(Object.entries(apiIds).map(([id, op]) => ({ hash: `#/api/${id}`, kind: 'api', op })));
+  const legacy = { ecommerce: '#/guides/integration-options', 'order-request-v06': '#/page/checkout-form', notifications: '#/page/notification-simulator' };
+
+  const browser = await chromium.launch();
+  const linkTargets = new Map(); // href -> first page
+  try {
+    for (const [device, viewport, isMobile] of [['desktop', { width: 1366, height: 900 }, false], ['mobile', { width: 390, height: 844 }, true]]) {
+      for (const lang of LANGS) {
+        const context = await browser.newContext({ viewport, isMobile, hasTouch: isMobile });
+        await context.addInitScript((l) => localStorage.setItem('tps-api-language', l), lang);
+        const page = await context.newPage();
+        const errors = [];
+        page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+        page.on('console', (m) => { if (m.type() === 'error') errors.push(`console: ${m.text()}`); });
+        page.on('requestfailed', (r) => { if (r.url().startsWith(SITE)) errors.push(`requestfailed: ${r.url()}`); });
+        const t0 = Date.now();
+        await page.goto(SITE, { waitUntil: 'networkidle' });
+        if (device === 'desktop' && lang === 'en') results.timing.firstLoadMs = Date.now() - t0;
+        for (const route of routes) {
+          errors.length = 0;
+          const started = Date.now();
+          await page.evaluate((h) => { window.location.hash = h; }, route.hash);
+          await page.waitForTimeout(route.kind === 'api' ? 900 : 500);
+          const info = await page.evaluate(() => {
+            const main = document.querySelector('main') || document.body;
+            const h1 = (main.querySelector('h1')?.textContent || '').trim();
+            const text = main.innerText || '';
+            const overflow = document.documentElement.scrollWidth - document.documentElement.clientWidth;
+            const links = [...main.querySelectorAll('a[href]')].map((a) => a.getAttribute('href'));
+            return { h1, textLength: text.length, overflow, links, hasCode: !!main.querySelector('pre'), sample: text.slice(0, 200) };
+          });
+          const entry = { device, lang, hash: route.hash, ms: Date.now() - started, h1: info.h1, textLength: info.textLength, overflow: info.overflow, errors: [...errors] };
+          const issues = [];
+          if (errors.length) issues.push(`JS errors: ${errors.join(' | ').slice(0, 300)}`);
+          if (info.overflow > 2) issues.push(`horizontal overflow ${info.overflow}px`);
+          if (info.textLength < 80) issues.push(`almost empty page (${info.textLength} chars)`);
+          if (route.kind === 'guide') {
+            const expected = guideTitles[route.slug]?.[lang];
+            if (expected && info.h1 !== expected) issues.push(`title "${info.h1}" ≠ "${expected}"`);
+          }
+          if (route.kind === 'api' && !info.sample.includes(route.op.path) && !(await page.evaluate((p) => document.body.innerText.includes(p), route.op.path))) issues.push(`API path ${route.op.path} not shown`);
+          entry.issues = issues;
+          results.routes.push(entry);
+          if (issues.length) problems.push(`${device}/${lang} ${route.hash}: ${issues.join('; ')}`);
+          if (device === 'desktop') for (const href of info.links) if (!linkTargets.has(href)) linkTargets.set(href, `${lang} ${route.hash}`);
+        }
+        // Legacy redirects
+        if (device === 'desktop' && lang === 'en') {
+          for (const [old, target] of Object.entries(legacy)) {
+            await page.evaluate((h) => { window.location.hash = h; }, `#/page/${old}`);
+            await page.waitForTimeout(500);
+            const now = await page.evaluate(() => window.location.hash);
+            const ok = now === target;
+            results.interactions.push({ name: `legacy redirect #/page/${old}`, ok, detail: now });
+            if (!ok) problems.push(`legacy redirect #/page/${old} → ${now}, expected ${target}`);
+          }
+        }
+        // Interactions per language (desktop): search; (mobile): menu open/close
+        if (device === 'desktop') {
+          await page.evaluate(() => { window.location.hash = '#/'; });
+          await page.waitForTimeout(400);
+          const search = page.locator('input[type="text"], input[type="search"]').first();
+          let ok = false;
+          let detail = '';
+          try {
+            await search.fill('refund');
+            await page.waitForTimeout(700);
+            const count = await page.evaluate(() => document.querySelectorAll('aside button, aside a, [role="listbox"] *').length);
+            const text = await page.evaluate(() => (document.querySelector('aside') || document.body).innerText);
+            ok = /refund|возврат|rambursare/i.test(text);
+            detail = `results visible: ${ok}, items ${count}`;
+            await search.fill('');
+          } catch (e) { detail = String(e.message || e); }
+          results.interactions.push({ name: `search "refund" (${lang})`, ok, detail });
+          if (!ok) problems.push(`search does not work in ${lang}: ${detail}`);
+        } else {
+          let ok = false;
+          let detail = '';
+          try {
+            await page.evaluate(() => { window.location.hash = '#/guides/notifications'; });
+            await page.waitForTimeout(400);
+            await page.getByRole('button', { name: /open menu/i }).click();
+            await page.waitForTimeout(400);
+            await page.getByRole('button', { name: /close menu/i }).first().click();
+            await page.waitForTimeout(300);
+            ok = true;
+            detail = 'opened and closed';
+          } catch (e) { detail = String(e.message || e).slice(0, 200); }
+          results.interactions.push({ name: `mobile menu (${lang})`, ok, detail });
+          if (!ok) problems.push(`mobile menu (${lang}): ${detail}`);
+        }
+        await context.close();
+      }
+    }
+    // Language switch through the UI
+    {
+      const context = await browser.newContext({ viewport: { width: 1366, height: 900 } });
+      const page = await context.newPage();
+      await page.goto(SITE + '#/guides/notifications', { waitUntil: 'networkidle' });
+      let ok = false;
+      let detail = '';
+      try {
+        const before = await page.locator('main h1').first().textContent();
+        await page.locator('header button').filter({ hasText: /English|Русский|Română/ }).first().click();
+        await page.waitForTimeout(300);
+        await page.getByText('Русский').last().click();
+        await page.waitForTimeout(600);
+        const after = await page.locator('main h1').first().textContent();
+        ok = before !== after && /Уведомления/.test(after || '');
+        detail = `${before} → ${after}`;
+      } catch (e) { detail = String(e.message || e).slice(0, 200); }
+      results.interactions.push({ name: 'language switch EN → RU', ok, detail });
+      if (!ok) problems.push(`language switch: ${detail}`);
+      await context.close();
+    }
+  } finally {
+    await browser.close();
+  }
+
+  // Links
+  const guideSlugs = new Set(Object.keys(guideTitles));
+  const linkProblems = [];
+  const external = [];
+  for (const [href, from] of linkTargets) {
+    if (href.startsWith('mailto:')) continue;
+    let m;
+    if ((m = href.match(/^#\/guides\/([^#?]+)$/))) { if (!guideSlugs.has(m[1])) linkProblems.push(`${from}: broken guide link ${href}`); continue; }
+    if ((m = href.match(/^#\/api\/(.+)$/))) { if (!apiIds[m[1]]) linkProblems.push(`${from}: broken API link ${href}`); continue; }
+    if ((m = href.match(/^#\/page\/(.+)$/))) { if (!tools.includes(m[1]) && !legacy[m[1]]) linkProblems.push(`${from}: broken page link ${href}`); continue; }
+    if (href.startsWith('#')) continue; // in-page anchors
+    const url = /^https?:/.test(href) ? href : new URL(href, SITE).toString();
+    if (url.startsWith(SITE)) {
+      const r = await fetch(url).catch((e) => ({ status: `network: ${e.message}` }));
+      results.files.push({ href, status: r.status, from });
+      if (r.status !== 200) linkProblems.push(`${from}: file ${href} → ${r.status}`);
+    } else external.push({ href: url, from });
+  }
+  for (const { href, from } of external) {
+    let status;
+    try {
+      const r = await fetch(href, { method: 'GET', redirect: 'follow', signal: AbortSignal.timeout(15000) });
+      status = r.status;
+    } catch (e) { status = `network: ${e.message}`; }
+    results.links[href] = { status, from };
+    if (!(typeof status === 'number' && status < 400)) linkProblems.push(`${from}: external ${href} → ${status}`);
+  }
+  results.linkProblems = linkProblems;
+
+  // Published files (AI docs, OpenAPI, Postman, SDK, mocks)
+  for (const f of ['llms.txt', 'llms-full.txt', 'llms-ecom.txt', 'openapi.json', 'postman/paynet-ecom.postman_collection.json', 'postman/paynet-test.postman_environment.json', 'postman/paynet-production.postman_environment.json', 'sdk/paynet-ecom-sdk-php-1.0.0.zip', 'sdk/paynet-ecom-sdk-node-1.0.0.zip', 'mocks/index.json', 'docs/sdk.md', 'docs/ru/sdk.md', 'docs/ro/mobile-apps.md', 'docs/api/post-api-order.md']) {
+    const r = await fetch(SITE + f);
+    const body = Buffer.from(await r.arrayBuffer());
+    results.files.push({ href: f, status: r.status, bytes: body.length });
+    if (r.status !== 200 || body.length < 50) problems.push(`file ${f} → ${r.status} (${body.length} bytes)`);
+  }
+
+  // Bundle: size and secrets scan
+  const html = await (await fetch(SITE)).text();
+  const scripts = [...html.matchAll(/src="([^"]+\.js)"/g)].map((m) => new URL(m[1], SITE).toString());
+  let bundle = '';
+  for (const u of scripts) bundle += await (await fetch(u)).text();
+  results.bundle.bytes = bundle.length;
+  results.bundle.knownPublicTestValues = Object.fromEntries(['771064', 'sLgMnGWJ', 'F90D6485-9CCC-458B-96A3-8958AF9B4458', 'D9873689-E5F8-4272-A67F-0D8BA3F9BAA7'].map((v) => [v, bundle.includes(v)]));
+  const suspicious = [];
+  for (const [name, re] of [['private key', /-----BEGIN [A-Z ]*PRIVATE KEY-----/], ['AWS key', /AKIA[0-9A-Z]{16}/], ['GitHub token', /gh[pousr]_[A-Za-z0-9]{36}/], ['Google API key', /AIza[0-9A-Za-z_-]{35}/], ['Slack token', /xox[baprs]-[0-9A-Za-z-]{10,}/], ['JWT', /eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}/]]) if (re.test(bundle)) suspicious.push(name);
+  results.bundle.suspicious = suspicious;
+  if (suspicious.length) problems.push(`bundle contains: ${suspicious.join(', ')}`);
+
+  // npm audit
+  for (const [key, args] of [['all', ['audit', '--json']], ['runtimeOnly', ['audit', '--omit=dev', '--json']]]) {
+    let out;
+    try { out = execFileSync('npm', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); } catch (e) { out = e.stdout || '{}'; }
+    try {
+      const j = JSON.parse(out);
+      results.npm[key] = { counts: j.metadata?.vulnerabilities, packages: Object.entries(j.vulnerabilities || {}).map(([n, v]) => `${n} (${v.severity}${v.isDirect ? ', direct' : ''})`) };
+    } catch { results.npm[key] = { error: out.slice(0, 300) }; }
+  }
+
+  const routeCount = results.routes.length;
+  const failedRoutes = results.routes.filter((r) => r.issues.length).length;
+  results.summary = { routeChecks: routeCount, failedRoutes, internalLinks: [...linkTargets.keys()].length, externalLinks: external.length, linkProblems: linkProblems.length, interactionsFailed: results.interactions.filter((i) => !i.ok).length, problems: problems.length };
+  fs.writeFileSync(path.join(outDir, 'site-audit.json'), JSON.stringify(results, null, 2));
+  const md = ['# Site audit', '', '```json', JSON.stringify(results.summary, null, 2), '```', '', '## Problems', ...problems.map((p) => `- ${p}`), '', '## Link problems', ...linkProblems.map((p) => `- ${p}`), '', '## Interactions', ...results.interactions.map((i) => `- ${i.ok ? '✓' : '✗'} ${i.name}: ${i.detail}`), '', '## Bundle', '```json', JSON.stringify(results.bundle, null, 2), '```', '', '## npm audit', '```json', JSON.stringify(results.npm, null, 2), '```', '', `First load (desktop, en): ${results.timing.firstLoadMs} ms`];
+  fs.writeFileSync(path.join(outDir, 'site-audit.md'), md.join('\n'));
+  note('site-audit', results.summary);
+};
+
 const main = async () => {
+  if (stage === 'site-audit') return siteAuditStage();
   if (stage === 'postman') return postmanStage();
   if (stage === 'portal') return portalStage();
   if (stage === 'shop') return shopStage();
