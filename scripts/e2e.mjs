@@ -314,7 +314,7 @@ const portalStage = async () => {
     await orderInput.scrollIntoViewIfNeeded();
     await snap(simulator, 'portal-02-simulator');
 
-    await simulator.click('button:has-text("Get")');
+    await simulator.getByRole('button', { name: 'Get', exact: true }).click();
     await simulator.waitForTimeout(4000);
     await snap(simulator, 'portal-03-get');
     if (after !== sentOrder) throw new Error(`simulator shows ${after}, expected ${sentOrder}`);
