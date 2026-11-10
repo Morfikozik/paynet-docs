@@ -14,7 +14,7 @@ Paynet e-commerce permite magazinului online să accepte plăți cu cardul (incl
 
 - **Aveți backend și doriți control deplin** → [Server-to-server](#/guides/server-to-server). Cea mai flexibilă opțiune, primiți `paymentId` imediat.
 - **Aveți nevoie doar de un buton „Plătește” fără apel API pentru crearea comenzii** → [Hosted checkout](#/guides/hosted-checkout). Backend-ul este totuși necesar pentru calculul semnăturii: cheia secretă nu trebuie să ajungă în codul browserului.
-- **Magazinul rulează pe un CMS suportat** → descărcați un plugin din **E-commerce → Pluginuri**. Shopify se conectează prin Cybersource.
+- **Magazinul rulează pe un CMS suportat** → descărcați un plugin din [**Pluginuri**](#/page/plugins). Shopify se conectează prin Cybersource.
 
 ## Ce necesită orice integrare
 

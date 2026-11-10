@@ -68,7 +68,7 @@ const rewriteLinks = (markdown, mode) =>
     .replace(/\]\(#\/guides\/([a-z0-9-]+)\)/g, (_, slug) =>
       mode === 'full' ? `](#${slug})` : `](${siteUrl}docs/${slug}.md)`
     )
-    .replace(/\]\(mocks\//g, `](${siteUrl}mocks/`).replace(/\]\(postman\//g, `](${siteUrl}postman/`);
+    .replace(/\]\(mocks\//g, `](${siteUrl}mocks/`).replace(/\]\(postman\//g, `](${siteUrl}postman/`).replace(/\]\(#\/page\//g, `](${siteUrl}#/page/`);
 
 // ---------- API reference from OpenAPI ----------
 const resolveRef = (ref) => ref.replace('#/', '').split('/').reduce((node, key) => node?.[key], spec);
@@ -296,7 +296,7 @@ for (const lang of ['ru', 'ro']) {
       const slug = file.replace(/^\d+-/, '').replace(/\.md$/, '');
       const source = fs.readFileSync(path.join(dir, file), 'utf8')
         .replace(/\]\(#\/guides\/([a-z0-9-]+)\)/g, (_, target) => `](${siteUrl}docs/${lang}/${target}.md)`)
-        .replace(/\]\(mocks\//g, `](${siteUrl}mocks/`).replace(/\]\(postman\//g, `](${siteUrl}postman/`);
+        .replace(/\]\(mocks\//g, `](${siteUrl}mocks/`).replace(/\]\(postman\//g, `](${siteUrl}postman/`).replace(/\]\(#\/page\//g, `](${siteUrl}#/page/`);
       fs.writeFileSync(path.join(docsOut, lang, `${slug}.md`), source);
     }
   }
