@@ -177,19 +177,27 @@ class PaynetClient
     }
 
     /**
-     * GET /api/order/search — payments in a period.
-     * @param \DateTimeInterface|string $from
+     * GET /api/order/search — payments in a period. Returns ['payments' => [...]].
+     * Checked on the test API: `from` / `to` are read as Chișinău local time (a trailing "Z" is ignored),
+     * so DateTimeInterface values are converted to Chișinău time. An empty period answers 404
+     * NOT_FOUND_RECORD — the SDK returns ['payments' => []] instead.
+     *
+     * @param \DateTimeInterface|string $from DateTimeInterface or 'YYYY-MM-DDTHH:mm:ss' in Chișinău time
      * @param \DateTimeInterface|string $to
-     * @return mixed
      */
-    public function searchPayments($from, $to)
+    public function searchPayments($from, $to): array
     {
-        $iso = static function ($d): string {
-            return $d instanceof \DateTimeInterface
-                ? (new \DateTimeImmutable('@' . $d->getTimestamp()))->format('Y-m-d\TH:i:s.v\Z')
-                : (string) $d;
+        $t = static function ($d): string {
+            return $d instanceof \DateTimeInterface ? Time::chisinauDateTime($d) : (string) $d;
         };
-        return $this->request('GET', '/api/order/search?from=' . rawurlencode($iso($from)) . '&to=' . rawurlencode($iso($to)));
+        try {
+            return $this->request('GET', '/api/order/search?from=' . rawurlencode($t($from)) . '&to=' . rawurlencode($t($to)));
+        } catch (PaynetException $e) {
+            if ($e->kind === PaynetException::NOT_FOUND) {
+                return ['payments' => []];
+            }
+            throw $e;
+        }
     }
 
     // ---------- refunds ----------

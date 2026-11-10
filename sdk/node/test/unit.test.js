@@ -174,3 +174,12 @@ test('constructor validates options', () => {
   assert.throws(() => new PaynetClient({ username: 'u', password: 'p', environment: 'prod' }), (e) => /Unknown environment/.test(e.message));
   assert.equal(new PaynetClient({ username: 'u', password: 'p', environment: 'production' }).apiUrl, 'https://ecom-api.paynet.md');
 });
+
+test('searchPayments sends Chișinău time and returns [] for an empty period', async () => {
+  let query = '';
+  const api = fakeApi({ 'GET /api/order/search': (init, calls) => { query = calls.at(-1).path; return json(404, { status: 404, code: 'NOT_FOUND_RECORD', message: 'Record not found' }); } });
+  const client = new PaynetClient({ username: 'u', password: 'p', fetch: api.fetch });
+  const result = await client.searchPayments({ from: new Date('2026-11-10T10:00:00Z'), to: new Date('2026-11-10T11:00:00Z') });
+  assert.deepEqual(result, { payments: [] });
+  assert.equal(decodeURIComponent(query), '/api/order/search?from=2026-11-10T12:00:00&to=2026-11-10T13:00:00');
+});

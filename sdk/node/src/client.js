@@ -1,6 +1,6 @@
 // Paynet e-commerce API client (Node.js 18+, no dependencies).
 import { PaynetError, ErrorKind, errorFromResponse } from './errors.js';
-import { chisinauDate } from './time.js';
+import { chisinauDate, chisinauDateTime } from './time.js';
 import { PaymentStatus } from './status.js';
 
 export const Environment = Object.freeze({
@@ -115,10 +115,20 @@ export class PaynetClient {
     return this.request('GET', `/api/order/merchant/${encodeURIComponent(order)}`);
   }
 
-  /** GET /api/order/search — payments in a period. Dates: Date objects or ISO strings. */
-  searchPayments({ from, to }) {
-    const iso = (d) => (d instanceof Date ? d.toISOString() : String(d));
-    return this.request('GET', `/api/order/search?from=${encodeURIComponent(iso(from))}&to=${encodeURIComponent(iso(to))}`);
+  /**
+   * GET /api/order/search — payments in a period. Returns { payments: [...] }.
+   * Checked on the test API: `from` / `to` are read as Chișinău local time (a trailing "Z" is ignored),
+   * so Date objects are converted to Chișinău time. An empty period answers 404 NOT_FOUND_RECORD —
+   * the SDK returns { payments: [] } instead.
+   */
+  async searchPayments({ from, to }) {
+    const t = (d) => (d instanceof Date ? chisinauDateTime(d) : String(d));
+    try {
+      return await this.request('GET', `/api/order/search?from=${encodeURIComponent(t(from))}&to=${encodeURIComponent(t(to))}`);
+    } catch (error) {
+      if (error instanceof PaynetError && error.kind === ErrorKind.NOT_FOUND) return { payments: [] };
+      throw error;
+    }
   }
 
   /** True when the payment for this Order is paid (status 4). */

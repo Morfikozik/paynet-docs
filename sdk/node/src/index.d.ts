@@ -100,7 +100,8 @@ export declare class PaynetClient {
   createOrder(order: OrderRequest): Promise<Payment>;
   getPayment(paymentId: number | string): Promise<Payment>;
   getPaymentByOrder(order: number | string): Promise<Payment>;
-  searchPayments(period: { from: Date | string; to: Date | string }): Promise<unknown>;
+  /** from / to: Date (converted to Chișinău time) or 'YYYY-MM-DDTHH:mm:ss' in Chișinău time. Empty period → { payments: [] }. */
+  searchPayments(period: { from: Date | string; to: Date | string }): Promise<{ payments: Payment[] }>;
   isPaid(order: number | string): Promise<boolean>;
   refund(params: {
     paymentId: number;

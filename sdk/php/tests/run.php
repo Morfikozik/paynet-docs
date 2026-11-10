@@ -233,5 +233,13 @@ check('statuses and constructor', function () {
     eq((new PaynetClient(['username' => 'u', 'password' => 'p', 'environment' => 'production']))->apiUrl, 'https://ecom-api.paynet.md');
 });
 
+check('searchPayments sends Chișinău time and returns [] for an empty period', function () {
+    $query = '';
+    [$client, $calls] = fakeClient(['GET /api/order/search' => function () { return resp(404, ['status' => 404, 'code' => 'NOT_FOUND_RECORD', 'message' => 'Record not found']); }]);
+    eq($client->searchPayments(new \DateTimeImmutable('2026-11-10T10:00:00Z'), new \DateTimeImmutable('2026-11-10T11:00:00Z')), ['payments' => []]);
+    $last = $calls[count($calls) - 1];
+    eq(rawurldecode($last['path']), '/api/order/search?from=2026-11-10T12:00:00&to=2026-11-10T13:00:00');
+});
+
 echo "\n# pass $passed\n# fail " . count($failed) . "\n";
 exit($failed ? 1 : 0);

@@ -62,8 +62,8 @@ if ($phase === 'create') {
         'Customer' => ['Code' => $customerCode, 'NameFirst' => 'SDK', 'NameLast' => 'PHP', 'PhoneNumber' => '37360000000', 'email' => 'sdk-check@example.com'],
         'ExpiryDate' => Time::expiryInHours(24),
         'Currency' => 498,
-        'Services' => [['Name' => 'sdk-check', 'Description' => 'PHP SDK check #' . $order, 'Amount' => 300,
-            'Products' => [['LineNo' => 1, 'Code' => 'SKU-1', 'Name' => 'Demo', 'Description' => 'Demo', 'UnitPrice' => 300, 'Quantity' => 100, 'Amount' => 300, 'TotalAmount' => 300]]]],
+        'Services' => [['Name' => 'sdk-check', 'Description' => 'PHP SDK check #' . $order, 'Amount' => 400,
+            'Products' => [['LineNo' => 1, 'Code' => 'SKU-1', 'Name' => 'Demo', 'Description' => 'Demo', 'UnitPrice' => 400, 'Quantity' => 100, 'Amount' => 400, 'TotalAmount' => 400]]]],
         'MoneyType' => 'Card',
         'Lang' => 'en',
     ];
@@ -84,7 +84,7 @@ if ($phase === 'create') {
         return 'status 1';
     });
     check('refund of an unpaid payment is refused by the SDK', function () use ($client, &$created) {
-        return expectError(function () use ($client, $created) { $client->refund((int) $created['paymentId'], SALE_AREA, 300); }, PaynetException::RULE, '/not paid/');
+        return expectError(function () use ($client, $created) { $client->refund((int) $created['paymentId'], SALE_AREA, 400); }, PaynetException::RULE, '/not paid/');
     });
     echo json_encode(['order' => $order, 'customerCode' => $customerCode, 'paymentId' => $created['paymentId'] ?? null, 'paymentLink' => $created['paymentLink'] ?? null, 'checks' => $checks], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), "\n";
 } elseif ($phase === 'after-pay') {
@@ -108,7 +108,7 @@ if ($phase === 'create') {
         return 'found';
     });
     check('refund more than paid is refused by the SDK', function () use ($client, $paymentId) {
-        return expectError(function () use ($client, $paymentId) { $client->refund($paymentId, SALE_AREA, 301); }, PaynetException::RULE, '/more than the paid/');
+        return expectError(function () use ($client, $paymentId) { $client->refund($paymentId, SALE_AREA, 401); }, PaynetException::RULE, '/more than the paid/');
     });
     check('partial refund 1.00 MDL', function () use ($client, $paymentId) {
         $r = $client->refund($paymentId, SALE_AREA, 100, null, 'SDK check');
