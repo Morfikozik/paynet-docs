@@ -1,0 +1,19 @@
+{
+    "name": "paynet/ecom-sdk",
+    "description": "Official Paynet e-commerce API SDK for PHP: orders, payment status, refunds, saved cards, statements, notification verification and hosted checkout form.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["paynet", "moldova", "payments", "ecommerce", "mdl", "sdk"],
+    "authors": [{ "name": "Paynet Services SRL" }],
+    "require": {
+        "php": ">=7.4",
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": { "Paynet\\Ecom\\": "src/" }
+    },
+    "scripts": {
+        "test": "php tests/run.php"
+    }
+}

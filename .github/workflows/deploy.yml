@@ -35,6 +35,11 @@ jobs:
       - name: Check documentation (signature vectors, samples, links, translations)
         run: node scripts/check-docs.mjs
 
+      - name: SDK unit tests (Node.js and PHP, offline)
+        run: |
+          node --test sdk/node/test/unit.test.js
+          php sdk/php/tests/run.php
+
       - name: Generate AI documentation (llms.txt, llms-full.txt, docs/*.md)
         run: |
           node scripts/build-ai-docs.mjs

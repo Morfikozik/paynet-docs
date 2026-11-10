@@ -458,6 +458,69 @@ const quantityStage = async (token) => {
   note('quantity:get', { status: got.status, products: got.body?.services?.[0]?.products });
 };
 
+// SDK check: every SDK creates its OWN order, the order is paid with the test card, then the SDK
+// runs the rest (status, search, refund rules, saved card, statements, errors). Report per language.
+const sdkStage = async (token) => {
+  const { execFileSync } = await import('node:child_process');
+  const runners = {
+    node: (args) => execFileSync('node', ['sdk/node/e2e/check.mjs', ...args], { encoding: 'utf8', timeout: 180000 }),
+    php: (args) => execFileSync('php', ['sdk/php/e2e/check.php', ...args], { encoding: 'utf8', timeout: 180000 }),
+  };
+  const report = {};
+  const lastJson = (out) => JSON.parse(out.trim().split('\n').filter((l) => l.startsWith('{')).pop());
+  for (const [lang, run] of Object.entries(runners)) {
+    const entry = { checks: [], environment: 'ok' };
+    report[lang] = entry;
+    try {
+      const created = lastJson(run(['create']));
+      entry.order = created.order;
+      entry.paymentId = created.paymentId;
+      entry.checks.push(...created.checks.map((c) => ({ ...c, phase: 'before payment' })));
+      if (!created.paymentLink) throw new Error('no paymentLink');
+
+      const browser = await chromium.launch();
+      try {
+        const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+        await page.goto(created.paymentLink, { waitUntil: 'networkidle', timeout: 60000 });
+        await fillAndPay(page, `sdk-${lang}-pay`);
+        await page.waitForURL(/shop\.example|receipt/, { timeout: 120000 }).catch(() => {});
+      } finally {
+        await browser.close();
+      }
+      let status;
+      for (let i = 0; i < 30; i++) {
+        status = (await call('GET', `/api/order/merchant/${created.order}`, null, token)).body?.status;
+        if (status === 4) break;
+        await new Promise((r) => setTimeout(r, 3000));
+      }
+      entry.paidStatus = status;
+      if (status !== 4) {
+        entry.environment = `payment did not reach status 4 (status ${status}) — test environment problem, not the SDK`;
+      } else {
+        const after = lastJson(run(['after-pay', String(created.order)]));
+        entry.checks.push(...after.checks.map((c) => ({ ...c, phase: 'after payment' })));
+      }
+    } catch (error) {
+      entry.checks.push({ name: 'runner', ok: false, detail: String(error?.stdout || error?.stderr || error?.message || error).slice(0, 2000), phase: '-' });
+    }
+    note(`sdk:${lang}`, entry);
+  }
+
+  // Human-readable report.
+  const lines = ['# SDK check on the Paynet test environment', '', `Date: ${new Date().toISOString()}`, ''];
+  for (const [lang, e] of Object.entries(report)) {
+    const ok = e.checks.filter((c) => c.ok).length;
+    lines.push(`## ${lang === 'node' ? 'Node.js' : 'PHP'} — ${ok} / ${e.checks.length} passed`, '');
+    lines.push(`Order \`${e.order}\`, paymentId \`${e.paymentId}\`. Environment: ${e.environment}.`, '');
+    lines.push('| Phase | Check | Result | Detail |', '|---|---|---|---|');
+    for (const c of e.checks) lines.push(`| ${c.phase} | ${c.name} | ${c.ok ? '✓' : '✗'} | ${String(c.detail).replace(/\|/g, '\\|').replace(/\n/g, ' ').slice(0, 300)} |`);
+    lines.push('');
+  }
+  fs.writeFileSync(path.join(outDir, 'sdk-report.md'), lines.join('\n'));
+  const failed = Object.values(report).some((e) => e.environment !== 'ok' || e.checks.some((c) => !c.ok));
+  if (failed) throw new Error('SDK check has failures — see sdk-report.md');
+};
+
 const main = async () => {
   if (stage === 'postman') return postmanStage();
   if (stage === 'portal') return portalStage();
@@ -471,6 +534,7 @@ const main = async () => {
   if (stage === 'cards') return cardsStage(token);
   if (stage === 'probe-errors') return probeErrorsStage(token);
   if (stage === 'quantity') return quantityStage(token);
+  if (stage === 'sdk') return sdkStage(token);
 
   const order1 = Date.now();
   const created = await call('POST', '/api/order', orderBody(order1, 300), token);

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: 'explore | full | shop | contract | cards | portal | probe-errors | postman | quantity'
+        description: 'explore | full | shop | contract | cards | portal | probe-errors | postman | quantity | sdk'
         required: true
         default: 'explore'
 
