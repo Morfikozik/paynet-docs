@@ -1188,7 +1188,7 @@
           },
           "PhoneNumber": {
             "type": "string",
-            "description": "(Optional) The customer's phone number.",
+            "description": "(Optional) The customer's phone number. If it is not sent, the customer types it on the payment page (block \"Billing information\").",
             "nullable": true
           }
         },

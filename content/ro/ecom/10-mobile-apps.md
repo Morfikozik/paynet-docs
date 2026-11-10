@@ -27,7 +27,7 @@ import { paynet } from './paynet.js';
 // Într-un magazin real comanda se ia din baza de date după id: suma — din comandă, nu din cererea aplicației.
 // expiryDate se salvează la crearea comenzii (de exemplu, expiryInHours(1)), astfel încât o nouă apăsare
 // pe „Plătește” să trimită în Paynet exact aceeași cerere.
-const findOrder = async (id) => ({ order: Number(id), amount: 300, customerCode: 'customer-42', expiryDate: '2026-11-10T19:00:00' });
+const findOrder = async (id) => ({ order: Number(id), amount: 300, customerCode: 'customer-42', customerPhone: '37360000000', expiryDate: '2026-11-10T19:00:00' });
 
 http.createServer(async (req, res) => {
   const match = req.url.match(/^\/mobile\/orders\/(\d+)\/(pay|status)$/);
@@ -40,7 +40,7 @@ http.createServer(async (req, res) => {
       SaleAreaCode: 'onlidocumentation_md',
       LinkUrlSuccess: `https://shop.example/app/payment/success?order=${order.order}`,
       LinkUrlCancel: `https://shop.example/app/payment/cancel?order=${order.order}`,
-      Customer: { Code: order.customerCode },
+      Customer: { Code: order.customerCode, PhoneNumber: order.customerPhone },
       ExpiryDate: order.expiryDate,
       Currency: 498,
       Services: [{ Name: 'My shop', Description: `Order #${order.order}`, Amount: order.amount }],

@@ -91,7 +91,7 @@ Content-Type: application/json
 | `Lang` | string | да | Язык платёжной страницы: `RO`, `RU` или `EN`. |
 | `Customer` | object | нет | Данные покупателя. Обязателен, чтобы [сохранить карту](#/guides/saved-cards) или оплатить сохранённой картой. |
 | `Customer.Code` | string | да, если передан `Customer` | ID покупателя в вашей системе. |
-| `Customer.NameFirst`, `NameLast`, `email`, `PhoneNumber` | string | нет | Данные покупателя. Обратите внимание: `email` с маленькой буквы. |
+| `Customer.NameFirst`, `NameLast`, `email`, `PhoneNumber` | string | нет | Данные покупателя. Обратите внимание: `email` с маленькой буквы. Если не передать `PhoneNumber`, покупателю придётся ввести телефон на платёжной странице (блок «Billing information»). Передавайте данные покупателя, если они у вас есть, — тогда покупателю не нужно вводить их самому. |
 | `CardLinkHash` | string | нет | Токен сохранённой карты этого покупателя, полученный в уведомлении. Передавайте вместе с тем же `Customer`. См. [Сохранение карт](#/guides/saved-cards). |
 
 `Services[]`:

@@ -10,6 +10,7 @@ Clarifications found by a test in which a developer new to Paynet integrated usi
 - Payment search dates in the formats table: Chișinău time, without `Z`.
 - Notifications: only the HTTP code `200` counts, the response body does not matter.
 - Getting started: where the merchant code is used.
+- `Customer.PhoneNumber`: optional, but without it the customer types the phone on the payment page. Examples now send it.
 
 ## Documentation v3.2 — 10.11.2026
 

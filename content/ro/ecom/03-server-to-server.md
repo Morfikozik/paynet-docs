@@ -91,7 +91,7 @@ Content-Type: application/json
 | `Lang` | string | da | Limba paginii de plată: `RO`, `RU` sau `EN`. |
 | `Customer` | object | nu | Datele clientului. Obligatoriu pentru a [salva cardul](#/guides/saved-cards) sau a plăti cu un card salvat. |
 | `Customer.Code` | string | da, dacă se trimite `Customer` | ID-ul clientului în sistemul dvs. |
-| `Customer.NameFirst`, `NameLast`, `email`, `PhoneNumber` | string | nu | Datele clientului. Atenție: `email` cu literă mică. |
+| `Customer.NameFirst`, `NameLast`, `email`, `PhoneNumber` | string | nu | Datele clientului. Atenție: `email` cu literă mică. Dacă nu trimiteți `PhoneNumber`, clientul trebuie să introducă telefonul pe pagina de plată (blocul „Billing information”). Trimiteți datele clientului dacă le aveți, ca acesta să nu le introducă singur. |
 | `CardLinkHash` | string | nu | Tokenul cardului salvat al acestui client, primit într-o notificare. Trimiteți-l împreună cu același `Customer`. Vezi [Salvarea cardurilor](#/guides/saved-cards). |
 
 `Services[]`:

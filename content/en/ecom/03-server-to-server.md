@@ -91,7 +91,7 @@ Content-Type: application/json
 | `Lang` | string | yes | Payment page language: `RO`, `RU` or `EN`. |
 | `Customer` | object | no | Customer data. Required to [save a card](#/guides/saved-cards) or to pay with a saved card. |
 | `Customer.Code` | string | yes, if `Customer` is sent | Customer ID in your system. |
-| `Customer.NameFirst`, `NameLast`, `email`, `PhoneNumber` | string | no | Customer details. Note the lowercase `email`. |
+| `Customer.NameFirst`, `NameLast`, `email`, `PhoneNumber` | string | no | Customer details. Note the lowercase `email`. If you do not send `PhoneNumber`, the customer has to type the phone on the payment page (block "Billing information"). Send the customer's details when you have them, so the customer does not have to enter them. |
 | `CardLinkHash` | string | no | Saved card token of this customer, received in a notification. Send it together with the same `Customer`. See [Saved cards](#/guides/saved-cards). |
 
 `Services[]`:

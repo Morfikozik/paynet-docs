@@ -27,7 +27,7 @@ import { paynet } from './paynet.js';
 // In a real shop the order comes from your database by id: the amount comes from the order, not from the app's request.
 // expiryDate is stored when the order is created (for example, expiryInHours(1)), so that tapping
 // "Pay" again sends exactly the same request to Paynet.
-const findOrder = async (id) => ({ order: Number(id), amount: 300, customerCode: 'customer-42', expiryDate: '2026-11-10T19:00:00' });
+const findOrder = async (id) => ({ order: Number(id), amount: 300, customerCode: 'customer-42', customerPhone: '37360000000', expiryDate: '2026-11-10T19:00:00' });
 
 http.createServer(async (req, res) => {
   const match = req.url.match(/^\/mobile\/orders\/(\d+)\/(pay|status)$/);
@@ -40,7 +40,7 @@ http.createServer(async (req, res) => {
       SaleAreaCode: 'onlidocumentation_md',
       LinkUrlSuccess: `https://shop.example/app/payment/success?order=${order.order}`,
       LinkUrlCancel: `https://shop.example/app/payment/cancel?order=${order.order}`,
-      Customer: { Code: order.customerCode },
+      Customer: { Code: order.customerCode, PhoneNumber: order.customerPhone },
       ExpiryDate: order.expiryDate,
       Currency: 498,
       Services: [{ Name: 'My shop', Description: `Order #${order.order}`, Amount: order.amount }],

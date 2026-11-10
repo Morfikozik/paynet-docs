@@ -10,6 +10,7 @@ Clarificări în urma unui test în care un dezvoltator nou în Paynet a făcut 
 - Datele căutării plăților în tabelul de formate: ora Chișinău, fără `Z`.
 - Notificări: contează doar codul HTTP `200`, corpul răspunsului nu contează.
 - Getting started: unde se folosește codul comerciantului.
+- `Customer.PhoneNumber`: opțional, dar fără el clientul introduce telefonul pe pagina de plată. Exemplele îl trimit acum.
 
 ## Documentația v3.2 — 10.11.2026
 

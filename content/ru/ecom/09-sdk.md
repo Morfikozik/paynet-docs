@@ -83,7 +83,7 @@ $order = [
     'SaleAreaCode' => 'onlidocumentation_md',
     'LinkUrlSuccess' => 'https://shop.example/payment/success',
     'LinkUrlCancel' => 'https://shop.example/payment/cancel',
-    'Customer' => ['Code' => 'customer-42', 'NameFirst' => 'Ion', 'NameLast' => 'Popescu', 'email' => 'ion@example.com'],
+    'Customer' => ['Code' => 'customer-42', 'NameFirst' => 'Ion', 'NameLast' => 'Popescu', 'email' => 'ion@example.com', 'PhoneNumber' => '37360000000'],
     'ExpiryDate' => Time::expiryInHours(24), // через сутки, по Кишинёву
     'Currency' => 498,
     'Services' => [['Name' => 'My shop', 'Description' => 'Order #1762444800000', 'Amount' => 300]], // 300 = 3,00 MDL
@@ -105,7 +105,7 @@ const order = {
   SaleAreaCode: 'onlidocumentation_md',
   LinkUrlSuccess: 'https://shop.example/payment/success',
   LinkUrlCancel: 'https://shop.example/payment/cancel',
-  Customer: { Code: 'customer-42', NameFirst: 'Ion', NameLast: 'Popescu', email: 'ion@example.com' },
+  Customer: { Code: 'customer-42', NameFirst: 'Ion', NameLast: 'Popescu', email: 'ion@example.com', PhoneNumber: '37360000000' },
   ExpiryDate: expiryInHours(24), // через сутки, по Кишинёву
   Currency: 498,
   Services: [{ Name: 'My shop', Description: 'Order #1762444800000', Amount: 300 }], // 300 = 3,00 MDL
