@@ -1,5 +1,7 @@
 import React from 'react';
-import { Search, ChevronRight, Download, Home, Wrench, X } from 'lucide-react';
+import { Search, ChevronRight, Download, Wrench, X } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { NAV_GROUPS, FALLBACK_ICON } from '../content/sidebarNav';
 import { OpenAPISpec, ServiceCategory } from '../types/api';
 import { Language } from '../types/language';
 import { buildPostmanCollectionFromOpenApi } from '../utils/postmanCollection';
@@ -163,6 +165,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   // ---------- rendering helpers ----------
+  const iconLabel = (Icon: LucideIcon, label: string, fullTitle?: string) => (
+    <span className="flex items-center gap-3" title={fullTitle && fullTitle !== label ? fullTitle : undefined}>
+      <Icon className="w-4 h-4 flex-shrink-0 text-paynet-gray-500" strokeWidth={1.75} />
+      <span>{label}</span>
+    </span>
+  );
+
   const navItem = (label: React.ReactNode, active: boolean, onClick: () => void, extraClass = '') => (
     <button
       type="button"
@@ -185,11 +194,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </span>,
       isPage(page),
       () => navigate(`#/page/${page}`),
-      'pl-6'
+      'pl-10'
     );
 
   const apiMethodsBlock = (
-    <div className="pl-3">
+    <div className="pl-7">
       <button
         type="button"
         onClick={() => setMethodsOpen((open) => !open)}
@@ -303,34 +312,53 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
         ) : (
-          <div className="space-y-5">
-            {navItem(
-              <span className="inline-flex items-center gap-2">
-                <Home className="w-4 h-4" />
-                {ui.home}
-              </span>,
-              route.kind === 'home',
-              () => navigate('#/')
-            )}
-
-            {SECTIONS.map((section) => (
-              <div key={section.id}>
-                <div className="text-xs font-semibold uppercase tracking-wide text-paynet-gray-500 mb-2 px-1">
-                  {section.title[language]}
+          <div className="space-y-6">
+            {NAV_GROUPS.map((group, groupIndex) => {
+              const allGuides = SECTIONS.flatMap((section) => getSectionGuides(language, section.id));
+              const listed = new Set(NAV_GROUPS.flatMap((g) => g.items.map((item) => (item.kind === 'guide' ? item.slug : ''))));
+              // Guides not listed in NAV_GROUPS are shown in the last group, so no page can disappear.
+              const extra = groupIndex === NAV_GROUPS.length - 1 ? allGuides.filter((guide) => !listed.has(guide.slug)) : [];
+              return (
+                <div key={group.id}>
+                  <div className="text-xs font-semibold uppercase tracking-wider text-paynet-gray-500 mb-2 px-3">
+                    {group.title[language]}
+                  </div>
+                  <div className="space-y-0.5">
+                    {group.items.map((item) => {
+                      if (item.kind === 'home') {
+                        return (
+                          <React.Fragment key="home">
+                            {navItem(iconLabel(item.icon, item.label[language]), route.kind === 'home', () => navigate('#/'))}
+                          </React.Fragment>
+                        );
+                      }
+                      if (item.kind === 'page') {
+                        return (
+                          <React.Fragment key={item.page}>
+                            {navItem(iconLabel(item.icon, item.label[language]), isPage(item.page), () => navigate(`#/page/${item.page}`))}
+                          </React.Fragment>
+                        );
+                      }
+                      const guide = allGuides.find((g) => g.slug === item.slug);
+                      if (!guide) return null;
+                      return (
+                        <React.Fragment key={item.slug}>
+                          {navItem(iconLabel(item.icon, item.label[language], guide.title), isGuide(item.slug), () => navigate(`#/guides/${item.slug}`))}
+                          {item.slug === 'notifications' && toolItem(ui.notificationSimulator, 'notification-simulator')}
+                          {item.slug === 'server-to-server' && apiMethodsBlock}
+                          {item.slug === 'hosted-checkout' && toolItem(ui.checkoutForm, 'checkout-form')}
+                        </React.Fragment>
+                      );
+                    })}
+                    {extra.map((guide) => (
+                      <React.Fragment key={guide.slug}>
+                        {navItem(iconLabel(FALLBACK_ICON, guide.title), isGuide(guide.slug), () => navigate(`#/guides/${guide.slug}`))}
+                      </React.Fragment>
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  {getSectionGuides(language, section.id).map((guide) => (
-                    <React.Fragment key={guide.slug}>
-                      {navItem(guide.title, isGuide(guide.slug), () => navigate(`#/guides/${guide.slug}`))}
-                      {guide.slug === 'notifications' && toolItem(ui.notificationSimulator, 'notification-simulator')}
-                      {guide.slug === 'server-to-server' && apiMethodsBlock}
-                      {guide.slug === 'hosted-checkout' && toolItem(ui.checkoutForm, 'checkout-form')}
-                    </React.Fragment>
-                  ))}
-                  {section.id === 'ecom' && navItem(ui.plugins, isPage('plugins'), () => navigate('#/page/plugins'))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </nav>
