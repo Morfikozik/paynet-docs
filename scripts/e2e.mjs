@@ -416,7 +416,9 @@ const postmanStage = async () => {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     await page.goto(created.paymentLink, { waitUntil: 'networkidle', timeout: 60000 });
     await fillAndPay(page, 'postman-pay');
-    await page.waitForTimeout(5000);
+    // Wait until the payment page finishes and returns the customer to LinkUrlSuccess.
+    await page.waitForURL(/shop\.example/, { timeout: 120000 }).catch(() => {});
+    note('postman:after-pay-url', { url: page.url() });
   } finally {
     await browser.close();
   }
