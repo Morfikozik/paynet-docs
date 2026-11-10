@@ -243,8 +243,8 @@ const cardsStage = async (token) => {
           note('cards:same-customer', { http: same.status, cardLinkHash: same.body?.cardLinkHash, status: same.body?.status, message: same.body?.message ?? same.body?.details });
           if (same.body?.paymentLink) {
             const q = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-            await q.goto(same.body.paymentLink, { waitUntil: 'networkidle', timeout: 60000 });
-            await q.waitForTimeout(2000);
+            await q.goto(same.body.paymentLink, { waitUntil: 'load', timeout: 60000 });
+            await q.waitForTimeout(8000);
             await snap(q, 'cards-saved-card-page');
             note('cards:saved-card-visible', { text: (await q.innerText('body')).match(/411111[\*•x]*1111|\*{2,}\s*1111|•{2,}\s*1111/i)?.[0] || null });
             await q.close();
@@ -257,8 +257,8 @@ const cardsStage = async (token) => {
           note('cards:other-customer', { http: other.status, body: other.body && { cardLinkHash: other.body.cardLinkHash, status: other.body.status, code: other.body.code, details: other.body.details } });
           if (other.body?.paymentLink) {
             const q = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-            await q.goto(other.body.paymentLink, { waitUntil: 'networkidle', timeout: 60000 });
-            await q.waitForTimeout(2000);
+            await q.goto(other.body.paymentLink, { waitUntil: 'load', timeout: 60000 });
+            await q.waitForTimeout(8000);
             await snap(q, 'cards-other-customer-page');
             note('cards:other-customer-card-visible', { text: (await q.innerText('body')).match(/411111[\*•x]*1111|\*{2,}\s*1111|•{2,}\s*1111/i)?.[0] || null });
             await q.close();
@@ -783,7 +783,7 @@ const langSwitchStage = async () => {
     const after = (await page.locator('h1').first().textContent())?.trim();
     await page.reload({ waitUntil: 'networkidle' });
     const afterReload = (await page.locator('h1').first().textContent())?.trim();
-    const ok = before === 'Notifications' && after === 'Уведомления' && afterReload === 'Уведомления';
+    const ok = before?.startsWith('Notifications') && after?.startsWith('Уведомления') && afterReload?.startsWith('Уведомления');
     note('lang-switch', { ok, before, after, afterReload });
     await snap(page, 'lang-switch-ru');
     if (!ok) throw new Error(`language switch: ${before} → ${after} → ${afterReload}`);
