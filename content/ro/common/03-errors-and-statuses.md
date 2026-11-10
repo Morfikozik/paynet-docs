@@ -10,7 +10,7 @@ Verificat în mediul de test pe 10.11.2026. Detalii despre fiecare format — î
 | `400` | `errorInfo`, `errors` listează câmpurile | JSON ilizibil, lipsesc câmpuri obligatorii, tip greșit (de exemplu, litere în loc de număr în `paymentId` din adresă) | Corectați cererea | Doar după corectare |
 | `401` | `UNAUTHORIZED` (chei cu majusculă: `Status`, `Code`…) | Token lipsă, invalid sau expirat | Obțineți un token nou prin `/auth` | Da, o dată cu tokenul nou |
 | `401` | `AUTHENTICATION_FAILED` | `/auth`: utilizator sau parolă greșite | Verificați datele de acces (pentru test și producție sunt diferite) | Nu |
-| `404` | `NOT_FOUND_RECORD` | Nu există plata cu acest ID; rambursarea unei plăți neachitate | Verificați `paymentId` / `Order` și statusul plății | Nu |
+| `404` | `NOT_FOUND_RECORD` | Nu există plata cu acest ID; rambursarea unei plăți neachitate; căutare: nu există plăți în perioadă (rezultat gol) | Verificați `paymentId` / `Order` și statusul plății; la căutare — considerați rezultatul gol | Nu |
 | `404` | Corp gol | Adresă (cale) greșită | Verificați URL-ul și adresa API | Nu |
 | `405` | Corp gol | Metodă HTTP greșită (de exemplu, `GET` în loc de `POST`) | Verificați metoda | Doar după corectare |
 | `415` | Corp gol | Lipsește antetul `Content-Type: application/json` sau corpul nu este JSON (inclusiv la `/auth`) | Adăugați antetul, trimiteți JSON | Doar după corectare |

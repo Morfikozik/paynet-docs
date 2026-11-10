@@ -10,7 +10,7 @@ Checked on the test environment on 10.11.2026. Details on each format are in the
 | `400` | `errorInfo`, `errors` lists the fields | Unreadable JSON, missing required fields, wrong type (for example, letters instead of a number in `paymentId` in the URL) | Fix the request | Only after fixing |
 | `401` | `UNAUTHORIZED` (capitalised keys: `Status`, `Code`…) | No token, or it is invalid or expired | Get a new token from `/auth` | Yes, once with the new token |
 | `401` | `AUTHENTICATION_FAILED` | `/auth`: wrong username or password | Check the credentials (test and production ones differ) | No |
-| `404` | `NOT_FOUND_RECORD` | No payment with this ID; refund of an unpaid payment | Check `paymentId` / `Order` and the payment status | No |
+| `404` | `NOT_FOUND_RECORD` | No payment with this ID; refund of an unpaid payment; search: no payments in the period (an empty result) | Check `paymentId` / `Order` and the payment status; for search, treat it as an empty result | No |
 | `404` | Empty body | Wrong address (path) | Check the URL and API address | No |
 | `405` | Empty body | Wrong HTTP method (for example, `GET` instead of `POST`) | Check the method | Only after fixing |
 | `415` | Empty body | No `Content-Type: application/json` header, or the body is not JSON (including `/auth`) | Add the header, send JSON | Only after fixing |

@@ -168,7 +168,7 @@ Ambele returnează același obiect de plată. Folosiți-le înainte de livrare �
 
 | Operațiune | Cerere | Note |
 |---|---|---|
-| Căutare plăți | `GET /api/order/search?from=…&to=…` | Dată-oră ISO 8601, de ex. `2026-03-09T06:40:05.010Z`. |
+| Căutare plăți | `GET /api/order/search?from=…&to=…` | Dată-oră **în ora Chișinăului**, fără `Z`, de ex. `2026-03-09T08:40:05`. API-ul ignoră marcajul UTC (`Z`): ora UTC deplasează perioada cu 2–3 ore, iar plățile recente nu apar în rezultat. Dacă în perioadă nu există plăți, API-ul răspunde `404 NOT_FOUND_RECORD` — un rezultat gol, nu o eroare. |
 | Rambursare | `POST /api/order/refund` | Corp: `PaymentId`, `SaleAreaCode`, `RefundType` (`full` sau `partial`), `Amount`, `Currency`, `Reason`. |
 | Deconectarea unui card salvat | `POST /api/linked-cards/unlink` | Corp: `CardLinkHash`, `SaleAreaCode`, `CustomerCode`. |
 | Extras | `GET /api/statement?dateStart=…&dateFinish=…` | Date de forma `2026-03-01`. `accountId` opțional. |

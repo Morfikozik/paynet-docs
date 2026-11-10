@@ -409,6 +409,10 @@ const postmanStage = async () => {
   note('postman:created', { order: sentBody.Order, expiryDate: sentBody.ExpiryDate, paymentId: created.paymentId });
   const chained = rows1.filter((r) => r.name.startsWith('Get payment')).every((r) => r.code === 200 && r.url.includes(String(r.name.includes('Order') ? sentBody.Order : created.paymentId)));
   note('postman:chaining', { ok: chained });
+  const searchExec = first.run.executions.find((e) => e.item.name.startsWith('Search payments'));
+  const searchFound = String(searchExec?.response?.stream || '').includes(String(created.paymentId));
+  note('postman:search-finds-new-payment', { code: searchExec?.response?.code, found: searchFound });
+  if (!searchFound) throw new Error('Search did not find the payment just created');
   if (!chained) throw new Error('Variables were not passed between requests');
 
   const browser = await chromium.launch();

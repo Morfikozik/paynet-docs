@@ -181,12 +181,15 @@ const getByOrder = request('Get payment by Order (merchant order number)', 'GET'
 });
 const search = request('Search payments (last 24 hours)', 'GET', '/api/order/search', {
   query: [{ key: 'from', value: '{{searchFrom}}' }, { key: 'to', value: '{{searchTo}}' }],
-  description: describe('/api/order/search', 'get', '`from` / `to` are set automatically to the last 24 hours (ISO 8601).'),
-  prerequest: `
-pm.collectionVariables.set('searchTo', new Date().toISOString());
-pm.collectionVariables.set('searchFrom', new Date(Date.now() - 24 * 3600 * 1000).toISOString());
+  description: describe('/api/order/search', 'get', '`from` / `to` are set automatically to the last 24 hours in **Chișinău time** — the API reads them as Chișinău local time and ignores a trailing `Z`. No payments in the period → `404 NOT_FOUND_RECORD` (an empty result).'),
+  prerequest: `${chisinauDate}
+pm.collectionVariables.set('searchTo', chisinau(new Date(Date.now() + 60 * 1000)));
+pm.collectionVariables.set('searchFrom', chisinau(new Date(Date.now() - 24 * 3600 * 1000)));
 `,
-  test: `pm.test('HTTP 200', () => pm.response.to.have.status(200));`,
+  test: `
+pm.test('HTTP 200, or 404 = no payments in the period', () => pm.expect([200, 404]).to.include(pm.response.code));
+if (pm.response.code === 404) console.log('No payments in the period (404 NOT_FOUND_RECORD means an empty result).');
+`,
 });
 const refund = request('Refund (pay the order first)', 'POST', '/api/order/refund', {
   body: { PaymentId: '{{paymentId}}', SaleAreaCode: '{{saleAreaCode}}', RefundType: 'full', Amount: '{{amount}}', Currency: 498, Reason: 'Customer request' },

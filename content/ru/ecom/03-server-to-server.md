@@ -168,7 +168,7 @@ Authorization: Bearer <access_token>
 
 | Операция | Запрос | Примечание |
 |---|---|---|
-| Поиск платежей | `GET /api/order/search?from=…&to=…` | Дата-время ISO 8601, например `2026-03-09T06:40:05.010Z`. |
+| Поиск платежей | `GET /api/order/search?from=…&to=…` | Дата-время **по Кишинёву** без `Z`, например `2026-03-09T08:40:05`. Пометку UTC (`Z`) API не учитывает: время в UTC сдвинет период на 2–3 часа, и свежие платежи не попадут в результат. Если за период нет платежей, API отвечает `404 NOT_FOUND_RECORD` — это пустой результат, а не ошибка. |
 | Возврат | `POST /api/order/refund` | Тело: `PaymentId`, `SaleAreaCode`, `RefundType` (`full` или `partial`), `Amount`, `Currency`, `Reason`. |
 | Удалить сохранённую карту | `POST /api/linked-cards/unlink` | Тело: `CardLinkHash`, `SaleAreaCode`, `CustomerCode`. |
 | Выписка | `GET /api/statement?dateStart=…&dateFinish=…` | Даты вида `2026-03-01`. Необязательный `accountId`. |

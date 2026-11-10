@@ -168,7 +168,7 @@ Both return the same payment object. Use them before shipping goods and whenever
 
 | Operation | Request | Notes |
 |---|---|---|
-| Search payments | `GET /api/order/search?from=…&to=…` | ISO 8601 date-time, e.g. `2026-03-09T06:40:05.010Z`. |
+| Search payments | `GET /api/order/search?from=…&to=…` | Date-time **in Chișinău time** without `Z`, e.g. `2026-03-09T08:40:05`. The API ignores the UTC marker (`Z`): UTC times shift the period by 2–3 hours, and recent payments are missed. If there are no payments in the period, the API answers `404 NOT_FOUND_RECORD` — an empty result, not an error. |
 | Refund | `POST /api/order/refund` | Body: `PaymentId`, `SaleAreaCode`, `RefundType` (`full` or `partial`), `Amount`, `Currency`, `Reason`. |
 | Unlink a saved card | `POST /api/linked-cards/unlink` | Body: `CardLinkHash`, `SaleAreaCode`, `CustomerCode`. |
 | Statement | `GET /api/statement?dateStart=…&dateFinish=…` | Dates like `2026-03-01`. Optional `accountId`. |

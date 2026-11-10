@@ -91,7 +91,7 @@ Colecția gata făcută funcționează imediat după import, nu trebuie modifica
 | Obține și reînnoiește tokenul | Înainte de fiecare cerere, dacă tokenul lipsește sau expiră curând |
 | Creează o comandă unică | `Order` = ora curentă în ms, `ExpiryDate` = mâine, ora Chișinăului |
 | Transmite datele între cereri | Salvează `paymentId`, `paymentLink`, `lastOrder`, `cardLinkHash` |
-| Calculează perioadele | Căutare — ultimele 24 de ore, extras — ultimele 7 zile |
+| Calculează perioadele | Căutare — ultimele 24 de ore în ora Chișinăului, extras — ultimele 7 zile |
 | Afișează erorile | Codul, mesajul, `details` și `traceId` în Postman Console |
 
 Dosarul **5. Error examples** provoacă intenționat erorile `401`, `400` și `404`, ca să vedeți cum arată.

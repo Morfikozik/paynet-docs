@@ -622,7 +622,7 @@
             "name": "from",
             "in": "query",
             "required": true,
-            "description": "The starting date and time of the search interval.",
+            "description": "Start of the search period in Chișinău local time, YYYY-MM-DDTHH:mm:ss (a trailing Z is ignored).",
             "schema": {
               "type": "string",
               "format": "date-time"
@@ -632,7 +632,7 @@
             "name": "to",
             "in": "query",
             "required": true,
-            "description": "The ending date and time of the search interval.",
+            "description": "End of the search period in Chișinău local time, YYYY-MM-DDTHH:mm:ss (a trailing Z is ignored).",
             "schema": {
               "type": "string",
               "format": "date-time"
@@ -711,7 +711,7 @@
             }
           }
         },
-        "description": "The get transaction list method is used to retrieve a list of payments within a specified date and time interval. To perform this request, the Partner must provide the from and to parameters in the query string, defining the start and end of the search period. Paynet will return a collection of transactions that were created or processed within the specified timeframe. Each transaction record includes relevant details such as payment ID, amount, currency, status, and timestamps. This method allows the Partner to perform transaction monitoring, reporting, and reconciliation over a defined period."
+        "description": "The get transaction list method is used to retrieve a list of payments within a specified date and time interval. To perform this request, the Partner must provide the from and to parameters in the query string, defining the start and end of the search period. Paynet will return a collection of transactions that were created or processed within the specified timeframe. Each transaction record includes relevant details such as payment ID, amount, currency, status, and timestamps. If no payments match the period, the API answers 404 NOT_FOUND_RECORD (an empty result). This method allows the Partner to perform transaction monitoring, reporting, and reconciliation over a defined period."
       }
     },
     "/api/order/refund": {

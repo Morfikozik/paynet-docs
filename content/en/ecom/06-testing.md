@@ -91,7 +91,7 @@ The ready-made collection works right after import; nothing needs editing.
 | Gets and refreshes the token | Before each request, if there is no token or it is about to expire |
 | Creates a unique order | `Order` = current time in ms, `ExpiryDate` = tomorrow, Chisinau time |
 | Passes data between requests | Saves `paymentId`, `paymentLink`, `lastOrder`, `cardLinkHash` |
-| Calculates periods | Search — last 24 hours, statement — last 7 days |
+| Calculates periods | Search — last 24 hours in Chișinău time, statement — last 7 days |
 | Shows errors | Code, message, `details` and `traceId` in the Postman Console |
 
 The **5. Error examples** folder triggers `401`, `400` and `404` on purpose, so you can see what they look like.
