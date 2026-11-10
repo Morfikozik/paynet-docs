@@ -246,7 +246,7 @@ const cardsStage = async (token) => {
             await q.goto(same.body.paymentLink, { waitUntil: 'load', timeout: 60000 });
             await q.waitForTimeout(8000);
             await snap(q, 'cards-saved-card-page');
-            note('cards:saved-card-visible', { text: (await q.innerText('body')).match(/411111[\*•x°]*1111|[\*•°]{2,}\s*1111/i)?.[0] || null });
+            note('cards:saved-card-visible', { text: (await q.content()).match(/"CardNumberBrief":"([^"]*1111)"/)?.[1] || null });
             await q.close();
           }
           // Another customer + the same token → should be refused or not show the card.
@@ -260,7 +260,7 @@ const cardsStage = async (token) => {
             await q.goto(other.body.paymentLink, { waitUntil: 'load', timeout: 60000 });
             await q.waitForTimeout(8000);
             await snap(q, 'cards-other-customer-page');
-            note('cards:other-customer-card-visible', { text: (await q.innerText('body')).match(/411111[\*•x°]*1111|[\*•°]{2,}\s*1111/i)?.[0] || null });
+            note('cards:other-customer-card-visible', { text: (await q.content()).match(/"CardNumberBrief":"([^"]*1111)"/)?.[1] || null });
             await q.close();
           }
           // Unknown token for the same customer.
