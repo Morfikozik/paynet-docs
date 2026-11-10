@@ -10,11 +10,14 @@
     <link rel="alternate" type="text/markdown" title="Documentation for AI (llms-full.txt)" href="llms-full.txt" />
     <link rel="alternate" type="text/plain" title="llms.txt" href="llms.txt" />
     <link rel="alternate" type="application/json" title="OpenAPI" href="openapi.json" />
+    <!-- Browsers with JavaScript hide the crawler fallback before the first paint (no flash). Crawlers still read it in the HTML. -->
+    <script>document.documentElement.classList.add('js');</script>
+    <style>.js #no-js-fallback { display: none; }</style>
   </head>
   <body>
     <div id="root">
       <!-- Shown to crawlers and AI tools that do not run JavaScript; React replaces it on load. -->
-      <main style="font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; color: #334155">
+      <main id="no-js-fallback" style="font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; color: #334155">
         <h1>Paynet for developers</h1>
         <p>This portal needs JavaScript. The same documentation is available as plain text:</p>
         <ul>
