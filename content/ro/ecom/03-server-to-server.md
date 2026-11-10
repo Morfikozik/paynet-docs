@@ -64,7 +64,7 @@ Content-Type: application/json
           "Name": "Demo product",
           "Description": "Demo product",
           "UnitPrice": 100,
-          "Quantity": 3,
+          "Quantity": 300,
           "Amount": 300,
           "TotalAmount": 300
         }
@@ -103,7 +103,7 @@ Content-Type: application/json
 | `Amount` | integer | da | Suma serviciului în unități minime. |
 | `Products` | array | nu | Dacă trimiteți produse, toate câmpurile produsului de mai jos sunt obligatorii. |
 
-`Services[].Products[]`: `LineNo` (int), `Code` (string), `Name` (string), `Description` (string), `UnitPrice` (int), `Quantity` (int), `Amount` (int), `TotalAmount` (int).
+`Services[].Products[]`: `LineNo` (int), `Code` (string), `Name` (string), `Description` (string), `UnitPrice` (int), `Quantity` (int, în sutimi: `100` = 1 buc., `300` = 3 buc.), `Amount` (int), `TotalAmount` (int).
 
 **Sumele** sunt numere întregi în unități minime (bani): `1201` = 12,01 MDL.
 

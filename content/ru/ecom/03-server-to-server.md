@@ -64,7 +64,7 @@ Content-Type: application/json
           "Name": "Demo product",
           "Description": "Demo product",
           "UnitPrice": 100,
-          "Quantity": 3,
+          "Quantity": 300,
           "Amount": 300,
           "TotalAmount": 300
         }
@@ -103,7 +103,7 @@ Content-Type: application/json
 | `Amount` | integer | да | Сумма услуги в минимальных единицах. |
 | `Products` | array | нет | Если передаёте товары, все поля товара ниже обязательны. |
 
-`Services[].Products[]`: `LineNo` (int), `Code` (string), `Name` (string), `Description` (string), `UnitPrice` (int), `Quantity` (int), `Amount` (int), `TotalAmount` (int).
+`Services[].Products[]`: `LineNo` (int), `Code` (string), `Name` (string), `Description` (string), `UnitPrice` (int), `Quantity` (int, в сотых долях: `100` = 1 шт., `300` = 3 шт.), `Amount` (int), `TotalAmount` (int).
 
 **Суммы** — целые числа в минимальных единицах (бани): `1201` = 12,01 MDL.
 

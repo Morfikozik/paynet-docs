@@ -1378,12 +1378,12 @@
           },
           "Quantity": {
             "type": "integer",
-            "description": "The quantity of the product being purchased.",
+            "description": "Quantity in hundredths: 100 = 1 pc, 300 = 3 pcs.",
             "format": "int64"
           },
           "Amount": {
             "type": "integer",
-            "description": "The total amount for this quantity (usually UnitPrice * Quantity).",
+            "description": "The total amount for this quantity in minor units (usually UnitPrice * Quantity / 100).",
             "format": "int64"
           },
           "TotalAmount": {
