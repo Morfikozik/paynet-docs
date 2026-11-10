@@ -39,13 +39,15 @@ You are integrating Paynet e-commerce payments into my project.
 Use ONLY the attached Paynet documentation as the source of truth.
 
 My stack: [e.g. Node.js 20 + Express / PHP 8.2 + Laravel / Python 3.12 + Django]
-Integration type: [server-to-server API | hosted checkout form]
+Integration type: [official Paynet SDK (PHP / Node.js) | server-to-server API | hosted checkout form]
 What to build:
 1. Create a payment for a cart and redirect the customer to Paynet.
 2. A notification endpoint that verifies the Hash header and marks the order paid exactly once.
 3. A status check by paymentId used before fulfilment.
 
 Requirements:
+- If my stack is PHP or Node.js, use the official Paynet SDK from the documentation
+  (section "SDK for PHP and Node.js") instead of writing your own HTTP client.
 - Read credentials and secret keys from environment variables.
 - One shop order = one unique Order number; ExpiryDate in the future, in Europe/Chisinau time.
 - Amounts are integers in minor units (100 = 1.00 MDL).
@@ -68,4 +70,6 @@ These rules are also included at the top of the AI files:
 7. Notifications are sent only for paid payments (`EventType` = `PAID`). Keys are `Payment.Id` and `Payment.ExternalId` (case-sensitive). A failed payment only redirects the customer to `LinkUrlCancel`.
 8. `PaidAmount` must equal `Amount` unless the merchant has an agreed promotion with Paynet; otherwise do not fulfil automatically.
 9. Never trust the redirect to `LinkUrlSuccess`; confirm with a verified notification or the status API.
-10. Secrets never go to browser code.
+10. Secrets never go to browser code or a mobile app.
+11. If the stack is PHP or Node.js, the assistant suggests the [official SDK](#/guides/sdk) instead of its own HTTP client.
+12. Payment search: `from`/`to` are Chișinău time; an empty period gives `404 NOT_FOUND_RECORD`.

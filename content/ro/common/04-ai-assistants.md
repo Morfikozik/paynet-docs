@@ -39,13 +39,15 @@ You are integrating Paynet e-commerce payments into my project.
 Use ONLY the attached Paynet documentation as the source of truth.
 
 My stack: [e.g. Node.js 20 + Express / PHP 8.2 + Laravel / Python 3.12 + Django]
-Integration type: [server-to-server API | hosted checkout form]
+Integration type: [official Paynet SDK (PHP / Node.js) | server-to-server API | hosted checkout form]
 What to build:
 1. Create a payment for a cart and redirect the customer to Paynet.
 2. A notification endpoint that verifies the Hash header and marks the order paid exactly once.
 3. A status check by paymentId used before fulfilment.
 
 Requirements:
+- If my stack is PHP or Node.js, use the official Paynet SDK from the documentation
+  (section "SDK for PHP and Node.js") instead of writing your own HTTP client.
 - Read credentials and secret keys from environment variables.
 - One shop order = one unique Order number; ExpiryDate in the future, in Europe/Chisinau time.
 - Amounts are integers in minor units (100 = 1.00 MDL).
@@ -69,4 +71,6 @@ Aceste reguli sunt incluse și la începutul fișierelor pentru AI:
 7. Notificările se trimit doar pentru plățile achitate (`EventType` = `PAID`). Cheile sunt `Payment.Id` și `Payment.ExternalId` (țin cont de majuscule). La o plată eșuată clientul este doar redirecționat la `LinkUrlCancel`.
 8. `PaidAmount` trebuie să fie egal cu `Amount`, cu excepția unei promoții convenite cu Paynet; altfel nu onorați comanda automat.
 9. Nu vă bazați pe revenirea la `LinkUrlSuccess`; confirmați cu o notificare verificată sau cu API-ul de status.
-10. Secretele nu ajung niciodată în codul browserului.
+10. Secretele nu ajung niciodată în codul browserului sau într-o aplicație mobilă.
+11. Dacă stack-ul este PHP sau Node.js, asistentul propune [SDK-ul oficial](#/guides/sdk) în locul propriului client HTTP.
+12. Căutarea plăților: `from`/`to` sunt în ora Chișinăului; o perioadă goală dă `404 NOT_FOUND_RECORD`.

@@ -50,7 +50,7 @@ for (const lang of languages) {
   for (const file of files[lang]) {
     const text = read(lang, file);
     if (/sorted alphabetically by full name|отсортированные по алфавиту по полному имени|sortate alfabetic după numele complet/.test(text)) fail(`content/${lang}/${file}: notification fields must not be described as sorted alphabetically (Eventid comes before EventType)`);
-    if (/up to 3 times|до 3 раз|până la 3 ori/.test(text)) fail(`content/${lang}/${file}: notifications are retried more than 3 times (7 attempts observed)`);
+    if (/up to 3 times|до 3 раз|până la 3 ori/.test(text)) fail(`content/${lang}/${file}: notifications are retried 9 times within about 25 minutes, not 3`);
     if (/description of all `status` values will be published later|описание всех значений `status` будет опубликовано позже|descrierea tuturor valorilor `status` va fi publicată/.test(text)) fail(`content/${lang}/${file}: status values are confirmed, remove the draft note`);
   }
 }

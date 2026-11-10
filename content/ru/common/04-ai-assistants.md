@@ -39,13 +39,15 @@ You are integrating Paynet e-commerce payments into my project.
 Use ONLY the attached Paynet documentation as the source of truth.
 
 My stack: [e.g. Node.js 20 + Express / PHP 8.2 + Laravel / Python 3.12 + Django]
-Integration type: [server-to-server API | hosted checkout form]
+Integration type: [official Paynet SDK (PHP / Node.js) | server-to-server API | hosted checkout form]
 What to build:
 1. Create a payment for a cart and redirect the customer to Paynet.
 2. A notification endpoint that verifies the Hash header and marks the order paid exactly once.
 3. A status check by paymentId used before fulfilment.
 
 Requirements:
+- If my stack is PHP or Node.js, use the official Paynet SDK from the documentation
+  (section "SDK for PHP and Node.js") instead of writing your own HTTP client.
 - Read credentials and secret keys from environment variables.
 - One shop order = one unique Order number; ExpiryDate in the future, in Europe/Chisinau time.
 - Amounts are integers in minor units (100 = 1.00 MDL).
@@ -69,4 +71,6 @@ Requirements:
 7. Уведомления приходят только об оплаченных платежах (`EventType` = `PAID`). Ключи — `Payment.Id` и `Payment.ExternalId` (с учётом регистра). При неуспешной оплате покупатель только перенаправляется на `LinkUrlCancel`.
 8. `PaidAmount` должен равняться `Amount`, если у мерчанта нет согласованной с Paynet акции; иначе не выполнять заказ автоматически.
 9. Не доверяйте возврату на `LinkUrlSuccess`; подтверждайте проверенным уведомлением или API статуса.
-10. Секреты никогда не попадают в код браузера.
+10. Секреты никогда не попадают в код браузера и мобильного приложения.
+11. Если стек — PHP или Node.js, ассистент предлагает [официальный SDK](#/guides/sdk) вместо собственного HTTP-клиента.
+12. Поиск платежей: `from`/`to` — по времени Кишинёва; пустой период — `404 NOT_FOUND_RECORD`.
