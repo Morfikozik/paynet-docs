@@ -380,11 +380,12 @@ const postmanStage = async () => {
   const { execFileSync } = await import('node:child_process');
   execFileSync('node', ['scripts/build-postman.mjs'], { stdio: 'inherit' });
   const newman = (await import('newman')).default;
-  const run = (collection, folders) => new Promise((resolve, reject) => {
+  const run = (folders, envVar = []) => new Promise((resolve, reject) => {
     newman.run({
-      collection,
+      collection: 'public/postman/paynet-ecom.postman_collection.json',
       environment: 'public/postman/paynet-test.postman_environment.json',
       folder: folders,
+      envVar,
       reporters: [],
     }, (error, summary) => (error ? reject(error) : resolve(summary)));
   });
@@ -392,22 +393,28 @@ const postmanStage = async () => {
     const rows = summary.run.executions.map((e) => ({
       name: e.item.name,
       code: e.response?.code,
+      url: e.request?.url?.toString(),
       failed: (e.assertions || []).filter((a) => a.error).map((a) => `${a.assertion}: ${a.error.message}`),
     }));
     note(`postman:${label}`, { rows, failures: summary.run.failures.map((f) => `${f.source?.name || ''} ${f.at || ''}: ${f.error?.name || ''} ${f.error?.message || ''}`) });
     return rows;
   };
-  const first = await run('public/postman/paynet-ecom.postman_collection.json', ['Create order']);
-  report('create', first);
-  const after = first.collection.toJSON();
-  const saved = after.variable;
-  const value = (key) => saved.find((v) => v.key === key)?.value;
-  note('postman:variables', { orderNumber: value('orderNumber'), paymentId: value('paymentId'), paymentLink: value('paymentLink'), expiryDate: value('expiryDate'), tokenSaved: !!value('accessToken') });
+
+  // Run 1: the whole "Payments" folder in one run — create order, then the next requests reuse paymentId / Order.
+  const first = await run(['1. Payments']);
+  const rows1 = report('payments-before-pay', first);
+  const createExec = first.run.executions.find((e) => e.item.name === 'Create order');
+  const created = JSON.parse(createExec.response.stream.toString());
+  const sentBody = JSON.parse(createExec.request.body.raw);
+  note('postman:created', { order: sentBody.Order, expiryDate: sentBody.ExpiryDate, paymentId: created.paymentId });
+  const chained = rows1.filter((r) => r.name.startsWith('Get payment')).every((r) => r.code === 200 && r.url.includes(String(r.name.includes('Order') ? sentBody.Order : created.paymentId)));
+  note('postman:chaining', { ok: chained });
+  if (!chained) throw new Error('Variables were not passed between requests');
 
   const browser = await chromium.launch();
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-    await page.goto(value('paymentLink'), { waitUntil: 'networkidle', timeout: 60000 });
+    await page.goto(created.paymentLink, { waitUntil: 'networkidle', timeout: 60000 });
     await fillAndPay(page, 'postman-pay');
     await page.waitForTimeout(5000);
   } finally {
@@ -416,19 +423,22 @@ const postmanStage = async () => {
   const auth = await call('POST', '/auth', { grantType: 'password', username: '771064', password: 'sLgMnGWJ' });
   let status;
   for (let i = 0; i < 20; i++) {
-    status = (await call('GET', `/api/order/merchant/${value('orderNumber')}`, null, auth.body.access_token)).body?.status;
+    status = (await call('GET', `/api/order/merchant/${sentBody.Order}`, null, auth.body.access_token)).body?.status;
     if (status === 4) break;
     await new Promise((r) => setTimeout(r, 3000));
   }
   note('postman:paid', { status });
-  const rest = await run(after, [
+
+  // Run 2: after payment — refund, statements, authorization, error examples.
+  const rest = await run([
     'Get payment by Order (merchant order number)',
-    'Get payment by paymentId',
-    'Search payments (last 24 hours)',
     'Refund (pay the order first)',
     '3. Statements',
     '4. Authorization',
     '5. Error examples (fail on purpose)',
+  ], [
+    { key: 'paymentId', value: String(created.paymentId) },
+    { key: 'lastOrder', value: String(sentBody.Order) },
   ]);
   const rows = report('rest', rest);
   const bad = rows.filter((r) => r.failed.length);
