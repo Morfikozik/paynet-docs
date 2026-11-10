@@ -290,11 +290,19 @@ const portalStage = async () => {
     note('portal-simulator-before', { value: await orderInput.inputValue() });
 
     const api = await context.newPage();
+    await api.goto(SITE + '#/api/post-auth', { waitUntil: 'networkidle' });
+    await api.click('button:has-text("Test API Request")');
+    await api.waitForFunction(() => !!localStorage.getItem('tps_api_token'), null, { timeout: 60000 });
+    note('portal-auth', { ok: true });
     await api.goto(SITE + '#/api/post-api-order', { waitUntil: 'networkidle' });
+    await api.waitForTimeout(800);
     const requestText = await api.locator('textarea').first().inputValue();
     const sentOrder = String(JSON.parse(requestText).Order);
     await api.click('button:has-text("Test API Request")');
-    await api.waitForFunction(() => !!localStorage.getItem('paynet_last_order'), null, { timeout: 60000 });
+    await api.waitForFunction(() => !!localStorage.getItem('paynet_last_order'), null, { timeout: 60000 }).catch(async (error) => {
+      await snap(api, 'portal-00-api-failed');
+      throw error;
+    });
     const stored = await api.evaluate(() => localStorage.getItem('paynet_last_order'));
     note('portal-order-created', { sentOrder, stored });
     await snap(api, 'portal-01-api');
