@@ -387,7 +387,7 @@ function paynetHandleRequest($db, callable $getToken): void {
 Open **General → Notifications → Notification simulator**:
 
 1. Enter your callback URL. It must be reachable from the internet and, **for the simulator only**, accept requests from the browser (CORS).
-2. Enter the notification secret key (test: `D9873689-E5F8-4272-A67F-0D8BA3F9BAA7`).
+2. Check the notification secret key: the test key `D9873689-E5F8-4272-A67F-0D8BA3F9BAA7` is already filled in; you can replace it with your own.
 3. Enter your merchant order number (`Order`) of a **paid** test payment and press **Get** — the portal loads the payment.
 4. Press **Send notification** — the portal sends a signed `PAID` notification built from that payment to your URL and shows the `PreparedString` and `Hash` it used.
 

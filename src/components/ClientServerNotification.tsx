@@ -129,7 +129,8 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
   };
 
   const [isExpanded, setIsExpanded] = React.useState(true);
-  const [notificationSecretKey, setNotificationSecretKey] = React.useState('');
+  // Public test notification key of the shared test merchant (265505); replace it with your own key.
+  const [notificationSecretKey, setNotificationSecretKey] = React.useState('D9873689-E5F8-4272-A67F-0D8BA3F9BAA7');
   const [notificationCallbackUrl, setNotificationCallbackUrl] = React.useState('https://your-domain.com/paynet/notification');
   const [isSendingNotification, setIsSendingNotification] = React.useState(false);
   const [notificationResult, setNotificationResult] = React.useState('');
@@ -810,6 +811,13 @@ Payment.ExternalId + Payment.Id + Payment.Merchant + Payment.StatusDate`}
                               className="w-full px-3 py-2 border border-paynet-gray-300 rounded-md text-sm font-mono mb-3"
                               placeholder="Enter secret key used for signature validation"
                             />
+                            <p className="-mt-2 mb-3 text-xs text-paynet-gray-500">
+                              {tDesc(
+                                'Pre-filled with the public test key of the shared test merchant. Replace it with your own test key if you have one. Never enter a production key here.',
+                                'Уже заполнен публичным тестовым ключом общего тестового мерчанта. Если у вас есть свой тестовый ключ, замените его. Боевой ключ сюда не вводите.',
+                                'Completat deja cu cheia publică de test a comerciantului de test comun. Dacă aveți propria cheie de test, înlocuiți-o. Nu introduceți aici cheia de producție.'
+                              )}
+                            </p>
                             <label className="block text-sm font-medium text-paynet-gray-700 mb-1">MerchantSystemUrl (callback URL)</label>
                             <input
                               value={notificationCallbackUrl}

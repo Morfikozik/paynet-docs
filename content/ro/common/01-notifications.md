@@ -387,7 +387,7 @@ function paynetHandleRequest($db, callable $getToken): void {
 Deschideți **General → Notificări → Simulator notificări**:
 
 1. Introduceți URL-ul dvs. de callback. Trebuie să fie accesibil din internet și, **doar pentru simulator**, să accepte cereri din browser (CORS).
-2. Introduceți cheia secretă pentru notificări (test: `D9873689-E5F8-4272-A67F-0D8BA3F9BAA7`).
+2. Verificați cheia secretă pentru notificări: cheia de test `D9873689-E5F8-4272-A67F-0D8BA3F9BAA7` este deja completată; o puteți înlocui cu propria cheie.
 3. Introduceți numărul comenzii comerciantului (`Order`) al unei plăți de test **achitate** și apăsați **Get** — portalul încarcă plata.
 4. Apăsați **Send notification** — portalul trimite la URL-ul dvs. o notificare `PAID` semnată, construită din această plată, și afișează `PreparedString` și `Hash` folosite.
 
