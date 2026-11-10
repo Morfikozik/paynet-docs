@@ -447,6 +447,17 @@ const postmanStage = async () => {
   if (bad.length) throw new Error('Postman assertions failed: ' + JSON.stringify(bad));
 };
 
+// Quantity units check: Products[].Quantity = 300 with UnitPrice 100 and Amount 300.
+const quantityStage = async (token) => {
+  const order = Date.now();
+  const body = orderBody(order, 300);
+  body.Services[0].Products = [{ LineNo: 1, Code: 'SKU-1', Name: 'Demo product', Description: 'Demo product', UnitPrice: 100, Quantity: 300, Amount: 300, TotalAmount: 300 }];
+  const created = await call('POST', '/api/order', body, token);
+  note('quantity:create', { status: created.status, body: created.body });
+  const got = await call('GET', `/api/order/merchant/${order}`, null, token);
+  note('quantity:get', { status: got.status, products: got.body?.services?.[0]?.products });
+};
+
 const main = async () => {
   if (stage === 'postman') return postmanStage();
   if (stage === 'portal') return portalStage();
@@ -459,6 +470,7 @@ const main = async () => {
   if (stage === 'contract') return contractStage(token);
   if (stage === 'cards') return cardsStage(token);
   if (stage === 'probe-errors') return probeErrorsStage(token);
+  if (stage === 'quantity') return quantityStage(token);
 
   const order1 = Date.now();
   const created = await call('POST', '/api/order', orderBody(order1, 300), token);
