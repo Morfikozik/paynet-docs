@@ -1,5 +1,5 @@
 // End-to-end check of the documentation against the Paynet TEST environment.
-// Usage: node scripts/e2e.mjs <explore|full|shop|contract|cards|portal> <outDir>
+// Usage: node scripts/e2e.mjs <explore|full|shop|contract|cards|portal|probe-errors|postman> <outDir>
 // Results (log.json, screenshots, page HTML) go to outDir; CI publishes them to the ci/e2e branch.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -323,6 +323,58 @@ const portalStage = async () => {
   }
 };
 
+// Error probes on the test API: which HTTP codes Paynet really returns (415, 405, 404, 429...).
+const probeErrorsStage = async (token) => {
+  const raw = async (name, method, url, { headers = {}, body } = {}) => {
+    const started = Date.now();
+    const response = await fetch(API + url, { method, headers, body });
+    const text = await response.text();
+    const result = {
+      status: response.status,
+      ms: Date.now() - started,
+      contentType: response.headers.get('content-type'),
+      retryAfter: response.headers.get('retry-after'),
+      body: text.slice(0, 600),
+    };
+    note(`probe:${name}`, result);
+    return result;
+  };
+  const auth = { Authorization: `Bearer ${token}` };
+  const json = JSON.stringify(orderBody(Date.now(), 300));
+  await raw('order-text-plain', 'POST', '/api/order', { headers: { ...auth, 'Content-Type': 'text/plain' }, body: json });
+  await raw('order-no-content-type', 'POST', '/api/order', { headers: auth, body: json });
+  await raw('order-xml', 'POST', '/api/order', { headers: { ...auth, 'Content-Type': 'application/xml' }, body: '<Order>1</Order>' });
+  await raw('order-form-urlencoded', 'POST', '/api/order', { headers: { ...auth, 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'Order=1' });
+  await raw('auth-text-plain', 'POST', '/auth', { headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ grantType: 'password', username: '771064', password: 'sLgMnGWJ' }) });
+  await raw('order-wrong-method-get', 'GET', '/api/order', { headers: auth });
+  await raw('order-wrong-method-put', 'PUT', '/api/order', { headers: { ...auth, 'Content-Type': 'application/json' }, body: json });
+  await raw('unknown-path', 'GET', '/api/does-not-exist', { headers: auth });
+  await raw('payment-not-numeric', 'GET', '/api/order/abc', { headers: auth });
+  await raw('payment-not-found', 'GET', '/api/order/999999999', { headers: auth });
+  await raw('order-empty-json', 'POST', '/api/order', { headers: { ...auth, 'Content-Type': 'application/json' }, body: '{}' });
+  await raw('order-broken-json', 'POST', '/api/order', { headers: { ...auth, 'Content-Type': 'application/json' }, body: '{"Order": ' });
+
+  // Rate limit: 3 bursts of parallel read-only requests.
+  const created = await call('POST', '/api/order', orderBody(Date.now(), 300), token);
+  const id = created.body?.paymentId;
+  for (const size of [20, 50, 100]) {
+    const started = Date.now();
+    const results = await Promise.all(Array.from({ length: size }, () =>
+      fetch(`${API}/api/order/${id}`, { headers: auth }).then(async (r) => ({ status: r.status, retryAfter: r.headers.get('retry-after'), body: r.status === 200 ? '' : (await r.text()).slice(0, 300) })).catch((e) => ({ status: 'network', body: String(e) }))
+    ));
+    const counts = {};
+    results.forEach((r) => { counts[r.status] = (counts[r.status] || 0) + 1; });
+    note(`probe:burst-${size}`, { ms: Date.now() - started, counts, sampleNon200: results.find((r) => r.status !== 200) || null });
+  }
+  // Auth burst (token endpoint).
+  const authResults = await Promise.all(Array.from({ length: 30 }, () =>
+    fetch(`${API}/auth`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ grantType: 'password', username: '771064', password: 'sLgMnGWJ' }) }).then((r) => r.status).catch(() => 'network')
+  ));
+  const authCounts = {};
+  authResults.forEach((st) => { authCounts[st] = (authCounts[st] || 0) + 1; });
+  note('probe:auth-burst-30', { counts: authCounts });
+};
+
 const main = async () => {
   if (stage === 'portal') return portalStage();
   if (stage === 'shop') return shopStage();
@@ -333,6 +385,7 @@ const main = async () => {
   check('auth', '/auth', 'post', auth);
   if (stage === 'contract') return contractStage(token);
   if (stage === 'cards') return cardsStage(token);
+  if (stage === 'probe-errors') return probeErrorsStage(token);
 
   const order1 = Date.now();
   const created = await call('POST', '/api/order', orderBody(order1, 300), token);
