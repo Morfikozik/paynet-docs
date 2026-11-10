@@ -681,12 +681,12 @@ const siteAuditStage = async () => {
       let ok = false;
       let detail = '';
       try {
-        const before = await page.locator('main h1').first().textContent();
+        const before = await page.locator('h1').first().textContent();
         await page.locator('header button').filter({ hasText: /English|Русский|Română/ }).first().click();
         await page.waitForTimeout(300);
         await page.getByText('Русский').last().click();
         await page.waitForTimeout(600);
-        const after = await page.locator('main h1').first().textContent();
+        const after = await page.locator('h1').first().textContent();
         ok = before !== after && /Уведомления/.test(after || '');
         detail = `${before} → ${after}`;
       } catch (e) { detail = String(e.message || e).slice(0, 200); }
@@ -766,7 +766,82 @@ const siteAuditStage = async () => {
   note('site-audit', results.summary);
 };
 
+// Language switch through the UI (standalone check).
+const langSwitchStage = async () => {
+  const SITE = 'https://morfikozik.github.io/paynet-docs/';
+  const browser = await chromium.launch();
+  try {
+    const context = await browser.newContext({ viewport: { width: 1366, height: 900 } });
+    await context.addInitScript(() => { if (!sessionStorage.getItem('init')) { localStorage.setItem('tps-api-language', 'en'); sessionStorage.setItem('init', '1'); } });
+    const page = await context.newPage();
+    await page.goto(SITE + '#/guides/notifications', { waitUntil: 'networkidle' });
+    const before = (await page.locator('h1').first().textContent())?.trim();
+    await page.locator('header button').filter({ hasText: /English|Русский|Română/ }).first().click();
+    await page.waitForTimeout(300);
+    await page.getByText('Русский', { exact: false }).last().click();
+    await page.waitForTimeout(700);
+    const after = (await page.locator('h1').first().textContent())?.trim();
+    await page.reload({ waitUntil: 'networkidle' });
+    const afterReload = (await page.locator('h1').first().textContent())?.trim();
+    const ok = before === 'Notifications' && after === 'Уведомления' && afterReload === 'Уведомления';
+    note('lang-switch', { ok, before, after, afterReload });
+    await snap(page, 'lang-switch-ru');
+    if (!ok) throw new Error(`language switch: ${before} → ${after} → ${afterReload}`);
+  } finally {
+    await browser.close();
+  }
+};
+
+// Suite: runs the checks one after another and writes suite-report.md.
+const suiteStage = async () => {
+  const getToken = async () => (await call('POST', '/auth', { grantType: 'password', username: '771064', password: 'sLgMnGWJ' })).body?.access_token;
+  const plan = [
+    ['contract', 'API reference matches real responses', async () => contractStage(await getToken())],
+    ['lang-switch', 'Language switch in the UI', langSwitchStage],
+    ['portal', 'Try-it console: order created in one tab is pre-filled in the notification simulator', portalStage],
+    ['shop', 'Example shop (Node.js): purchase → payment → notification → fulfilment → refund', shopStage],
+    ['cards', 'Saved cards: shown to the same customer only', async () => {
+      const before = log.length;
+      await cardsStage(await getToken());
+      const notes = log.slice(before);
+      const visible = notes.find((n) => n.step === 'cards:saved-card-visible')?.text;
+      const otherVisible = notes.find((n) => n.step === 'cards:other-customer-card-visible')?.text;
+      if (!visible) throw new Error('saved card is not shown to the same customer');
+      if (otherVisible) throw new Error('saved card is shown to another customer');
+    }],
+    ['postman', 'Postman collection (newman): full run with payment and refund', postmanStage],
+    ['sdk', 'SDKs (PHP, Node.js): 20 checks each on the test API', async () => sdkStage(await getToken())],
+    ['probe-errors', 'Real HTTP error codes (415, 405, 404, 400, rate)', async () => probeErrorsStage(await getToken())],
+    ['search-probe', 'Search period time zone and empty result', async () => searchProbeStage(await getToken())],
+    ['quantity', 'Products Quantity units', async () => quantityStage(await getToken())],
+  ];
+  const rows = [];
+  for (const [name, title, fn] of plan) {
+    const started = Date.now();
+    const before = log.length;
+    let ok = true;
+    let error = '';
+    try {
+      await fn();
+    } catch (e) {
+      ok = false;
+      error = String(e?.message || e).slice(0, 400);
+    }
+    // a note with ok:false or problems also counts as a failure
+    const notes = log.slice(before);
+    const failedNotes = notes.filter((n) => n.ok === false || (Array.isArray(n.problems) && n.problems.length) || n.step === 'error');
+    if (failedNotes.length) ok = false;
+    rows.push({ name, title, ok, seconds: Math.round((Date.now() - started) / 1000), error, failedNotes: failedNotes.map((n) => n.step).slice(0, 10) });
+    note(`suite:${name}`, rows.at(-1));
+  }
+  const md = ['# E2E suite', '', `Date: ${new Date().toISOString()}`, '', '| Check | What | Result | Time | Notes |', '|---|---|---|---|---|',
+    ...rows.map((r) => `| ${r.name} | ${r.title} | ${r.ok ? '✓' : '✗'} | ${r.seconds} s | ${(r.error + ' ' + r.failedNotes.join(', ')).trim().replace(/\|/g, '\\|')} |`)];
+  fs.writeFileSync(path.join(outDir, 'suite-report.md'), md.join('\n'));
+};
+
 const main = async () => {
+  if (stage === 'suite') return suiteStage();
+  if (stage === 'lang-switch') return langSwitchStage();
   if (stage === 'site-audit') return siteAuditStage();
   if (stage === 'postman') return postmanStage();
   if (stage === 'portal') return portalStage();
