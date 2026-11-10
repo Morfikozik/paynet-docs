@@ -395,7 +395,7 @@ const postmanStage = async () => {
       code: e.response?.code,
       failed: (e.assertions || []).filter((a) => a.error).map((a) => `${a.assertion}: ${a.error.message}`),
     }));
-    note(`postman:${label}`, { rows, failures: summary.run.failures.length });
+    note(`postman:${label}`, { rows, failures: summary.run.failures.map((f) => `${f.source?.name || ''} ${f.at || ''}: ${f.error?.name || ''} ${f.error?.message || ''}`) });
     return rows;
   };
   const c1 = path.join(outDir, 'collection-after-create.json');

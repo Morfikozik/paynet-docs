@@ -97,12 +97,20 @@ if (pm.response.code >= 400) {
 `;
 
 const chisinauDate = `
+// Chisinau local time without Intl (not reliable in the Postman sandbox):
+// UTC+3 from the last Sunday of March 01:00 UTC to the last Sunday of October 01:00 UTC, otherwise UTC+2.
+const lastSundayUtc = (year, month) => {
+  const d = new Date(Date.UTC(year, month + 1, 0, 1, 0, 0));
+  d.setUTCDate(d.getUTCDate() - d.getUTCDay());
+  return d.getTime();
+};
 const chisinau = (date, withTime = true) => {
-  const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/Chisinau', year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
-  }).formatToParts(date).map((x) => [x.type, x.value]));
-  return withTime ? p.year + '-' + p.month + '-' + p.day + 'T' + p.hour + ':' + p.minute + ':' + p.second : p.year + '-' + p.month + '-' + p.day;
+  const y = date.getUTCFullYear();
+  const summer = date.getTime() >= lastSundayUtc(y, 2) && date.getTime() < lastSundayUtc(y, 9);
+  const local = new Date(date.getTime() + (summer ? 3 : 2) * 3600 * 1000);
+  const pad = (n) => String(n).padStart(2, '0');
+  const day = local.getUTCFullYear() + '-' + pad(local.getUTCMonth() + 1) + '-' + pad(local.getUTCDate());
+  return withTime ? day + 'T' + pad(local.getUTCHours()) + ':' + pad(local.getUTCMinutes()) + ':' + pad(local.getUTCSeconds()) : day;
 };
 `;
 
