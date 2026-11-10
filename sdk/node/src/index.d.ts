@@ -76,6 +76,10 @@ export interface Payment {
   status: number;
   order: number;
   cardLinkHash: string | null;
+  /** Can be null in search results. */
+  linkUrlSuccess?: string | null;
+  /** Can be null in search results. */
+  linkUrlCancel?: string | null;
   amount: { requestAmount?: number; requestCurrency?: number; amount: number; paidAmount: number | null };
   customer?: { code?: string; cardLinkHash?: string | null; [key: string]: unknown };
   paidDate?: string | null;

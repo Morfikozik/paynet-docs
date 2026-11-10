@@ -1,14 +1,15 @@
 # Exemplu de magazin (Node.js)
 
-O integrare server-to-server minimă și gata de folosit: un server Node.js 18+ fără dependențe. Cod sursă: [examples/node-shop](https://github.com/Morfikozik/paynet-docs/tree/main/examples/node-shop).
+O integrare server-to-server minimă și gata de folosit: un server Node.js 18+ fără dependențe. Cod sursă: [paynet-example-shop-node.zip](sdk/paynet-example-shop-node.zip).
 
 > **Important:** acest exemplu este verificat de un test end-to-end în mediul de test Paynet: un robot cumpără un produs în exemplu, plătește cu cardul de test, trimite notificarea și face o rambursare. Deci codul exemplului funcționează.
 
 ## Pornire
 
 ```bash
-git clone https://github.com/Morfikozik/paynet-docs.git
-cd paynet-docs/examples/node-shop
+# descărcați paynet-example-shop-node.zip de pe această pagină, apoi:
+unzip paynet-example-shop-node.zip
+cd node-shop
 node server.mjs
 ```
 

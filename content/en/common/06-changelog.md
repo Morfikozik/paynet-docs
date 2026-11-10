@@ -11,6 +11,12 @@ Clarifications found by a test in which a developer new to Paynet integrated usi
 - Notifications: only the HTTP code `200` counts, the response body does not matter.
 - Getting started: where the merchant code is used.
 - `Customer.PhoneNumber`: optional, but without it the customer types the phone on the payment page. Examples now send it.
+- **Statuses:** `6` = paid, then partially refunded; `5` = not paid (declined, antifraud) or fully refunded.
+- **Notifications:** the first notification is sent after the card-issuing bank confirms the payment (timing depends on the bank); the retry intervals are unchanged.
+- **SDK notification example:** the notification is saved before the `200` answer, the order is fulfilled from the saved record.
+- `linkUrlSuccess` / `linkUrlCancel` in payment responses can be `null` (API reference, Node.js SDK types).
+- `Lang`: upper or lower case both work; an unknown value opens the page in English (checked on the test environment).
+- The example shop is now downloaded as an archive from this portal.
 
 ## Documentation v3.2 — 10.11.2026
 

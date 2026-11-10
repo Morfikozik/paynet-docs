@@ -11,6 +11,12 @@ Clarificări în urma unui test în care un dezvoltator nou în Paynet a făcut 
 - Notificări: contează doar codul HTTP `200`, corpul răspunsului nu contează.
 - Getting started: unde se folosește codul comerciantului.
 - `Customer.PhoneNumber`: opțional, dar fără el clientul introduce telefonul pe pagina de plată. Exemplele îl trimit acum.
+- **Statusuri:** `6` — achitat, apoi rambursat parțial; `5` — neachitat (refuz bancar, antifraudă) sau rambursat integral.
+- **Notificări:** prima notificare se trimite după ce banca emitentă confirmă plata (timpul depinde de bancă); intervalele reîncercărilor nu s-au schimbat.
+- **Exemplul de notificări din SDK:** notificarea se salvează înainte de răspunsul `200`, comanda se onorează din înregistrarea salvată.
+- `linkUrlSuccess` / `linkUrlCancel` în răspunsurile despre plată pot fi `null` (referința API, tipurile Node.js SDK).
+- `Lang`: majusculele nu contează; la o valoare necunoscută pagina se deschide în engleză (verificat în mediul de test).
+- Exemplul de magazin se descarcă acum ca arhivă de pe acest portal.
 
 ## Documentația v3.2 — 10.11.2026
 

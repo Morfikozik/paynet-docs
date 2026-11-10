@@ -1331,7 +1331,7 @@
           },
           "Lang": {
             "type": "string",
-            "description": "UI language for payment page (example: RO or RU or EN).",
+            "description": "UI language for payment page: RO, RU or EN; upper or lower case (EN = en). An unknown value opens the page in English.",
             "nullable": true
           }
         },
@@ -1530,10 +1530,14 @@
             "type": "string"
           },
           "linkUrlSuccess": {
-            "type": "string"
+            "type": "string",
+            "nullable": true,
+            "description": "Return URL after a successful payment, as sent in the order. Can be null in GET /api/order/search results (seen on the test environment)."
           },
           "linkUrlCancel": {
-            "type": "string"
+            "type": "string",
+            "nullable": true,
+            "description": "Return URL after a failed or cancelled payment, as sent in the order. Can be null in GET /api/order/search results (seen on the test environment)."
           },
           "signature": {
             "type": "string",

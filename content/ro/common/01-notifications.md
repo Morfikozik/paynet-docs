@@ -378,16 +378,16 @@ function paynetHandleRequest($db, callable $getToken): void {
 - Răspundeți repede: salvați notificarea, returnați `200`, iar procesarea grea faceți-o după răspuns.
 - Orice alt răspuns (sau lipsa răspunsului) este considerat eșec, iar Paynet trimite notificarea din nou. După un răspuns `200`, reîncercările se opresc.
 - Contează doar codul HTTP; corpul răspunsului nu contează. `{ "ResultCode": "SUCCESS" }` din exemple este opțional.
-- Programul reîncercărilor — **9 încercări în circa 25 de minute**, după care trimiterea se oprește:
+- Programul — **9 încercări**; reîncercările durează circa 25 de minute după prima încercare, apoi trimiterea se oprește:
 
 | Încercarea | Când |
 |---|---|
-| 1 | ~20 de secunde după plată |
+| 1 | după ce banca emitentă confirmă plata (depinde de bancă: de la câteva secunde la câteva minute) |
 | 2–4 | după ~1 minut, apoi la fiecare ~35 de secunde |
 | 5–7 | după ~5 minute, apoi la fiecare ~35 de secunde |
 | 8–9 | după ~15 minute, apoi după ~35 de secunde |
 
-> **Important:** reîncercările durează doar circa 25 de minute. Dacă serverul dvs. a fost indisponibil mai mult, notificarea nu va mai veni. De aceea verificați statusul comenzilor neplătite prin API și faceți reconcilierea zilnic.
+> **Important:** reîncercările durează doar circa 25 de minute după prima încercare. Dacă serverul dvs. a fost indisponibil mai mult, notificarea nu va mai veni. De aceea verificați statusul comenzilor neplătite prin API și faceți reconcilierea zilnic.
 
 - Din cauza reîncercărilor aceeași notificare poate sosi de mai multe ori. Procesați fiecare `Payment.Id` o singură dată.
 - Dacă notificarea nu a sosit (de exemplu, serverul a fost indisponibil mai mult decât toate încercările), verificați statusul cu `GET /api/order/{paymentId}` sau `GET /api/order/merchant/{Order}`. Retrimiterea o puteți cere la suportul Paynet.

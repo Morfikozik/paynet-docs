@@ -73,6 +73,8 @@ const ruTranslations: Record<string, string> = {
   '(Optional) The customer\'s last name.': '(Необязательно) Фамилия клиента.',
   '(Optional) The customer\'s phone number.': '(Необязательно) Номер телефона клиента.',
   '(Optional) The description of the product.': '(Необязательно) Описание товара.',
+  'Return URL after a successful payment, as sent in the order. Can be null in GET /api/order/search results (seen on the test environment).': 'Адрес возврата после успешной оплаты, как передан в заказе. В результатах GET /api/order/search может быть null (замечено на тестовой среде).',
+  'Return URL after a failed or cancelled payment, as sent in the order. Can be null in GET /api/order/search results (seen on the test environment).': 'Адрес возврата после неуспешной или отменённой оплаты, как передан в заказе. В результатах GET /api/order/search может быть null (замечено на тестовой среде).',
   "(Optional) The customer's phone number. If it is not sent, the customer types it on the payment page (block \"Billing information\").": '(Необязательно) Телефон покупателя. Если не передать, покупатель вводит его на платёжной странице (блок «Billing information»).',
   '(Optional) The hash of the linked card if using a saved payment method.': '(Необязательно) Хэш привязанной карты при использовании сохраненного способа оплаты.',
   '(Optional) Linked-card hash. If CardLinkHash is provided, the full Customer object (Code, NameFirst, NameLast, email, PhoneNumber) becomes required.': '(Необязательно) Хэш связанной карты. Если передан CardLinkHash, полный объект Customer (Code, NameFirst, NameLast, email, PhoneNumber) становится обязательным.',
@@ -150,6 +152,8 @@ const roTranslations: Record<string, string> = {
   '(Optional) The customer\'s last name.': '(Opțional) Numele de familie al clientului.',
   '(Optional) The customer\'s phone number.': '(Opțional) Numărul de telefon al clientului.',
   '(Optional) The description of the product.': '(Opțional) Descrierea produsului.',
+  'Return URL after a successful payment, as sent in the order. Can be null in GET /api/order/search results (seen on the test environment).': 'Adresa de revenire după plata reușită, așa cum a fost trimisă în comandă. În rezultatele GET /api/order/search poate fi null (observat în mediul de test).',
+  'Return URL after a failed or cancelled payment, as sent in the order. Can be null in GET /api/order/search results (seen on the test environment).': 'Adresa de revenire după plata eșuată sau anulată, așa cum a fost trimisă în comandă. În rezultatele GET /api/order/search poate fi null (observat în mediul de test).',
   "(Optional) The customer's phone number. If it is not sent, the customer types it on the payment page (block \"Billing information\").": '(Opțional) Telefonul clientului. Dacă nu este trimis, clientul îl introduce pe pagina de plată (blocul „Billing information”).',
   '(Optional) The hash of the linked card if using a saved payment method.': '(Opțional) Hash-ul cardului asociat, dacă se folosește o metodă de plată salvată.',
   '(Optional) Linked-card hash. If CardLinkHash is provided, the full Customer object (Code, NameFirst, NameLast, email, PhoneNumber) becomes required.': '(Opțional) Hash-ul cardului legat. Dacă este transmis CardLinkHash, întregul obiect Customer (Code, NameFirst, NameLast, email, PhoneNumber) devine obligatoriu.',
@@ -169,8 +173,8 @@ export const translateOpenApiDescription = (description: string | undefined, lan
   const normalized = normalizeDescription(description);
   if (normalized.startsWith('UI language for payment page')) {
     return language === 'ru'
-      ? 'Язык интерфейса платежной страницы (пример: RO или RU или EN).'
-      : 'Limba interfeței paginii de plată (exemplu: RO sau RU sau EN).';
+      ? 'Язык платёжной страницы: RO, RU или EN; регистр не важен (EN = en). При неизвестном значении страница открывается на английском.'
+      : 'Limba paginii de plată: RO, RU sau EN; majusculele nu contează (EN = en). La o valoare necunoscută pagina se deschide în engleză.';
   }
   const translated = descriptionsByLanguage[language]?.[normalized];
   return translated || description;

@@ -1,4 +1,4 @@
-// Packs the SDKs into downloadable archives: public/sdk/paynet-ecom-sdk-{node,php}-<version>.zip
+// Packs the SDKs and the example shop into downloadable archives in public/sdk/ (SDK: paynet-ecom-sdk-{node,php}-<version>.zip).
 // Each archive contains one folder "paynet-ecom-sdk" (code, README, LICENSE, offline tests).
 // The live-check scripts (e2e/) are not included.
 import fs from 'node:fs';
@@ -24,6 +24,20 @@ for (const [lang, entries] of Object.entries(packages)) {
   const zip = path.join(outDir, `paynet-ecom-sdk-${lang}-${version}.zip`);
   fs.rmSync(zip, { force: true });
   execFileSync('zip', ['-qr', zip, 'paynet-ecom-sdk'], { cwd: stage });
+  fs.rmSync(stage, { recursive: true, force: true });
+  console.log(`${path.relative(root, zip)} (${fs.statSync(zip).size} bytes)`);
+}
+
+// Example shop (Node.js): public/sdk/paynet-example-shop-node.zip, one folder "node-shop".
+{
+  const stage = fs.mkdtempSync(path.join(os.tmpdir(), 'paynet-shop-'));
+  fs.cpSync(path.join(root, 'examples', 'node-shop'), path.join(stage, 'node-shop'), {
+    recursive: true,
+    filter: (src) => !/[\\/](node_modules|data|\.orders\.json)$/.test(src),
+  });
+  const zip = path.join(outDir, 'paynet-example-shop-node.zip');
+  fs.rmSync(zip, { force: true });
+  execFileSync('zip', ['-qr', zip, 'node-shop'], { cwd: stage });
   fs.rmSync(stage, { recursive: true, force: true });
   console.log(`${path.relative(root, zip)} (${fs.statSync(zip).size} bytes)`);
 }

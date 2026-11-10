@@ -112,8 +112,8 @@ A newly created order has `status` = `1` and `paidDate` = `null`.
 | `1` | Registered: the order exists, no payment yet | Wait for payment. If the customer left the page, you can send them to the same `paymentLink` again (the one from the create response, see below). |
 | `3` | Pending: the customer pressed "Pay", the bank has not answered yet | Do not create the order again and do not cancel it. Check the status later. |
 | `4` | Paid | Fulfil the order. |
-| `5` | Cancelled: declined by the bank, cancelled by antifraud, or fully refunded | Final. A new payment attempt needs an order with a new `Order`. |
-| `6` | Partially refunded | Final. |
+| `5` | Not paid (declined by the bank, cancelled by antifraud) or fully refunded | Final. A new payment attempt needs an order with a new `Order`. |
+| `6` | Paid, then partially refunded | Final. The customer paid; part of the money was returned. |
 
 ```
 1 ──► 3 ──► 4 ──► 5  (full refund / полный возврат / rambursare totală)
@@ -124,7 +124,7 @@ A newly created order has `status` = `1` and `paidDate` = `null`.
 - `5` and `6` are final: nothing changes after them. The value `2` is not used.
 - There is no separate "expired" status: if `ExpiryDate` has passed without payment, the order stays `1`, but it can no longer be paid.
 - Antifraud acts before the payment is confirmed. Once you have received a verified `PAID` notification, antifraud will not cancel that payment; status `5` on a paid order means a full refund only.
-- Treat a payment as paid when you received a verified `PAID` notification or `status` = `4`.
+- Treat a payment as paid when you received a verified `PAID` notification or `status` = `4`. `6` also means the customer paid (then part was refunded); `5` after a payment means it was refunded in full.
 - If the customer fails 3-D Secure, the payment gets status `5` and the customer returns to `LinkUrlCancel` — the same as a bank decline.
 - The reason for a decline (bank decline, antifraud, 3-D Secure) is not available through the API: status `5` only means this order is closed and a new attempt needs a new `Order`.
 

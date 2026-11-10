@@ -88,7 +88,7 @@ Content-Type: application/json
 | `ExpiryDate` | string | yes | Payment deadline, `YYYY-MM-DDTHH:mm:ss`, Chișinău local time (`Europe/Chisinau`), must be in the future. |
 | `Services` | array | yes | At least one service, see below. |
 | `MoneyType` | string | yes | `All`, `Card`, `Paynet`, `MIA` or `CashInvoice` (see below). |
-| `Lang` | string | yes | Payment page language: `RO`, `RU` or `EN`. |
+| `Lang` | string | yes | Payment page language: `RO`, `RU` or `EN`. Upper or lower case both work (`EN` = `en`). Checked on the test environment: with an unknown value the page opens in English. |
 | `Customer` | object | no | Customer data. Required to [save a card](#/guides/saved-cards) or to pay with a saved card. |
 | `Customer.Code` | string | yes, if `Customer` is sent | Customer ID in your system. |
 | `Customer.NameFirst`, `NameLast`, `email`, `PhoneNumber` | string | no | Customer details. Note the lowercase `email`. If you do not send `PhoneNumber`, the customer has to type the phone on the payment page (block "Billing information"). Send the customer's details when you have them, so the customer does not have to enter them. |

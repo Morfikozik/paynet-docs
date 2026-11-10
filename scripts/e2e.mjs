@@ -728,7 +728,7 @@ const siteAuditStage = async () => {
   results.linkProblems = linkProblems;
 
   // Published files (AI docs, OpenAPI, Postman, SDK, mocks)
-  for (const f of ['llms.txt', 'llms-full.txt', 'llms-ecom.txt', 'openapi.json', 'postman/paynet-ecom.postman_collection.json', 'postman/paynet-test.postman_environment.json', 'postman/paynet-production.postman_environment.json', 'sdk/paynet-ecom-sdk-php-1.0.0.zip', 'sdk/paynet-ecom-sdk-node-1.0.0.zip', 'mocks/index.json', 'docs/sdk.md', 'docs/ru/sdk.md', 'docs/ro/mobile-apps.md', 'docs/api/post-api-order.md']) {
+  for (const f of ['llms.txt', 'llms-full.txt', 'llms-ecom.txt', 'openapi.json', 'postman/paynet-ecom.postman_collection.json', 'postman/paynet-test.postman_environment.json', 'postman/paynet-production.postman_environment.json', 'sdk/paynet-ecom-sdk-php-1.0.0.zip', 'sdk/paynet-ecom-sdk-node-1.0.0.zip', 'sdk/paynet-example-shop-node.zip', 'mocks/index.json', 'docs/sdk.md', 'docs/ru/sdk.md', 'docs/ro/mobile-apps.md', 'docs/api/post-api-order.md']) {
     const r = await fetch(SITE + f);
     const body = Buffer.from(await r.arrayBuffer());
     results.files.push({ href: f, status: r.status, bytes: body.length });

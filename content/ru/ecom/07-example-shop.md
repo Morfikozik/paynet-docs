@@ -1,14 +1,15 @@
 # Пример магазина (Node.js)
 
-Готовая минимальная интеграция server-to-server: один сервер на Node.js 18+ без внешних библиотек. Исходный код: [examples/node-shop](https://github.com/Morfikozik/paynet-docs/tree/main/examples/node-shop).
+Готовая минимальная интеграция server-to-server: один сервер на Node.js 18+ без внешних библиотек. Исходный код: [paynet-example-shop-node.zip](sdk/paynet-example-shop-node.zip).
 
 > **Важно:** этот пример проверяется сквозным тестом на тестовой среде Paynet: робот покупает товар в примере, оплачивает его тестовой картой, отправляет уведомление и делает возврат. Поэтому код примера заведомо рабочий.
 
 ## Запуск
 
 ```bash
-git clone https://github.com/Morfikozik/paynet-docs.git
-cd paynet-docs/examples/node-shop
+# скачайте paynet-example-shop-node.zip с этой страницы, затем:
+unzip paynet-example-shop-node.zip
+cd node-shop
 node server.mjs
 ```
 

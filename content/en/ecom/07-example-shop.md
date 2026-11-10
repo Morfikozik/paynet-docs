@@ -1,14 +1,15 @@
 # Example shop (Node.js)
 
-A ready, minimal server-to-server integration: one Node.js 18+ server with no dependencies. Source code: [examples/node-shop](https://github.com/Morfikozik/paynet-docs/tree/main/examples/node-shop).
+A ready, minimal server-to-server integration: one Node.js 18+ server with no dependencies. Source code: [paynet-example-shop-node.zip](sdk/paynet-example-shop-node.zip).
 
 > **Important:** this example is checked by an end-to-end test on the Paynet test environment: a robot buys a product in the example, pays with the test card, sends the notification and makes a refund. So the example code is known to work.
 
 ## Run
 
 ```bash
-git clone https://github.com/Morfikozik/paynet-docs.git
-cd paynet-docs/examples/node-shop
+# download paynet-example-shop-node.zip from this page, then:
+unzip paynet-example-shop-node.zip
+cd node-shop
 node server.mjs
 ```
 

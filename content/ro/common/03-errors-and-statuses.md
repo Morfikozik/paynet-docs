@@ -112,8 +112,8 @@ O comandă nou creată are `status` = `1` și `paidDate` = `null`.
 | `1` | Înregistrată: comanda există, încă nu e plătită | Așteptați plata. Dacă clientul a părăsit pagina, îl puteți trimite din nou la același `paymentLink` (cel din răspunsul la crearea comenzii, vezi mai jos). |
 | `3` | În procesare: clientul a apăsat „Plătește”, banca încă nu a răspuns | Nu creați comanda din nou și nu o anulați. Verificați statusul mai târziu. |
 | `4` | Achitată | Onorați comanda. |
-| `5` | Anulată: refuzată de bancă, anulată de antifraudă sau rambursată integral | Final. O nouă încercare de plată necesită o comandă cu un `Order` nou. |
-| `6` | Rambursată parțial | Final. |
+| `5` | Neachitată (refuzată de bancă, anulată de antifraudă) sau rambursată integral | Final. O nouă încercare de plată necesită o comandă cu un `Order` nou. |
+| `6` | Achitată, apoi rambursată parțial | Final. Clientul a plătit; o parte din bani i-a fost returnată. |
 
 ```
 1 ──► 3 ──► 4 ──► 5  (full refund / полный возврат / rambursare totală)
@@ -124,7 +124,7 @@ O comandă nou creată are `status` = `1` și `paidDate` = `null`.
 - `5` și `6` sunt finale: după ele nu se mai schimbă nimic. Valoarea `2` nu se folosește.
 - Nu există un status separat „expirată”: dacă `ExpiryDate` a trecut fără plată, comanda rămâne `1`, dar nu mai poate fi plătită.
 - Antifrauda acționează înainte de confirmarea plății. După ce ați primit o notificare `PAID` verificată, antifrauda nu va anula acea plată; statusul `5` la o comandă plătită înseamnă doar rambursare integrală.
-- Considerați plata achitată când ați primit o notificare `PAID` verificată sau `status` = `4`.
+- Considerați plata achitată când ați primit o notificare `PAID` verificată sau `status` = `4`. `6` înseamnă tot că clientul a plătit (apoi o parte a fost rambursată); `5` după plată înseamnă rambursare integrală.
 - Dacă clientul nu trece 3-D Secure, plata primește statusul `5`, iar clientul revine la `LinkUrlCancel` — la fel ca la refuzul băncii.
 - Motivul refuzului (refuzul băncii, antifraudă, 3-D Secure) nu poate fi aflat prin API: statusul `5` înseamnă doar că această comandă este închisă și pentru o nouă încercare este nevoie de un `Order` nou.
 

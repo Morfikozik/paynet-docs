@@ -108,7 +108,7 @@ for (const [hash, name, action] of [
   await page.screenshot({ path: path.join(outDir, `${name}.png`) });
   await context.close();
 }
-for (const file of ['sdk/paynet-ecom-sdk-php-1.0.0.zip', 'sdk/paynet-ecom-sdk-node-1.0.0.zip', 'postman/paynet-ecom.postman_collection.json', 'postman/paynet-test.postman_environment.json', 'postman/paynet-production.postman_environment.json', 'mocks/index.json', 'mocks/notification-paid.json', 'docs/example-shop.md', 'docs/saved-cards.md', 'docs/ru/faq.md', 'docs/ru/signatures.md', 'docs/ro/testing.md', 'docs/api/post-api-order.md', 'docs/api/get-api-order-id.md',
+for (const file of ['sdk/paynet-ecom-sdk-php-1.0.0.zip', 'sdk/paynet-ecom-sdk-node-1.0.0.zip', 'sdk/paynet-example-shop-node.zip', 'postman/paynet-ecom.postman_collection.json', 'postman/paynet-test.postman_environment.json', 'postman/paynet-production.postman_environment.json', 'mocks/index.json', 'mocks/notification-paid.json', 'docs/example-shop.md', 'docs/saved-cards.md', 'docs/ru/faq.md', 'docs/ru/signatures.md', 'docs/ro/testing.md', 'docs/api/post-api-order.md', 'docs/api/get-api-order-id.md',
   'llms.txt', 'llms-full.txt', 'llms-ecom.txt', 'openapi.json', 'docs/signatures.md', 'legacy/']) {
   const res = await fetch(baseUrl + file);
   log.push(`GET ${file} → ${res.status} (${(await res.text()).length} bytes)`);

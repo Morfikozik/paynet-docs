@@ -143,11 +143,11 @@ if (payment.status === PaymentStatus.PAID) {
 }
 ```
 
-Statusuri: `1` — neachitat, `3` — în procesare (așteptați, până la circa o zi), `4` — achitat, `5` și `6` — finale. Mai mult: [Statusuri și erori](#/guides/errors-and-statuses).
+Statusuri: `1` — neachitat, `3` — în procesare (așteptați, până la circa o zi), `4` — achitat, `6` — achitat, apoi rambursat parțial, `5` — neachitat sau rambursat integral; `5` și `6` sunt finale. `isPaid` returnează `true` doar pentru `4`. Mai mult: [Statusuri și erori](#/guides/errors-and-statuses).
 
 ## Primiți notificarea
 
-Răspundeți `200` rapid și doar după verificarea semnăturii. Apoi confirmați plata prin API: suma achitată (`PaidAmount`) și alte câteva câmpuri nu sunt semnate.
+Ordinea pașilor: verificați semnătura → **salvați notificarea** → răspundeți `200` → confirmați plata prin API și onorați comanda din înregistrarea salvată. Salvați înainte de răspuns: după `200` Paynet nu mai trimite notificarea, iar o notificare nesalvată se pierde dacă codul dvs. cade ulterior. Suma achitată (`PaidAmount`) și alte câteva câmpuri nu sunt semnate — de aceea este necesară verificarea prin API.
 
 PHP:
 
@@ -161,12 +161,24 @@ try {
     http_response_code(400);
     exit;
 }
-// salvați notificarea (reîncercările vin cu același Payment.Id) și răspundeți 200
-http_response_code(200);
+// 1. Salvați notificarea (funcția dvs., de exemplu o înregistrare în baza de date). O reîncercare vine cu același Payment.Id: returnați false dacă este deja salvată.
+$isNew = saveNotification($notification);
 
+// 2. Răspundeți 200 doar după salvare.
+http_response_code(200);
+// Trimiteți răspunsul acum și continuați (PHP-FPM). Fără FPM răspunsul pleacă la sfârșitul scriptului.
+if (function_exists('fastcgi_finish_request')) {
+    fastcgi_finish_request();
+}
+if (!$isNew) {
+    exit;
+}
+
+// 3. După răspuns: confirmați prin API, apoi onorați comanda din înregistrarea salvată.
+// Dacă acest pas eșuează, înregistrarea rămâne neprocesată: procesați-o din nou mai târziu (de exemplu, o sarcină programată).
 $check = Notification::confirm($paynet, $notification, ['amount' => 300, 'customerCode' => 'customer-42']);
 if ($check['ok']) {
-    // executați comanda
+    // executați comanda și marcați înregistrarea salvată ca procesată
 } else {
     // trimiteți la verificare manuală: $check['problems']
 }
@@ -187,12 +199,18 @@ export async function handlePaynetNotification(rawBody, hash, res) {
     res.writeHead(400).end();
     return;
   }
-  // salvați notificarea (reîncercările vin cu același Payment.Id) și răspundeți 200
-  res.writeHead(200).end();
+  // 1. Salvați notificarea (funcția dvs., de exemplu o înregistrare în baza de date). O reîncercare vine cu același Payment.Id: returnați false dacă este deja salvată.
+  const isNew = await saveNotification(notification);
 
+  // 2. Răspundeți 200 doar după salvare.
+  res.writeHead(200).end();
+  if (!isNew) return;
+
+  // 3. După răspuns: confirmați prin API, apoi onorați comanda din înregistrarea salvată.
+  // Dacă acest pas eșuează, înregistrarea rămâne neprocesată: procesați-o din nou mai târziu (de exemplu, o sarcină programată).
   const check = await confirmNotification(paynet, notification, { amount: 300, customerCode: 'customer-42' });
   if (check.ok) {
-    // executați comanda
+    // executați comanda și marcați înregistrarea salvată ca procesată
   } else {
     // trimiteți la verificare manuală: check.problems
   }

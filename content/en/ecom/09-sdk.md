@@ -143,11 +143,11 @@ if (payment.status === PaymentStatus.PAID) {
 }
 ```
 
-Statuses: `1` — not paid, `3` — processing (wait, up to about a day), `4` — paid, `5` and `6` — final. More: [Statuses and errors](#/guides/errors-and-statuses).
+Statuses: `1` — not paid, `3` — processing (wait, up to about a day), `4` — paid, `6` — paid, then partially refunded, `5` — not paid or fully refunded; `5` and `6` are final. `isPaid` is `true` only for `4`. More: [Statuses and errors](#/guides/errors-and-statuses).
 
 ## Receive a notification
 
-Answer `200` quickly and only after the signature check. Then confirm the payment through the API: the paid amount (`PaidAmount`) and some other fields are not signed.
+Order of steps: check the signature → **save the notification** → answer `200` → confirm the payment through the API and fulfil the order from the saved record. Save before answering: after a `200` Paynet does not send the notification again, so an unsaved notification would be lost if your code fails later. The paid amount (`PaidAmount`) and some other fields are not signed, which is why the API check is needed.
 
 PHP:
 
@@ -161,12 +161,24 @@ try {
     http_response_code(400);
     exit;
 }
-// store the notification (retries come with the same Payment.Id) and answer 200
-http_response_code(200);
+// 1. Save the notification (your function, e.g. a database insert). A retry has the same Payment.Id: return false if it is already saved.
+$isNew = saveNotification($notification);
 
+// 2. Answer 200 only after it is saved.
+http_response_code(200);
+// Send the answer now and continue (PHP-FPM). Without FPM the answer is sent when the script ends.
+if (function_exists('fastcgi_finish_request')) {
+    fastcgi_finish_request();
+}
+if (!$isNew) {
+    exit;
+}
+
+// 3. After the answer: confirm through the API, then fulfil the order from the saved record.
+// If this step fails, the saved record stays unprocessed: process it again later (for example, a scheduled job).
 $check = Notification::confirm($paynet, $notification, ['amount' => 300, 'customerCode' => 'customer-42']);
 if ($check['ok']) {
-    // fulfil the order
+    // fulfil the order and mark the saved record as processed
 } else {
     // send to manual review: $check['problems']
 }
@@ -187,12 +199,18 @@ export async function handlePaynetNotification(rawBody, hash, res) {
     res.writeHead(400).end();
     return;
   }
-  // store the notification (retries come with the same Payment.Id) and answer 200
-  res.writeHead(200).end();
+  // 1. Save the notification (your function, e.g. a database insert). A retry has the same Payment.Id: return false if it is already saved.
+  const isNew = await saveNotification(notification);
 
+  // 2. Answer 200 only after it is saved.
+  res.writeHead(200).end();
+  if (!isNew) return;
+
+  // 3. After the answer: confirm through the API, then fulfil the order from the saved record.
+  // If this step fails, the saved record stays unprocessed: process it again later (for example, a scheduled job).
   const check = await confirmNotification(paynet, notification, { amount: 300, customerCode: 'customer-42' });
   if (check.ok) {
-    // fulfil the order
+    // fulfil the order and mark the saved record as processed
   } else {
     // send to manual review: check.problems
   }

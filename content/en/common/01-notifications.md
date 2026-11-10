@@ -378,16 +378,16 @@ function paynetHandleRequest($db, callable $getToken): void {
 - Answer fast: store the notification, return `200`, and do heavy processing after the response.
 - Any other response (or no response) is treated as a failure, and Paynet sends the notification again. After a `200` response, retries stop.
 - Only the HTTP code counts; the response body does not matter. `{ "ResultCode": "SUCCESS" }` in the examples is optional.
-- Retry schedule — **9 attempts within about 25 minutes**, after which sending stops:
+- Schedule — **9 attempts**; the retries run for about 25 minutes after the first attempt, then sending stops:
 
 | Attempt | When |
 |---|---|
-| 1 | ~20 seconds after the payment |
+| 1 | after the card-issuing bank confirms the payment (depends on the bank: from a few seconds to several minutes) |
 | 2–4 | after ~1 minute, then every ~35 seconds |
 | 5–7 | after ~5 minutes, then every ~35 seconds |
 | 8–9 | after ~15 minutes, then after ~35 seconds |
 
-> **Important:** retries last only about 25 minutes. If your server was down longer, the notification will not come again. So check the status of unpaid orders through the API and reconcile daily.
+> **Important:** retries last only about 25 minutes after the first attempt. If your server was down longer, the notification will not come again. So check the status of unpaid orders through the API and reconcile daily.
 
 - Because of retries the same notification can arrive more than once. Process each `Payment.Id` only once.
 - If a notification did not arrive (for example, your server was down longer than all attempts), check the status with `GET /api/order/{paymentId}` or `GET /api/order/merchant/{Order}`. You can ask Paynet support to send it again.

@@ -88,7 +88,7 @@ Content-Type: application/json
 | `ExpiryDate` | string | da | Termenul de plată, `YYYY-MM-DDTHH:mm:ss`, ora locală Chișinău (`Europe/Chisinau`), în viitor. |
 | `Services` | array | da | Cel puțin un serviciu, vezi mai jos. |
 | `MoneyType` | string | da | `All`, `Card`, `Paynet`, `MIA` sau `CashInvoice` (vezi mai jos). |
-| `Lang` | string | da | Limba paginii de plată: `RO`, `RU` sau `EN`. |
+| `Lang` | string | da | Limba paginii de plată: `RO`, `RU` sau `EN`. Majusculele nu contează (`EN` = `en`). Verificat în mediul de test: la o valoare necunoscută pagina se deschide în engleză. |
 | `Customer` | object | nu | Datele clientului. Obligatoriu pentru a [salva cardul](#/guides/saved-cards) sau a plăti cu un card salvat. |
 | `Customer.Code` | string | da, dacă se trimite `Customer` | ID-ul clientului în sistemul dvs. |
 | `Customer.NameFirst`, `NameLast`, `email`, `PhoneNumber` | string | nu | Datele clientului. Atenție: `email` cu literă mică. Dacă nu trimiteți `PhoneNumber`, clientul trebuie să introducă telefonul pe pagina de plată (blocul „Billing information”). Trimiteți datele clientului dacă le aveți, ca acesta să nu le introducă singur. |
