@@ -380,12 +380,11 @@ const postmanStage = async () => {
   const { execFileSync } = await import('node:child_process');
   execFileSync('node', ['scripts/build-postman.mjs'], { stdio: 'inherit' });
   const newman = (await import('newman')).default;
-  const run = (collection, folders, exportTo) => new Promise((resolve, reject) => {
+  const run = (collection, folders) => new Promise((resolve, reject) => {
     newman.run({
       collection,
       environment: 'public/postman/paynet-test.postman_environment.json',
       folder: folders,
-      exportCollection: exportTo,
       reporters: [],
     }, (error, summary) => (error ? reject(error) : resolve(summary)));
   });
@@ -398,10 +397,10 @@ const postmanStage = async () => {
     note(`postman:${label}`, { rows, failures: summary.run.failures.map((f) => `${f.source?.name || ''} ${f.at || ''}: ${f.error?.name || ''} ${f.error?.message || ''}`) });
     return rows;
   };
-  const c1 = path.join(outDir, 'collection-after-create.json');
-  const first = await run('public/postman/paynet-ecom.postman_collection.json', ['Create order'], c1);
+  const first = await run('public/postman/paynet-ecom.postman_collection.json', ['Create order']);
   report('create', first);
-  const saved = JSON.parse(fs.readFileSync(c1, 'utf8')).variable;
+  const after = first.collection.toJSON();
+  const saved = after.variable;
   const value = (key) => saved.find((v) => v.key === key)?.value;
   note('postman:variables', { orderNumber: value('orderNumber'), paymentId: value('paymentId'), paymentLink: value('paymentLink'), expiryDate: value('expiryDate'), tokenSaved: !!value('accessToken') });
 
@@ -422,8 +421,7 @@ const postmanStage = async () => {
     await new Promise((r) => setTimeout(r, 3000));
   }
   note('postman:paid', { status });
-  const c2 = path.join(outDir, 'collection-after-all.json');
-  const rest = await run(c1, [
+  const rest = await run(after, [
     'Get payment by Order (merchant order number)',
     'Get payment by paymentId',
     'Search payments (last 24 hours)',
@@ -431,7 +429,7 @@ const postmanStage = async () => {
     '3. Statements',
     '4. Authorization',
     '5. Error examples (fail on purpose)',
-  ], c2);
+  ]);
   const rows = report('rest', rest);
   const bad = rows.filter((r) => r.failed.length);
   if (bad.length) throw new Error('Postman assertions failed: ' + JSON.stringify(bad));

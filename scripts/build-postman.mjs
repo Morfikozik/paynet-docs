@@ -21,7 +21,7 @@ const describe = (p, m, extra = '') => {
     .filter(Boolean)
     .join('\n\n');
 };
-const lines = (s) => s.trim().split('\n');
+const lines = (s) => ['{', ...s.trim().split('\n'), '}'];
 // Numeric placeholders must not be quoted in the JSON body: "{{amount}}" -> {{amount}}.
 const NUMERIC = ['orderNumber', 'amount', 'paymentId'];
 const json = (value) => {
