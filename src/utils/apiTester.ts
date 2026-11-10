@@ -1,3 +1,4 @@
+import { saveLastOrder } from './lastOrder';
 import { Endpoint } from '../types/api';
 import { OpenAPISpec } from '../types/api';
 
@@ -334,6 +335,16 @@ export async function executeApiTest(request: ApiTestRequest): Promise<ApiTestRe
       data = await response.text();
     }
     
+    // Remember the order created from the portal, so the notification simulator can pre-fill it.
+    if (request.method === 'POST' && /\/api\/order\/?(\?|$)/.test(request.url) && response.status === 200 && data && typeof data === 'object') {
+      try {
+        const sent = request.body ? JSON.parse(request.body) : {};
+        saveLastOrder(sent.Order ?? sent.order, 'api', (data as Record<string, unknown>).paymentId);
+      } catch {
+        /* body is not JSON: nothing to remember */
+      }
+    }
+
     // Check if this is an auth request and save token
     if (request.url.includes('/auth') && response.status === 200 && data && typeof data === 'object') {
       if (data.access_token) {

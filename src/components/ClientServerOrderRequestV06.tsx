@@ -5,6 +5,7 @@ import { Language } from '../types/language';
 
 import { getDefaultExpiryDate, getUniqueOrderNumber } from '../utils/sampleData';
 import ParamList from './ParamList';
+import { saveLastOrder } from '../utils/lastOrder';
 
 type FieldRow = {
   name: string;
@@ -293,6 +294,7 @@ export const ClientServerOrderRequestV06: React.FC<ClientServerOrderRequestV06Pr
       document.body.appendChild(form);
       form.submit();
       form.remove();
+      saveLastOrder(payload.Order, 'checkout-form');
 
       setResponseText('Payment form submitted in a new browser tab.');
     } catch (error) {

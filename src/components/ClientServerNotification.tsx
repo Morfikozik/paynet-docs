@@ -4,6 +4,7 @@ import { getAuthToken, setAuthToken } from '../utils/apiTester';
 import CryptoJS from 'crypto-js';
 import { Language } from '../types/language';
 import ParamList from './ParamList';
+import { useLastOrder } from '../utils/lastOrder';
 
 type NotificationFieldRow = {
   name: string;
@@ -139,6 +140,21 @@ export const ClientServerNotification: React.FC<ClientServerNotificationProps> =
   const [sentNotificationHash, setSentNotificationHash] = React.useState('');
   const [sentPreparedString, setSentPreparedString] = React.useState('');
   const [transactionId, setTransactionId] = React.useState('');
+  // Pre-fill Order with the last order created on this portal (any tab), unless the user typed their own.
+  const lastOrder = useLastOrder();
+  const autoOrderRef = React.useRef('');
+  const transactionIdRef = React.useRef(transactionId);
+  transactionIdRef.current = transactionId;
+  React.useEffect(() => {
+    if (!lastOrder) return;
+    const current = transactionIdRef.current;
+    if (current.trim() !== '' && current !== autoOrderRef.current) return;
+    autoOrderRef.current = lastOrder.order;
+    if (current === lastOrder.order) return;
+    setTransactionId(lastOrder.order);
+    setHasCompletedGet(false);
+    setPaymentInfoForNotification(null);
+  }, [lastOrder]);
   const [isGettingPaymentStatus, setIsGettingPaymentStatus] = React.useState(false);
   const [paymentStatusResult, setPaymentStatusResult] = React.useState('');
   const [paymentStatusError, setPaymentStatusError] = React.useState('');
@@ -855,6 +871,15 @@ Payment.ExternalId + Payment.Id + Payment.Merchant + Payment.StatusDate`}
                               {isGettingPaymentStatus ? 'Getting...' : 'Get'}
                             </button>
                           </div>
+                          {lastOrder && transactionId === lastOrder.order && (
+                            <p className="mt-1 text-xs text-paynet-gray-500">
+                              {tDesc(
+                                `Filled in automatically: the last order created on this site${lastOrder.source === 'checkout-form' ? ' (sent via the checkout form)' : ''}, ${new Date(lastOrder.createdAt).toLocaleTimeString()}. You can enter another number.`,
+                                `Подставлен автоматически: последний заказ, созданный на этом сайте${lastOrder.source === 'checkout-form' ? ' (отправлен через форму checkout)' : ''}, ${new Date(lastOrder.createdAt).toLocaleTimeString()}. Можно ввести другой номер.`,
+                                `Completat automat: ultima comandă creată pe acest site${lastOrder.source === 'checkout-form' ? ' (trimisă prin formularul checkout)' : ''}, ${new Date(lastOrder.createdAt).toLocaleTimeString()}. Puteți introduce alt număr.`
+                              )}
+                            </p>
+                          )}
                         </div>
                         {paymentStatusError && (
                           <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
