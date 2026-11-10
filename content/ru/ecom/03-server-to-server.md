@@ -101,9 +101,11 @@ Content-Type: application/json
 | `Name` | string | да | Название услуги. |
 | `Description` | string | да | Описание услуги. |
 | `Amount` | integer | да | Сумма услуги в минимальных единицах. |
-| `Products` | array | нет | Если передаёте товары, все поля товара ниже обязательны. |
+| `Products` | array | нет | Необязательно. Если передаёте товары, у каждого товара обязательны шесть полей (см. ниже). |
 
-`Services[].Products[]`: `LineNo` (int), `Code` (string), `Name` (string), `Description` (string), `UnitPrice` (int), `Quantity` (int, в сотых долях: `100` = 1 шт., `300` = 3 шт.), `Amount` (int), `TotalAmount` (int).
+`Services[].Products[]` — обязательные: `LineNo` (int), `Name` (string), `UnitPrice` (int), `Quantity` (int), `Amount` (int), `TotalAmount` (int). Необязательные: `Code` (string), `Description` (string). Проверено на тестовой среде: без любого из шести обязательных полей API отвечает `400`.
+
+**`Quantity` — в сотых долях:** `100` = 1 шт., `300` = 3 шт. В примере выше `"Quantity": 300` — это 3 шт. по `UnitPrice` 1,00 MDL.
 
 **Суммы** — целые числа в минимальных единицах (бани): `1201` = 12,01 MDL.
 
@@ -148,7 +150,7 @@ Content-Type: application/json
 
 ## 3. Перенаправьте покупателя
 
-Отправьте браузер покупателя на `paymentLink` (HTTP 302 или ссылка/кнопка). После успешной оплаты покупатель вернётся на `LinkUrlSuccess`, а если оплата не прошла или отменена — на `LinkUrlCancel`.
+Отправьте браузер покупателя на `paymentLink` (HTTP 302 или ссылка/кнопка). Сохраните эту ссылку вместе с заказом: полная ссылка есть только в ответе на `POST /api/order`, в ответах `GET /api/order/…` она сокращена, без номера платежа. После успешной оплаты покупатель вернётся на `LinkUrlSuccess`, а если оплата не прошла или отменена — на `LinkUrlCancel`.
 
 ## 4. Обработайте уведомление
 

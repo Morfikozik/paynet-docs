@@ -109,7 +109,7 @@ O comandă nou creată are `status` = `1` și `paidDate` = `null`.
 
 | `status` | Semnificație | Ce faceți |
 |---|---|---|
-| `1` | Înregistrată: comanda există, încă nu e plătită | Așteptați plata. Dacă clientul a părăsit pagina, îl puteți trimite din nou la același `paymentLink`. |
+| `1` | Înregistrată: comanda există, încă nu e plătită | Așteptați plata. Dacă clientul a părăsit pagina, îl puteți trimite din nou la același `paymentLink` (cel din răspunsul la crearea comenzii, vezi mai jos). |
 | `3` | În procesare: clientul a apăsat „Plătește”, banca încă nu a răspuns | Nu creați comanda din nou și nu o anulați. Verificați statusul mai târziu. |
 | `4` | Achitată | Onorați comanda. |
 | `5` | Anulată: refuzată de bancă, anulată de antifraudă sau rambursată integral | Final. O nouă încercare de plată necesită o comandă cu un `Order` nou. |
@@ -138,6 +138,8 @@ O plată eșuată nu generează notificare: clientul revine la `LinkUrlCancel`. 
 | `3` | Plata este încă în procesare | Așteptați și verificați statusul din nou. Nu creați o comandă nouă. |
 | `5` | Banca a refuzat plata | Comanda este închisă. Creați o comandă nouă cu un `Order` **nou** și trimiteți clientul la noul `paymentLink`. |
 
+**Păstrați `paymentLink` din răspunsul la `POST /api/order`.** Doar acest răspuns conține linkul complet (cu numărul plății și `?s=…`). În răspunsurile `GET /api/order/…` câmpul `paymentLink` este trunchiat la `https://…/ecom/getecom` și nu poate fi deschis. Dacă ați pierdut linkul, trimiteți din nou `POST /api/order` cu **același corp** (același `Order`, aceleași date): primiți aceeași plată și același link.
+
 ## Date și formate
 
 | Unde | Format | Exemplu |
@@ -146,7 +148,7 @@ O plată eșuată nu generează notificare: clientul revine la `LinkUrlCancel`. 
 | Datele în răspunsurile despre plată | `YYYY-MM-DD HH:mm:ss` | `2026-04-01 15:01:12` |
 | `eventDate` în răspunsul la rambursare | `DD.MM.YYYY HH:mm:ss` | `09.11.2026 18:17:54` |
 | Datele în notificări | `YYYY-MM-DDTHH:mm:ss`, ora locală Chișinău | `2026-11-09T12:00:00` |
-| `from` / `to` în `/api/order/search` | dată-oră ISO 8601 | `2026-03-09T06:40:05.010Z` |
+| `from` / `to` în `/api/order/search` | `YYYY-MM-DDTHH:mm:ss`, **ora locală Chișinău**, fără `Z` (`Z` sau decalajul sunt ignorate) | `2026-03-09T08:40:05` |
 | `dateStart` / `dateFinish` în extrase | dată | `2026-03-01` |
 | Sume | întreg, unități minime | `1201` = 12,01 MDL |
 | Monedă | numeric ISO 4217 | `498` = MDL |
@@ -159,10 +161,10 @@ Ora locală Chișinău este fusul orar `Europe/Chisinau`: UTC+2 iarna, UTC+3 var
 
 ```json
 {
-  "PaymentId": 296901,
+  "PaymentId": 328733,
   "SaleAreaCode": "onlidocumentation_md",
   "RefundType": "full",
-  "Amount": 50000,
+  "Amount": 400,
   "Currency": 498,
   "Reason": "Customer request"
 }
@@ -172,14 +174,17 @@ Ora locală Chișinău este fusul orar `Europe/Chisinau`: UTC+2 iarna, UTC+3 var
 |---|---|
 | Ce se poate rambursa | Doar o plată achitată (`status` = `4`). |
 | De câte ori | **O singură** rambursare per plată: integrală (`full`) sau parțială (`partial`). A doua rambursare a aceleiași plăți nu este posibilă. |
-| Suma | `Amount` în unități minime; maximum `PaidAmount` al plății (mai mic decât suma comenzii când s-a aplicat o promoție). |
+| Suma | `Amount` în unități minime; maximum `PaidAmount` al plății (mai mic decât suma comenzii când s-a aplicat o promoție). Pentru rambursarea integrală trimiteți `RefundType` `full` și `Amount` = `PaidAmount` (`amount.paidAmount` din `GET /api/order/merchant/{Order}`). |
 | Termen | 180 de zile după plată. |
 | Metode de plată | Toate, cu excepția `CASH_INVOICE`. |
-| Rezultat | Imediat în răspunsul `POST /api/order/refund`. Pentru rambursări nu se trimite notificare pe callback. |
+| Rezultat | Imediat în răspunsul `POST /api/order/refund`: `200` = rambursarea este efectuată. Pentru rambursări nu se trimite notificare pe callback. |
+| Repetarea cererii | Nu este sigură: a doua rambursare returnează `400`. După un timeout sau o eroare de rețea verificați mai întâi statusul cu `GET /api/order/merchant/{Order}`: `5` sau `6` înseamnă că rambursarea a trecut. |
 | Statusul după | `5` după rambursarea integrală, `6` după cea parțială. Ambele sunt finale. |
 | Soldul comerciantului | Dacă în contul comerciantului din Paynet nu sunt bani, rambursarea nu trece. |
 
 ### Răspunsuri la rambursare (verificat în mediul de test)
+
+Exemplul de cerere de mai sus și răspunsul de mai jos sunt aceeași plată de test (plătit 4,00 MDL, rambursat integral).
 
 | Situație | Răspuns |
 |---|---|

@@ -16,7 +16,7 @@ Ambele medii folosesc aceleași căi (`/auth`, `/api/...`).
 | Element | Test (comun) | Producție |
 |---|---|---|
 | Utilizator API (`username` / `password`) | `771064` / `sLgMnGWJ` | emis companiei dvs. de Paynet |
-| Codul comerciantului (`Merchant`) | `265505` | emis de Paynet |
+| Codul comerciantului (`Merchant`) | `265505` — nu se trimite în `POST /api/order`; se folosește în formularul Hosted Checkout și la verificarea notificărilor (`Payment.Merchant`) | emis de Paynet |
 | Codul zonei de vânzare (`SaleAreaCode`) | `onlidocumentation_md` | emis de Paynet (unul per site/magazin) |
 | Cheia secretă pentru semnătura hosted checkout | `F90D6485-9CCC-458B-96A3-8958AF9B4458` | emisă de Paynet, păstrați-o secretă |
 | Cheia secretă pentru notificări | `D9873689-E5F8-4272-A67F-0D8BA3F9BAA7` | emisă de Paynet, păstrați-o secretă |

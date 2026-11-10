@@ -101,9 +101,11 @@ Content-Type: application/json
 | `Name` | string | yes | Service name. |
 | `Description` | string | yes | Service description. |
 | `Amount` | integer | yes | Service amount in minor units. |
-| `Products` | array | no | If you send products, all product fields below are required. |
+| `Products` | array | no | Optional. If you send products, six fields of each product are required (see below). |
 
-`Services[].Products[]`: `LineNo` (int), `Code` (string), `Name` (string), `Description` (string), `UnitPrice` (int), `Quantity` (int, in hundredths: `100` = 1 pc, `300` = 3 pcs), `Amount` (int), `TotalAmount` (int).
+`Services[].Products[]` — required: `LineNo` (int), `Name` (string), `UnitPrice` (int), `Quantity` (int), `Amount` (int), `TotalAmount` (int). Optional: `Code` (string), `Description` (string). Checked on the test environment: without any of the six required fields the API answers `400`.
+
+**`Quantity` is in hundredths:** `100` = 1 pc, `300` = 3 pcs. In the example above `"Quantity": 300` means 3 pcs at `UnitPrice` 1.00 MDL.
 
 **Amounts** are integers in minor units (bani): `1201` = 12.01 MDL.
 
@@ -148,7 +150,7 @@ Store `paymentId` together with your order. It is the key for status checks, ref
 
 ## 3. Redirect the customer
 
-Send the customer's browser to `paymentLink` (HTTP 302 or a link/button). After a successful payment the customer returns to `LinkUrlSuccess`; if the payment fails or is cancelled, to `LinkUrlCancel`.
+Send the customer's browser to `paymentLink` (HTTP 302 or a link/button). Save this link with the order: only the `POST /api/order` response has the full link; `GET /api/order/…` responses return it shortened, without the payment number. After a successful payment the customer returns to `LinkUrlSuccess`; if the payment fails or is cancelled, to `LinkUrlCancel`.
 
 ## 4. Handle the notification
 

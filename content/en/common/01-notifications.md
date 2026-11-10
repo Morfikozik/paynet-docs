@@ -377,6 +377,7 @@ function paynetHandleRequest($db, callable $getToken): void {
 - Answer HTTP `200` **after** you have verified the hash and saved the result.
 - Answer fast: store the notification, return `200`, and do heavy processing after the response.
 - Any other response (or no response) is treated as a failure, and Paynet sends the notification again. After a `200` response, retries stop.
+- Only the HTTP code counts; the response body does not matter. `{ "ResultCode": "SUCCESS" }` in the examples is optional.
 - Retry schedule — **9 attempts within about 25 minutes**, after which sending stops:
 
 | Attempt | When |

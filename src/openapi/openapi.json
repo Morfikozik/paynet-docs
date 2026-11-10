@@ -725,8 +725,8 @@
           "content": {
             "application/json": {
               "example": {
-                "PaymentId": 296901,
-                "Amount": 50000,
+                "PaymentId": 328733,
+                "Amount": 400,
                 "SaleAreaCode": "onlidocumentation_md",
                 "Currency": 498,
                 "RefundType": "full",
@@ -1341,8 +1341,6 @@
       "Product": {
         "required": [
           "Amount",
-          "Code",
-          "Description",
           "LineNo",
           "Name",
           "Quantity",
@@ -1469,7 +1467,7 @@
             "items": {
               "$ref": "#/components/schemas/Product"
             },
-            "description": "(Optional) A list of specific products under this service. If at least one Products field is provided, all Product fields become required.",
+            "description": "(Optional) A list of specific products under this service. If you send products, LineNo, Name, UnitPrice, Quantity, Amount and TotalAmount are required; Code and Description are optional.",
             "nullable": true
           }
         },

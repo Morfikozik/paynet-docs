@@ -109,7 +109,7 @@ A newly created order has `status` = `1` and `paidDate` = `null`.
 
 | `status` | Meaning | What to do |
 |---|---|---|
-| `1` | Registered: the order exists, no payment yet | Wait for payment. If the customer left the page, you can send them to the same `paymentLink` again. |
+| `1` | Registered: the order exists, no payment yet | Wait for payment. If the customer left the page, you can send them to the same `paymentLink` again (the one from the create response, see below). |
 | `3` | Pending: the customer pressed "Pay", the bank has not answered yet | Do not create the order again and do not cancel it. Check the status later. |
 | `4` | Paid | Fulfil the order. |
 | `5` | Cancelled: declined by the bank, cancelled by antifraud, or fully refunded | Final. A new payment attempt needs an order with a new `Order`. |
@@ -138,6 +138,8 @@ A failed payment does not produce a notification: the customer returns to `LinkU
 | `3` | The payment is still being processed | Wait and check the status again. Do not create a new order. |
 | `5` | The bank declined the payment | The order is closed. Create a new order with a **new** `Order` and send the customer to the new `paymentLink`. |
 
+**Keep the `paymentLink` from the `POST /api/order` response.** Only that response has the full link (with the payment number and `?s=…`). In `GET /api/order/…` responses `paymentLink` is cut to `https://…/ecom/getecom` and cannot be opened. If you lost the link, send the same `POST /api/order` again with the **same body** (same `Order`, same data): you get the same payment and the same link.
+
 ## Dates and formats
 
 | Where | Format | Example |
@@ -146,7 +148,7 @@ A failed payment does not produce a notification: the customer returns to `LinkU
 | Dates in payment responses | `YYYY-MM-DD HH:mm:ss` | `2026-04-01 15:01:12` |
 | `eventDate` in the refund response | `DD.MM.YYYY HH:mm:ss` | `09.11.2026 18:17:54` |
 | Dates in notifications | `YYYY-MM-DDTHH:mm:ss`, Chișinău local time | `2026-11-09T12:00:00` |
-| `from` / `to` in `/api/order/search` | ISO 8601 date-time | `2026-03-09T06:40:05.010Z` |
+| `from` / `to` in `/api/order/search` | `YYYY-MM-DDTHH:mm:ss`, **Chișinău local time**, without `Z` (a `Z` or offset is ignored) | `2026-03-09T08:40:05` |
 | `dateStart` / `dateFinish` in statements | date | `2026-03-01` |
 | Amounts | integer, minor units | `1201` = 12.01 MDL |
 | Currency | ISO 4217 numeric | `498` = MDL |
@@ -159,10 +161,10 @@ Chișinău local time is the `Europe/Chisinau` time zone: UTC+2 in winter, UTC+3
 
 ```json
 {
-  "PaymentId": 296901,
+  "PaymentId": 328733,
   "SaleAreaCode": "onlidocumentation_md",
   "RefundType": "full",
-  "Amount": 50000,
+  "Amount": 400,
   "Currency": 498,
   "Reason": "Customer request"
 }
@@ -172,14 +174,17 @@ Chișinău local time is the `Europe/Chisinau` time zone: UTC+2 in winter, UTC+3
 |---|---|
 | What can be refunded | Only a paid payment (`status` = `4`). |
 | How many times | **One** refund per payment: full (`full`) or partial (`partial`). A second refund of the same payment is not possible. |
-| Amount | `Amount` in minor units; at most the payment's `PaidAmount` (lower than the order amount when a promotion applied). |
+| Amount | `Amount` in minor units; at most the payment's `PaidAmount` (lower than the order amount when a promotion applied). For a full refund send `RefundType` `full` and `Amount` = `PaidAmount` (`amount.paidAmount` from `GET /api/order/merchant/{Order}`). |
 | Deadline | 180 days after payment. |
 | Payment methods | All except `CASH_INVOICE`. |
-| Result | Immediately in the `POST /api/order/refund` response. No callback notification is sent for refunds. |
+| Result | Immediately in the `POST /api/order/refund` response: `200` = the refund is done. No callback notification is sent for refunds. |
+| Repeating the request | Not safe: a second refund returns `400`. After a timeout or network error, first check the status with `GET /api/order/merchant/{Order}`: `5` or `6` means the refund went through. |
 | Status afterwards | `5` after a full refund, `6` after a partial one. Both are final. |
 | Merchant balance | If there is no money on the merchant's Paynet account, the refund does not go through. |
 
 ### Refund responses (checked on the test environment)
+
+The request example above and the response below are the same test payment (paid 4.00 MDL, refunded in full).
 
 | Situation | Response |
 |---|---|

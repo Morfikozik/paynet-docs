@@ -16,7 +16,7 @@ Both environments use the same paths (`/auth`, `/api/...`).
 | Item | Test (shared) | Production |
 |---|---|---|
 | API user (`username` / `password`) | `771064` / `sLgMnGWJ` | issued to your company by Paynet |
-| Merchant code (`Merchant`) | `265505` | issued by Paynet |
+| Merchant code (`Merchant`) | `265505` — not sent in `POST /api/order`; used in the hosted checkout form and to check notifications (`Payment.Merchant`) | issued by Paynet |
 | Sale area code (`SaleAreaCode`) | `onlidocumentation_md` | issued by Paynet (one per website/shop) |
 | Secret key for the hosted checkout signature | `F90D6485-9CCC-458B-96A3-8958AF9B4458` | issued by Paynet, keep it secret |
 | Secret key for notifications | `D9873689-E5F8-4272-A67F-0D8BA3F9BAA7` | issued by Paynet, keep it secret |

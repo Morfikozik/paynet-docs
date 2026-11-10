@@ -377,6 +377,7 @@ function paynetHandleRequest($db, callable $getToken): void {
 - Răspundeți HTTP `200` **după** ce ați verificat hash-ul și ați salvat rezultatul.
 - Răspundeți repede: salvați notificarea, returnați `200`, iar procesarea grea faceți-o după răspuns.
 - Orice alt răspuns (sau lipsa răspunsului) este considerat eșec, iar Paynet trimite notificarea din nou. După un răspuns `200`, reîncercările se opresc.
+- Contează doar codul HTTP; corpul răspunsului nu contează. `{ "ResultCode": "SUCCESS" }` din exemple este opțional.
 - Programul reîncercărilor — **9 încercări în circa 25 de minute**, după care trimiterea se oprește:
 
 | Încercarea | Când |

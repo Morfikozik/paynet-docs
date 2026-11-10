@@ -1,5 +1,16 @@
 # Changelog
 
+## Documentation v3.3 — 10.11.2026
+
+Clarifications found by a test in which a developer new to Paynet integrated using only this documentation.
+
+- **Products:** if you send `Products`, `LineNo`, `Name`, `UnitPrice`, `Quantity`, `Amount`, `TotalAmount` are required; `Code` and `Description` are optional (checked on the test environment). See [Server-to-server](#/guides/server-to-server).
+- **Payment link:** keep `paymentLink` from the create response — status responses return it shortened.
+- **Refunds:** full refund = `Amount` equal to `PaidAmount`; `200` = done; do not repeat a refund without checking the status first. The request and response examples now show the same payment. See [Errors and statuses](#/guides/errors-and-statuses).
+- Payment search dates in the formats table: Chișinău time, without `Z`.
+- Notifications: only the HTTP code `200` counts, the response body does not matter.
+- Getting started: where the merchant code is used.
+
 ## Documentation v3.2 — 10.11.2026
 
 - **Official SDKs for PHP and Node.js** (version 1.0.0, MIT license): authorization, orders, statuses, refunds with rule checks, saved cards, statements, notifications, hosted checkout form, errors. Checked on the test environment. See [SDK](#/guides/sdk).

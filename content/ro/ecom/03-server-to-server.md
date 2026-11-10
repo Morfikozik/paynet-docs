@@ -101,9 +101,11 @@ Content-Type: application/json
 | `Name` | string | da | Denumirea serviciului. |
 | `Description` | string | da | Descrierea serviciului. |
 | `Amount` | integer | da | Suma serviciului în unități minime. |
-| `Products` | array | nu | Dacă trimiteți produse, toate câmpurile produsului de mai jos sunt obligatorii. |
+| `Products` | array | nu | Opțional. Dacă trimiteți produse, la fiecare produs sunt obligatorii șase câmpuri (vezi mai jos). |
 
-`Services[].Products[]`: `LineNo` (int), `Code` (string), `Name` (string), `Description` (string), `UnitPrice` (int), `Quantity` (int, în sutimi: `100` = 1 buc., `300` = 3 buc.), `Amount` (int), `TotalAmount` (int).
+`Services[].Products[]` — obligatorii: `LineNo` (int), `Name` (string), `UnitPrice` (int), `Quantity` (int), `Amount` (int), `TotalAmount` (int). Opționale: `Code` (string), `Description` (string). Verificat în mediul de test: fără oricare dintre cele șase câmpuri obligatorii API-ul răspunde `400`.
+
+**`Quantity` este în sutimi:** `100` = 1 buc., `300` = 3 buc. În exemplul de mai sus `"Quantity": 300` înseamnă 3 buc. la `UnitPrice` 1,00 MDL.
 
 **Sumele** sunt numere întregi în unități minime (bani): `1201` = 12,01 MDL.
 
@@ -148,7 +150,7 @@ Salvați `paymentId` împreună cu comanda: este cheia pentru verificarea status
 
 ## 3. Redirecționați clientul
 
-Trimiteți browserul clientului la `paymentLink` (HTTP 302 sau link/buton). După plata reușită clientul revine la `LinkUrlSuccess`; dacă plata eșuează sau este anulată — la `LinkUrlCancel`.
+Trimiteți browserul clientului la `paymentLink` (HTTP 302 sau link/buton). Salvați acest link împreună cu comanda: linkul complet există doar în răspunsul la `POST /api/order`; în răspunsurile `GET /api/order/…` este scurtat, fără numărul plății. După plata reușită clientul revine la `LinkUrlSuccess`; dacă plata eșuează sau este anulată — la `LinkUrlCancel`.
 
 ## 4. Procesați notificarea
 

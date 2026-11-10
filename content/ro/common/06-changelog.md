@@ -1,5 +1,16 @@
 # Jurnalul modificărilor
 
+## Documentația v3.3 — 10.11.2026
+
+Clarificări în urma unui test în care un dezvoltator nou în Paynet a făcut integrarea folosind doar această documentație.
+
+- **Produse:** dacă trimiteți `Products`, sunt obligatorii `LineNo`, `Name`, `UnitPrice`, `Quantity`, `Amount`, `TotalAmount`; `Code` și `Description` sunt opționale (verificat în mediul de test). Vezi [Server-to-server](#/guides/server-to-server).
+- **Linkul de plată:** păstrați `paymentLink` din răspunsul la crearea comenzii — în răspunsurile de status este scurtat.
+- **Rambursări:** rambursare integrală = `Amount` egal cu `PaidAmount`; `200` = efectuată; nu repetați rambursarea fără a verifica statusul. Exemplele de cerere și răspuns arată acum aceeași plată. Vezi [Erori și statusuri](#/guides/errors-and-statuses).
+- Datele căutării plăților în tabelul de formate: ora Chișinău, fără `Z`.
+- Notificări: contează doar codul HTTP `200`, corpul răspunsului nu contează.
+- Getting started: unde se folosește codul comerciantului.
+
 ## Documentația v3.2 — 10.11.2026
 
 - **SDK-uri oficiale pentru PHP și Node.js** (versiunea 1.0.0, licență MIT): autorizare, comenzi, statusuri, rambursări cu verificarea regulilor, carduri salvate, extrase, notificări, formularul hosted checkout, erori. Verificate în mediul de test. Vezi [SDK](#/guides/sdk).
