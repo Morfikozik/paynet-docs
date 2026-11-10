@@ -484,6 +484,8 @@ const sdkStage = async (token) => {
         await page.goto(created.paymentLink, { waitUntil: 'networkidle', timeout: 60000 });
         await fillAndPay(page, `sdk-${lang}-pay`);
         await page.waitForURL(/shop\.example|receipt/, { timeout: 120000 }).catch(() => {});
+        entry.afterPayUrl = page.url();
+        await snap(page, `sdk-${lang}-after-pay`);
       } finally {
         await browser.close();
       }
@@ -521,6 +523,29 @@ const sdkStage = async (token) => {
   if (failed) throw new Error('SDK check has failures — see sdk-report.md');
 };
 
+// Search probe: how /api/order/search interprets from/to (UTC "Z" vs Chișinău local time) and what an empty result looks like.
+const searchProbeStage = async (token) => {
+  const created = await call('POST', '/api/order', orderBody(Date.now(), 300), token);
+  const id = created.body?.paymentId;
+  note('search:created', { id, registered: created.body?.registered });
+  const now = Date.now();
+  const iso = (ms) => new Date(ms).toISOString();
+  const local = (ms) => { const d = new Date(ms + 2 * 3600e3); return d.toISOString().slice(0, 19); }; // Chișinău winter time (UTC+2)
+  const variants = {
+    'utc-Z last hour': [iso(now - 3600e3), iso(now + 60e3)],
+    'utc-Z last 3 hours': [iso(now - 3 * 3600e3), iso(now + 60e3)],
+    'local no-Z last hour': [local(now - 3600e3), local(now + 60e3)],
+    'utc no-Z last hour': [iso(now - 3600e3).slice(0, 19), iso(now + 60e3).slice(0, 19)],
+    'utc-Z +3h future window': [iso(now - 3600e3), iso(now + 3 * 3600e3)],
+    'empty period 2020': ['2020-01-01T00:00:00', '2020-01-02T00:00:00'],
+  };
+  for (const [name, [from, to]] of Object.entries(variants)) {
+    const r = await call('GET', `/api/order/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, null, token);
+    const text = JSON.stringify(r.body);
+    note(`search:${name}`, { from, to, status: r.status, found: text.includes(String(id)), count: Array.isArray(r.body) ? r.body.length : (r.body?.items?.length ?? null), sample: text.slice(0, 300) });
+  }
+};
+
 const main = async () => {
   if (stage === 'postman') return postmanStage();
   if (stage === 'portal') return portalStage();
@@ -535,6 +560,7 @@ const main = async () => {
   if (stage === 'probe-errors') return probeErrorsStage(token);
   if (stage === 'quantity') return quantityStage(token);
   if (stage === 'sdk') return sdkStage(token);
+  if (stage === 'search-probe') return searchProbeStage(token);
 
   const order1 = Date.now();
   const created = await call('POST', '/api/order', orderBody(order1, 300), token);
