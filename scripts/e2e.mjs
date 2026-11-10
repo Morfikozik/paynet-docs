@@ -1,5 +1,5 @@
 // End-to-end check of the documentation against the Paynet TEST environment.
-// Usage: node scripts/e2e.mjs <explore|full> <outDir>
+// Usage: node scripts/e2e.mjs <explore|full|shop|contract|cards|portal> <outDir>
 // Results (log.json, screenshots, page HTML) go to outDir; CI publishes them to the ci/e2e branch.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -276,7 +276,47 @@ const cardsStage = async (token) => {
   }
 };
 
+
+// Portal check on the published site: an order created with "Test API Request" in one tab
+// is pre-filled in the notification simulator opened in another tab.
+const portalStage = async () => {
+  const SITE = 'https://morfikozik.github.io/paynet-docs/';
+  const browser = await chromium.launch();
+  try {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const simulator = await context.newPage();
+    await simulator.goto(SITE + '#/page/notification-simulator', { waitUntil: 'networkidle' });
+    const orderInput = simulator.locator('input[placeholder="317184"]');
+    note('portal-simulator-before', { value: await orderInput.inputValue() });
+
+    const api = await context.newPage();
+    await api.goto(SITE + '#/api/post-api-order', { waitUntil: 'networkidle' });
+    const requestText = await api.locator('textarea').first().inputValue();
+    const sentOrder = String(JSON.parse(requestText).Order);
+    await api.click('button:has-text("Test API Request")');
+    await api.waitForFunction(() => !!localStorage.getItem('paynet_last_order'), null, { timeout: 60000 });
+    const stored = await api.evaluate(() => localStorage.getItem('paynet_last_order'));
+    note('portal-order-created', { sentOrder, stored });
+    await snap(api, 'portal-01-api');
+
+    await simulator.bringToFront();
+    await simulator.waitForTimeout(1000);
+    const after = await orderInput.inputValue();
+    note('portal-simulator-after', { value: after, matches: after === sentOrder });
+    await orderInput.scrollIntoViewIfNeeded();
+    await snap(simulator, 'portal-02-simulator');
+
+    await simulator.click('button:has-text("Get")');
+    await simulator.waitForTimeout(4000);
+    await snap(simulator, 'portal-03-get');
+    if (after !== sentOrder) throw new Error(`simulator shows ${after}, expected ${sentOrder}`);
+  } finally {
+    await browser.close();
+  }
+};
+
 const main = async () => {
+  if (stage === 'portal') return portalStage();
   if (stage === 'shop') return shopStage();
   const auth = await call('POST', '/auth', { grantType: 'password', username: '771064', password: 'sLgMnGWJ' });
   const token = auth.body?.access_token;
