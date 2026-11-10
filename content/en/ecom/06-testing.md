@@ -74,4 +74,26 @@ A bank decline, refund errors and damaged notifications cannot be reproduced wit
 
 ## Testing from this portal
 
-The "Test API Request" buttons call the test API directly from your browser. This works on the official portal domain. If you open a copy of the portal from another address, the browser may block the calls (CORS); use cURL or Postman instead. A Postman collection can be downloaded from the sidebar.
+The "Test API Request" buttons call the test API directly from your browser. This works on the official portal domain. If you open a copy of the portal from another address, the browser may block the calls (CORS); use cURL or Postman instead. A ready-made Postman collection is described below.
+
+## Postman
+
+The ready-made collection works right after import; nothing needs editing.
+
+1. Download the [collection](postman/paynet-ecom.postman_collection.json) and the [test environment](postman/paynet-test.postman_environment.json) (also in the sidebar under the "Postman collection" button).
+2. In Postman: **Import** → select both files → choose the **Paynet — TEST** environment at the top right.
+3. Run **1. Payments → Create order**. The token is obtained automatically; `Order` and `ExpiryDate` are new every time.
+4. The **Postman Console** shows `paymentLink` — open it and pay with the test card.
+5. Run **Get payment by Order**: `status` = `4` means paid. Then you can run **Refund**.
+
+| What the collection does by itself | How |
+|---|---|
+| Gets and refreshes the token | Before each request, if there is no token or it is about to expire |
+| Creates a unique order | `Order` = current time in ms, `ExpiryDate` = tomorrow, Chisinau time |
+| Passes data between requests | Saves `paymentId`, `paymentLink`, `lastOrder`, `cardLinkHash` |
+| Calculates periods | Search — last 24 hours, statement — last 7 days |
+| Shows errors | Code, message, `details` and `traceId` in the Postman Console |
+
+The **5. Error examples** folder triggers `401`, `400` and `404` on purpose, so you can see what they look like.
+
+For production, import the [PRODUCTION environment](postman/paynet-production.postman_environment.json) and fill in **your own** `username`, `password`, `saleAreaCode`. Do not share this file once filled in.

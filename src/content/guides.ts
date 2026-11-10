@@ -81,6 +81,8 @@ type UiText = {
   checkoutForm: string;
   notificationSimulator: string;
   plugins: string;
+  postmanEnvironments: string;
+  postmanHowTo: string;
   searchPlaceholder: string;
   searchGuides: string;
   searchMethods: string;
@@ -116,6 +118,8 @@ export const guideUiText: Record<Language, UiText> = {
     checkoutForm: 'Checkout form (try it)',
     notificationSimulator: 'Notification simulator',
     plugins: 'Plugins',
+    postmanEnvironments: 'Environments',
+    postmanHowTo: 'How to use',
     searchPlaceholder: 'Search the documentation…',
     searchGuides: 'Guides',
     searchMethods: 'API methods',
@@ -155,6 +159,8 @@ export const guideUiText: Record<Language, UiText> = {
     checkoutForm: 'Форма checkout (попробовать)',
     notificationSimulator: 'Симулятор уведомлений',
     plugins: 'Плагины',
+    postmanEnvironments: 'Окружения',
+    postmanHowTo: 'Как пользоваться',
     searchPlaceholder: 'Поиск по документации…',
     searchGuides: 'Руководства',
     searchMethods: 'Методы API',
@@ -194,6 +200,8 @@ export const guideUiText: Record<Language, UiText> = {
     checkoutForm: 'Formular checkout (încercați)',
     notificationSimulator: 'Simulator notificări',
     plugins: 'Pluginuri',
+    postmanEnvironments: 'Medii',
+    postmanHowTo: 'Cum se folosește',
     searchPlaceholder: 'Căutați în documentație…',
     searchGuides: 'Ghiduri',
     searchMethods: 'Metode API',

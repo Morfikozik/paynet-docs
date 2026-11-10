@@ -23,7 +23,7 @@ jobs:
           node-version: 22
       - name: Install Playwright
         run: |
-          npm install --no-save --no-audit --no-fund playwright@1.49.1
+          npm install --no-save --no-audit --no-fund playwright@1.49.1 newman@6
           npx playwright install --with-deps chromium
       - name: Run
         run: node scripts/e2e.mjs "${{ github.event.inputs.stage }}" e2e-out || echo "E2E_FAILED=1" >> $GITHUB_ENV

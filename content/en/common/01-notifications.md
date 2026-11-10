@@ -376,10 +376,21 @@ function paynetHandleRequest($db, callable $getToken): void {
 
 - Answer HTTP `200` **after** you have verified the hash and saved the result.
 - Answer fast: store the notification, return `200`, and do heavy processing after the response.
-- Any other response (or no response) is treated as a failure, and Paynet sends the notification again. Example from a real log: 7 attempts within about 9 minutes, in two series, after which sending stopped. The exact schedule is not guaranteed — do not rely on it.
+- Any other response (or no response) is treated as a failure, and Paynet sends the notification again. After a `200` response, retries stop.
+- Retry schedule — **9 attempts within about 25 minutes**, after which sending stops:
+
+| Attempt | When |
+|---|---|
+| 1 | ~20 seconds after the payment |
+| 2–4 | after ~1 minute, then every ~35 seconds |
+| 5–7 | after ~5 minutes, then every ~35 seconds |
+| 8–9 | after ~15 minutes, then after ~35 seconds |
+
+> **Important:** retries last only about 25 minutes. If your server was down longer, the notification will not come again. So check the status of unpaid orders through the API and reconcile daily.
+
 - Because of retries the same notification can arrive more than once. Process each `Payment.Id` only once.
 - If a notification did not arrive (for example, your server was down longer than all attempts), check the status with `GET /api/order/{paymentId}` or `GET /api/order/merchant/{Order}`. You can ask Paynet support to send it again.
-- If your server is behind a firewall, ask Paynet support for the IP addresses notifications come from.
+- If your server is behind a firewall, allow incoming requests from Paynet's IP addresses: `93.113.159.22` — production, `93.113.159.23` — test environment.
 - Antifraud will not cancel a payment you received `PAID` for: it acts before the payment is confirmed. A paid payment changes status only after your own [refund](#/guides/errors-and-statuses) (`5` or `6`).
 
 ## Notification simulator on this portal

@@ -4,7 +4,6 @@ import type { LucideIcon } from 'lucide-react';
 import { NAV_GROUPS, FALLBACK_ICON } from '../content/sidebarNav';
 import { OpenAPISpec, ServiceCategory } from '../types/api';
 import { Language } from '../types/language';
-import { buildPostmanCollectionFromOpenApi } from '../utils/postmanCollection';
 import { getMethodTranslation } from '../utils/pathTranslations';
 import { SECTIONS, getSectionGuides, guidePlainText, guideUiText } from '../content/guides';
 
@@ -56,7 +55,6 @@ const makeSnippet = (text: string, query: string) => {
 export const Sidebar: React.FC<SidebarProps> = ({
   language,
   categories,
-  currentSpec,
   route,
   navigate,
   searchQuery,
@@ -77,19 +75,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isPage = (page: string) => route.kind === 'page' && route.page === page;
   const isApi = (id: string) => route.kind === 'api' && route.endpointId === id;
 
-  const handleDownloadPostmanCollection = () => {
-    if (!currentSpec) return;
-    const collection = buildPostmanCollectionFromOpenApi(currentSpec);
-    const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
-    const objectUrl = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = objectUrl;
-    anchor.download = 'paynet-ecommerce-postman-collection.json';
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(objectUrl);
-  };
+  // Ready-made Postman files, generated at build time by scripts/build-postman.mjs.
+  const postmanFile = (name: string) => `${import.meta.env.BASE_URL}postman/${name}`;
 
   // ---------- full-text search ----------
   const searchIndex = React.useMemo(() => {
@@ -259,16 +246,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           )}
         </div>
-        {currentSpec && (
-          <button
-            type="button"
-            onClick={handleDownloadPostmanCollection}
-            className="mt-3 w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-paynet-primary bg-white border border-paynet-gray-200 hover:bg-paynet-light rounded-lg transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            Postman collection
-          </button>
-        )}
+        <a
+          href={postmanFile('paynet-ecom.postman_collection.json')}
+          download
+          className="mt-3 w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-paynet-primary bg-white border border-paynet-gray-200 hover:bg-paynet-light rounded-lg transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          Postman collection
+        </a>
+        <div className="mt-1.5 flex flex-wrap justify-center gap-x-2 text-xs text-paynet-gray-500">
+          <span>{ui.postmanEnvironments}:</span>
+          <a href={postmanFile('paynet-test.postman_environment.json')} download className="text-paynet-primary hover:underline">TEST</a>
+          <a href={postmanFile('paynet-production.postman_environment.json')} download className="text-paynet-primary hover:underline">PRODUCTION</a>
+          <button type="button" onClick={() => navigate('#/guides/testing')} className="text-paynet-primary hover:underline">{ui.postmanHowTo}</button>
+        </div>
       </div>
 
       <nav className="p-4 flex-1 overflow-y-auto min-h-0 bg-paynet-gray-50">

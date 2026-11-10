@@ -375,7 +375,70 @@ const probeErrorsStage = async (token) => {
   note('probe:auth-burst-30', { counts: authCounts });
 };
 
+// Postman collection check with newman: create order -> pay with the test card -> the rest of the collection.
+const postmanStage = async () => {
+  const { execFileSync } = await import('node:child_process');
+  execFileSync('node', ['scripts/build-postman.mjs'], { stdio: 'inherit' });
+  const newman = (await import('newman')).default;
+  const run = (collection, folders, exportTo) => new Promise((resolve, reject) => {
+    newman.run({
+      collection,
+      environment: 'public/postman/paynet-test.postman_environment.json',
+      folder: folders,
+      exportCollection: exportTo,
+      reporters: [],
+    }, (error, summary) => (error ? reject(error) : resolve(summary)));
+  });
+  const report = (label, summary) => {
+    const rows = summary.run.executions.map((e) => ({
+      name: e.item.name,
+      code: e.response?.code,
+      failed: (e.assertions || []).filter((a) => a.error).map((a) => `${a.assertion}: ${a.error.message}`),
+    }));
+    note(`postman:${label}`, { rows, failures: summary.run.failures.length });
+    return rows;
+  };
+  const c1 = path.join(outDir, 'collection-after-create.json');
+  const first = await run('public/postman/paynet-ecom.postman_collection.json', ['Create order'], c1);
+  report('create', first);
+  const saved = JSON.parse(fs.readFileSync(c1, 'utf8')).variable;
+  const value = (key) => saved.find((v) => v.key === key)?.value;
+  note('postman:variables', { orderNumber: value('orderNumber'), paymentId: value('paymentId'), paymentLink: value('paymentLink'), expiryDate: value('expiryDate'), tokenSaved: !!value('accessToken') });
+
+  const browser = await chromium.launch();
+  try {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await page.goto(value('paymentLink'), { waitUntil: 'networkidle', timeout: 60000 });
+    await fillAndPay(page, 'postman-pay');
+    await page.waitForTimeout(5000);
+  } finally {
+    await browser.close();
+  }
+  const auth = await call('POST', '/auth', { grantType: 'password', username: '771064', password: 'sLgMnGWJ' });
+  let status;
+  for (let i = 0; i < 20; i++) {
+    status = (await call('GET', `/api/order/merchant/${value('orderNumber')}`, null, auth.body.access_token)).body?.status;
+    if (status === 4) break;
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+  note('postman:paid', { status });
+  const c2 = path.join(outDir, 'collection-after-all.json');
+  const rest = await run(c1, [
+    'Get payment by Order (merchant order number)',
+    'Get payment by paymentId',
+    'Search payments (last 24 hours)',
+    'Refund (pay the order first)',
+    '3. Statements',
+    '4. Authorization',
+    '5. Error examples (fail on purpose)',
+  ], c2);
+  const rows = report('rest', rest);
+  const bad = rows.filter((r) => r.failed.length);
+  if (bad.length) throw new Error('Postman assertions failed: ' + JSON.stringify(bad));
+};
+
 const main = async () => {
+  if (stage === 'postman') return postmanStage();
   if (stage === 'portal') return portalStage();
   if (stage === 'shop') return shopStage();
   const auth = await call('POST', '/auth', { grantType: 'password', username: '771064', password: 'sLgMnGWJ' });

@@ -36,7 +36,9 @@ jobs:
         run: node scripts/check-docs.mjs
 
       - name: Generate AI documentation (llms.txt, llms-full.txt, docs/*.md)
-        run: node scripts/build-ai-docs.mjs
+        run: |
+          node scripts/build-ai-docs.mjs
+          node scripts/build-postman.mjs
 
       - name: Type check
         run: npx tsc --noEmit -p tsconfig.app.json

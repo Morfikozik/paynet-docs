@@ -1,5 +1,26 @@
 # Erori și statusuri
 
+## Fișă rapidă: ce faceți la o eroare
+
+Verificat în mediul de test pe 10.11.2026. Detalii despre fiecare format — în secțiunile de mai jos.
+
+| HTTP | Ce conține răspunsul | Când apare | Ce faceți | Repetați cererea? |
+|---|---|---|---|---|
+| `400` | `INVALID_PARAMETER`, `details` numește câmpul | Valoare invalidă a unui parametru | Corectați câmpul din `details` | Doar după corectare |
+| `400` | `errorInfo`, `errors` listează câmpurile | JSON ilizibil, lipsesc câmpuri obligatorii, tip greșit (de exemplu, litere în loc de număr în `paymentId` din adresă) | Corectați cererea | Doar după corectare |
+| `401` | `UNAUTHORIZED` (chei cu majusculă: `Status`, `Code`…) | Token lipsă, invalid sau expirat | Obțineți un token nou prin `/auth` | Da, o dată cu tokenul nou |
+| `401` | `AUTHENTICATION_FAILED` | `/auth`: utilizator sau parolă greșite | Verificați datele de acces (pentru test și producție sunt diferite) | Nu |
+| `404` | `NOT_FOUND_RECORD` | Nu există plata cu acest ID; rambursarea unei plăți neachitate | Verificați `paymentId` / `Order` și statusul plății | Nu |
+| `404` | Corp gol | Adresă (cale) greșită | Verificați URL-ul și adresa API | Nu |
+| `405` | Corp gol | Metodă HTTP greșită (de exemplu, `GET` în loc de `POST`) | Verificați metoda | Doar după corectare |
+| `415` | Corp gol | Lipsește antetul `Content-Type: application/json` sau corpul nu este JSON (inclusiv la `/auth`) | Adăugați antetul, trimiteți JSON | Doar după corectare |
+| `500` | `TECHNICAL_ERROR` | `Order` repetat cu alte date sau după plată; ori o defecțiune la Paynet | Verificați întâi `GET /api/order/merchant/{Order}`. Dacă este un `Order` repetat, creați o comandă cu un `Order` nou | Doar după verificare |
+| — | Niciun răspuns (timeout, rețea) | Problemă de conexiune | Căutați comanda după `Order`; dacă nu există, repetați **aceeași** cerere fără modificări | Da, cu același corp |
+
+- În mediul de test nu au apărut răspunsuri `403`, `429` sau `503`. Nu s-a observat limitarea frecvenței: 100 de cereri paralele au primit `200`. Paynet nu publică limite oficiale, așa că nu trimiteți cereri în buclă fără pauză.
+- În `errorInfo`, câmpul `ppResponseCodeDescription` poate conține „We are sorry, this service is temporarily unavailable” chiar și la o eroare obișnuită de validare. Bazați-vă pe `errors`, nu pe acest text, și nu-l afișați clientului.
+- Dacă primiți `401` pentru token: obțineți un token nou și repetați cererea **o singură dată**. Dacă din nou `401` — verificați datele de acces.
+
 ## Coduri HTTP
 
 | HTTP | `code` | Semnificație | Ce faceți |
@@ -104,6 +125,8 @@ O comandă nou creată are `status` = `1` și `paidDate` = `null`.
 - Nu există un status separat „expirată”: dacă `ExpiryDate` a trecut fără plată, comanda rămâne `1`, dar nu mai poate fi plătită.
 - Antifrauda acționează înainte de confirmarea plății. După ce ați primit o notificare `PAID` verificată, antifrauda nu va anula acea plată; statusul `5` la o comandă plătită înseamnă doar rambursare integrală.
 - Considerați plata achitată când ați primit o notificare `PAID` verificată sau `status` = `4`.
+- Dacă clientul nu trece 3-D Secure, plata primește statusul `5`, iar clientul revine la `LinkUrlCancel` — la fel ca la refuzul băncii.
+- Motivul refuzului (refuzul băncii, antifraudă, 3-D Secure) nu poate fi aflat prin API: statusul `5` înseamnă doar că această comandă este închisă și pentru o nouă încercare este nevoie de un `Order` nou.
 
 ### Plată eșuată și o nouă încercare
 
@@ -184,3 +207,22 @@ Ora locală Chișinău este fusul orar `Europe/Chisinau`: UTC+2 iarna, UTC+3 var
 - `eventDate` în răspunsul la rambursare are formatul `DD.MM.YYYY HH:mm:ss`.
 - `moneyType` aici este codul de procesare (de exemplu `CYBER_SOURCE`), nu valoarea din notificare (`CARD`…).
 - După rambursare `paidDate` al plății rămâne completat.
+
+## Contactarea suportului
+
+- **Dacă vă conectează un manager Paynet:** de obicei se creează un chat comun în Telegram cu un dezvoltator Paynet și dezvoltatorul dvs. Acolo primiți datele de acces și linkurile și puteți pune întrebări despre integrare. Rugați managerul să creeze un astfel de chat.
+- **Dacă încă nu ați discutat cu un manager:** scrieți la [support@paynet.md](mailto:support@paynet.md).
+
+Pentru un răspuns rapid, trimiteți imediat:
+
+| Ce | Exemplu |
+|---|---|
+| `traceId` din răspunsul cu eroare | `9b9346f9-f83a-465d-ac8d-dc382c460c22` |
+| Metoda și adresa | `POST https://ecom-api-test.paynet.md/api/order` |
+| Data și ora cererii (ora Chișinăului) | `10.11.2026 12:05` |
+| `Order` și / sau `paymentId` | `1762444800000`, `328731` |
+| Zona de vânzare și comerciantul | `onlidocumentation_md`, `265505` |
+| Codul HTTP și corpul complet al răspunsului | `400`, `{ "errorInfo": … }` |
+| Test sau producție | test |
+
+Nu trimiteți niciodată parola, cheile secrete sau tokenul.

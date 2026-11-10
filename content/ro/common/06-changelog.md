@@ -1,5 +1,13 @@
 # Jurnalul modificărilor
 
+## Documentația v3.1 — 10.11.2026
+
+- **Colecție Postman nouă** cu mediile TEST și PRODUCTION: tokenul se obține automat, fiecare comandă este unică, datele se transmit între cereri. Verificată printr-o rulare în mediul de test. Vezi [Testare → Postman](#/guides/testing).
+- **Fișă rapidă pentru erori** cu coloana „repetați cererea?”; au fost adăugate `405`, `415` și `404` cu corp gol (verificat în mediul de test). Vezi [Erori și statusuri](#/guides/errors-and-statuses).
+- **Programul reîncercărilor notificărilor:** 9 încercări în circa 25 de minute. **Adresele IP** Paynet pentru firewall. Vezi [Notificări](#/guides/notifications).
+- 3-D Secure și motivul refuzului în secțiunea de statusuri; secțiunea „Contactarea suportului”.
+- Meniu lateral cu pictograme; tabelele de parametri se citesc pe telefon.
+
 ## Documentația v3 — 09.11.2026
 
 - **Exemplu de magazin în Node.js** — o integrare completă fără dependențe. Verificat de un test end-to-end în mediul de test: cumpărare, plată, notificare, rambursare. Vezi [Exemplu de magazin](#/guides/example-shop).

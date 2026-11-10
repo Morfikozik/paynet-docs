@@ -1,5 +1,26 @@
 # Errors and statuses
 
+## Cheat sheet: what to do on an error
+
+Checked on the test environment on 10.11.2026. Details on each format are in the sections below.
+
+| HTTP | What the response contains | When it happens | What to do | Retry the request? |
+|---|---|---|---|---|
+| `400` | `INVALID_PARAMETER`, `details` names the field | Invalid parameter value | Fix the field named in `details` | Only after fixing |
+| `400` | `errorInfo`, `errors` lists the fields | Unreadable JSON, missing required fields, wrong type (for example, letters instead of a number in `paymentId` in the URL) | Fix the request | Only after fixing |
+| `401` | `UNAUTHORIZED` (capitalised keys: `Status`, `Code`…) | No token, or it is invalid or expired | Get a new token from `/auth` | Yes, once with the new token |
+| `401` | `AUTHENTICATION_FAILED` | `/auth`: wrong username or password | Check the credentials (test and production ones differ) | No |
+| `404` | `NOT_FOUND_RECORD` | No payment with this ID; refund of an unpaid payment | Check `paymentId` / `Order` and the payment status | No |
+| `404` | Empty body | Wrong address (path) | Check the URL and API address | No |
+| `405` | Empty body | Wrong HTTP method (for example, `GET` instead of `POST`) | Check the method | Only after fixing |
+| `415` | Empty body | No `Content-Type: application/json` header, or the body is not JSON (including `/auth`) | Add the header, send JSON | Only after fixing |
+| `500` | `TECHNICAL_ERROR` | `Order` repeated with different data or after payment; or a failure on Paynet's side | First check `GET /api/order/merchant/{Order}`. If it is a repeated `Order`, create an order with a new `Order` | Only after checking |
+| — | No response (timeout, network) | Connection problem | Look the order up by `Order`; if it does not exist, repeat **the same** request unchanged | Yes, with the same body |
+
+- No `403`, `429` or `503` responses were seen on the test environment. No rate limiting was observed: 100 parallel requests returned `200`. Paynet does not publish official limits, so do not send requests in a loop without a pause.
+- In `errorInfo`, `ppResponseCodeDescription` may say "We are sorry, this service is temporarily unavailable" even for an ordinary validation error. Rely on `errors`, not on this text, and do not show it to the customer.
+- If you get `401` for the token: get a new token and repeat the request **once**. If it is `401` again, check the credentials.
+
 ## HTTP status codes
 
 | HTTP | `code` | Meaning | What to do |
@@ -104,6 +125,8 @@ A newly created order has `status` = `1` and `paidDate` = `null`.
 - There is no separate "expired" status: if `ExpiryDate` has passed without payment, the order stays `1`, but it can no longer be paid.
 - Antifraud acts before the payment is confirmed. Once you have received a verified `PAID` notification, antifraud will not cancel that payment; status `5` on a paid order means a full refund only.
 - Treat a payment as paid when you received a verified `PAID` notification or `status` = `4`.
+- If the customer fails 3-D Secure, the payment gets status `5` and the customer returns to `LinkUrlCancel` — the same as a bank decline.
+- The reason for a decline (bank decline, antifraud, 3-D Secure) is not available through the API: status `5` only means this order is closed and a new attempt needs a new `Order`.
 
 ### Failed payment and another attempt
 
@@ -184,3 +207,22 @@ Chișinău local time is the `Europe/Chisinau` time zone: UTC+2 in winter, UTC+3
 - `eventDate` in the refund response uses the format `DD.MM.YYYY HH:mm:ss`.
 - `moneyType` here is the processing code (for example `CYBER_SOURCE`), not the notification value (`CARD`…).
 - After a refund the payment's `paidDate` stays filled.
+
+## Contacting support
+
+- **If a Paynet manager is onboarding you:** usually a shared Telegram chat is created with a Paynet developer and your developer. There you get credentials and links and can ask integration questions. Ask your manager to create such a chat.
+- **If you have not talked to a manager yet:** write to [support@paynet.md](mailto:support@paynet.md).
+
+To get a fast answer, send right away:
+
+| What | Example |
+|---|---|
+| `traceId` from the error response | `9b9346f9-f83a-465d-ac8d-dc382c460c22` |
+| Method and address | `POST https://ecom-api-test.paynet.md/api/order` |
+| Date and time of the request (Chisinau time) | `10.11.2026 12:05` |
+| `Order` and / or `paymentId` | `1762444800000`, `328731` |
+| Sale area and merchant | `onlidocumentation_md`, `265505` |
+| HTTP code and the full response body | `400`, `{ "errorInfo": … }` |
+| Test or production | test |
+
+Never send your password, secret keys or token.

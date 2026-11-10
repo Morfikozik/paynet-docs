@@ -74,4 +74,26 @@ Refuzul băncii, erorile de rambursare și notificările deteriorate nu pot fi r
 
 ## Testare de pe acest portal
 
-Butoanele „Test API Request” apelează API-ul de test direct din browserul dvs. Funcționează pe domeniul oficial al portalului. Dacă deschideți o copie a portalului de la altă adresă, browserul poate bloca apelurile (CORS) — folosiți atunci cURL sau Postman. Colecția Postman se descarcă din meniul lateral.
+Butoanele „Test API Request” apelează API-ul de test direct din browserul dvs. Funcționează pe domeniul oficial al portalului. Dacă deschideți o copie a portalului de la altă adresă, browserul poate bloca apelurile (CORS) — folosiți atunci cURL sau Postman. O colecție Postman gata de utilizare este descrisă mai jos.
+
+## Postman
+
+Colecția gata făcută funcționează imediat după import, nu trebuie modificat nimic.
+
+1. Descărcați [colecția](postman/paynet-ecom.postman_collection.json) și [mediul de test](postman/paynet-test.postman_environment.json) (le găsiți și în meniul lateral, sub butonul „Postman collection”).
+2. În Postman: **Import** → selectați ambele fișiere → în dreapta sus alegeți mediul **Paynet — TEST**.
+3. Rulați **1. Payments → Create order**. Tokenul se obține automat; `Order` și `ExpiryDate` sunt noi de fiecare dată.
+4. În **Postman Console** apare `paymentLink` — deschideți-l și plătiți cu cardul de test.
+5. Rulați **Get payment by Order**: `status` = `4` înseamnă achitat. Apoi puteți rula **Refund**.
+
+| Ce face colecția singură | Cum |
+|---|---|
+| Obține și reînnoiește tokenul | Înainte de fiecare cerere, dacă tokenul lipsește sau expiră curând |
+| Creează o comandă unică | `Order` = ora curentă în ms, `ExpiryDate` = mâine, ora Chișinăului |
+| Transmite datele între cereri | Salvează `paymentId`, `paymentLink`, `lastOrder`, `cardLinkHash` |
+| Calculează perioadele | Căutare — ultimele 24 de ore, extras — ultimele 7 zile |
+| Afișează erorile | Codul, mesajul, `details` și `traceId` în Postman Console |
+
+Dosarul **5. Error examples** provoacă intenționat erorile `401`, `400` și `404`, ca să vedeți cum arată.
+
+Pentru producție, importați [mediul PRODUCTION](postman/paynet-production.postman_environment.json) și completați **propriile** `username`, `password`, `saleAreaCode`. Nu distribuiți acest fișier după completare.

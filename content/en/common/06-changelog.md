@@ -1,5 +1,13 @@
 # Changelog
 
+## Documentation v3.1 — 10.11.2026
+
+- **New Postman collection** with TEST and PRODUCTION environments: the token is obtained automatically, every order is unique, data is passed between requests. Checked by a run on the test environment. See [Testing → Postman](#/guides/testing).
+- **Error cheat sheet** with a "retry the request?" column; `405`, `415` and `404` with an empty body added (checked on the test environment). See [Errors and statuses](#/guides/errors-and-statuses).
+- **Notification retry schedule:** 9 attempts within about 25 minutes. Paynet **IP addresses** for your firewall. See [Notifications](#/guides/notifications).
+- 3-D Secure and the decline reason in the statuses section; a "Contacting support" section.
+- Sidebar with icons; parameter tables are readable on phones.
+
 ## Documentation v3 — 09.11.2026
 
 - **Example shop in Node.js** — a complete integration with no dependencies. Checked by an end-to-end test on the test environment: purchase, payment, notification, refund. See [Example shop](#/guides/example-shop).

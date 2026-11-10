@@ -376,10 +376,21 @@ function paynetHandleRequest($db, callable $getToken): void {
 
 - Răspundeți HTTP `200` **după** ce ați verificat hash-ul și ați salvat rezultatul.
 - Răspundeți repede: salvați notificarea, returnați `200`, iar procesarea grea faceți-o după răspuns.
-- Orice alt răspuns (sau lipsa răspunsului) este considerat eșec, iar Paynet trimite notificarea din nou. Exemplu dintr-un log real: 7 încercări în circa 9 minute, în două serii, după care trimiterea s-a oprit. Programul exact nu este garantat — nu vă bazați pe el.
+- Orice alt răspuns (sau lipsa răspunsului) este considerat eșec, iar Paynet trimite notificarea din nou. După un răspuns `200`, reîncercările se opresc.
+- Programul reîncercărilor — **9 încercări în circa 25 de minute**, după care trimiterea se oprește:
+
+| Încercarea | Când |
+|---|---|
+| 1 | ~20 de secunde după plată |
+| 2–4 | după ~1 minut, apoi la fiecare ~35 de secunde |
+| 5–7 | după ~5 minute, apoi la fiecare ~35 de secunde |
+| 8–9 | după ~15 minute, apoi după ~35 de secunde |
+
+> **Important:** reîncercările durează doar circa 25 de minute. Dacă serverul dvs. a fost indisponibil mai mult, notificarea nu va mai veni. De aceea verificați statusul comenzilor neplătite prin API și faceți reconcilierea zilnic.
+
 - Din cauza reîncercărilor aceeași notificare poate sosi de mai multe ori. Procesați fiecare `Payment.Id` o singură dată.
 - Dacă notificarea nu a sosit (de exemplu, serverul a fost indisponibil mai mult decât toate încercările), verificați statusul cu `GET /api/order/{paymentId}` sau `GET /api/order/merchant/{Order}`. Retrimiterea o puteți cere la suportul Paynet.
-- Dacă serverul dvs. este protejat de firewall, adresele IP de la care vin notificările le puteți obține de la suportul Paynet.
+- Dacă serverul dvs. este protejat de firewall, permiteți cererile de intrare de la adresele IP Paynet: `93.113.159.22` — producție, `93.113.159.23` — mediul de test.
 - Antifrauda nu va anula o plată pentru care ați primit `PAID`: ea acționează înainte de confirmarea plății. O plată achitată își schimbă statusul doar după [rambursarea](#/guides/errors-and-statuses) dvs. (`5` sau `6`).
 
 ## Simulatorul de notificări pe acest portal
