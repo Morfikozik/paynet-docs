@@ -134,6 +134,27 @@ for (const lang of languages) {
   }
 }
 
+// 4d. The SDK guide calls only methods / exports that exist in the SDKs.
+{
+  const sdk = await import(path.join(root, 'sdk', 'node', 'src', 'index.js'));
+  const nodeMethods = new Set(Object.getOwnPropertyNames(sdk.PaynetClient.prototype));
+  const phpSources = fs.readdirSync(path.join(root, 'sdk', 'php', 'src')).map((f) => fs.readFileSync(path.join(root, 'sdk', 'php', 'src', f), 'utf8')).join('\n');
+  for (const lang of languages) {
+    const file = files[lang].find((f) => f.endsWith('-sdk.md'));
+    if (!file) { fail(`content/${lang}: SDK guide not found`); continue; }
+    const doc = read(lang, file);
+    for (const code of codeBlocks(doc, 'javascript')) {
+      for (const [, name] of code.matchAll(/paynet\.(\w+)\(/g)) if (!nodeMethods.has(name)) fail(`content/${lang}/${file}: Node.js example calls paynet.${name}() which the SDK does not have`);
+      for (const [, names] of code.matchAll(/import \{([^}]+)\} from '\.\/paynet-ecom-sdk\/src\/index\.js'/g))
+        for (const name of names.split(',').map((n) => n.trim()).filter(Boolean)) if (!(name in sdk)) fail(`content/${lang}/${file}: Node.js example imports ${name} which the SDK does not export`);
+    }
+    for (const code of (doc.match(/```php\n([\s\S]*?)```/g) || [])) {
+      for (const [, name] of code.matchAll(/\$paynet->(\w+)\(/g)) if (!new RegExp(`public function ${name}\\(`).test(phpSources)) fail(`content/${lang}/${file}: PHP example calls $paynet->${name}() which the SDK does not have`);
+      for (const [, cls, name] of code.matchAll(/\b(\w+)::(\w+)\(/g)) if (!new RegExp(`class ${cls}\\b[\\s\\S]*public static function ${name}\\(`).test(phpSources)) fail(`content/${lang}/${file}: PHP example calls ${cls}::${name}() which the SDK does not have`);
+    }
+  }
+}
+
 // 4c. The complete notification handlers: run the Node.js one against mocked Paynet/API/storage, lint the PHP one.
 for (const lang of languages) {
   const notificationFile = files[lang].find((f) => f.endsWith('-notifications.md'));

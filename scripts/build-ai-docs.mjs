@@ -46,6 +46,8 @@ const SUMMARIES = {
   changelog: 'what changed in each documentation version',
   testing: 'test environment, test card, rules and test scenarios with expected results',
   'go-live': 'checklist before switching to production',
+  sdk: 'official SDKs for PHP and Node.js: install, create order, check status, notifications, refunds, checkout form, errors',
+  'mobile-apps': 'how a mobile app takes payments: through your server and the Paynet payment page (iOS/Android), no keys in the app',
 };
 
 const guides = SECTIONS.flatMap((section) =>
@@ -68,7 +70,7 @@ const rewriteLinks = (markdown, mode) =>
     .replace(/\]\(#\/guides\/([a-z0-9-]+)\)/g, (_, slug) =>
       mode === 'full' ? `](#${slug})` : `](${siteUrl}docs/${slug}.md)`
     )
-    .replace(/\]\(mocks\//g, `](${siteUrl}mocks/`).replace(/\]\(postman\//g, `](${siteUrl}postman/`).replace(/\]\(#\/page\//g, `](${siteUrl}#/page/`);
+    .replace(/\]\(mocks\//g, `](${siteUrl}mocks/`).replace(/\]\(postman\//g, `](${siteUrl}postman/`).replace(/\]\(#\/page\//g, `](${siteUrl}#/page/`).replace(/\]\(sdk\//g, `](${siteUrl}sdk/`);
 
 // ---------- API reference from OpenAPI ----------
 const resolveRef = (ref) => ref.replace('#/', '').split('/').reduce((node, key) => node?.[key], spec);
@@ -296,7 +298,7 @@ for (const lang of ['ru', 'ro']) {
       const slug = file.replace(/^\d+-/, '').replace(/\.md$/, '');
       const source = fs.readFileSync(path.join(dir, file), 'utf8')
         .replace(/\]\(#\/guides\/([a-z0-9-]+)\)/g, (_, target) => `](${siteUrl}docs/${lang}/${target}.md)`)
-        .replace(/\]\(mocks\//g, `](${siteUrl}mocks/`).replace(/\]\(postman\//g, `](${siteUrl}postman/`).replace(/\]\(#\/page\//g, `](${siteUrl}#/page/`);
+        .replace(/\]\(mocks\//g, `](${siteUrl}mocks/`).replace(/\]\(postman\//g, `](${siteUrl}postman/`).replace(/\]\(#\/page\//g, `](${siteUrl}#/page/`).replace(/\]\(sdk\//g, `](${siteUrl}sdk/`);
       fs.writeFileSync(path.join(docsOut, lang, `${slug}.md`), source);
     }
   }

@@ -14,6 +14,8 @@ Paynet e-commerce lets your online shop accept payments by card (including Apple
 
 - **You have a backend and want full control** → [Server-to-server integration](#/guides/server-to-server). This is the most flexible option and gives you the `paymentId` immediately.
 - **You only need a "Pay" button and do not want to call an API to create orders** → [Hosted checkout](#/guides/hosted-checkout). You still need a backend to compute the signature, because the secret key must never be in browser code.
+- **You want less code** → ready-made [SDKs for PHP and Node.js](#/guides/sdk): authorization, refund rules, signatures and errors are already done.
+- **You have a mobile app** → payments go through your server and the Paynet page, see [Mobile apps](#/guides/mobile-apps).
 - **Your shop runs on a supported CMS** → download a plugin from [**Plugins**](#/page/plugins). Shopify is connected through Cybersource.
 
 ## What every integration needs

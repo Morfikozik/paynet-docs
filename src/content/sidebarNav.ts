@@ -22,6 +22,8 @@ import {
   HelpCircle,
   History,
   FileText,
+  Package,
+  Smartphone,
 } from 'lucide-react';
 import { Language } from '../types/language';
 
@@ -50,7 +52,9 @@ export const NAV_GROUPS: NavGroup[] = [
     title: { ru: 'Интеграция', en: 'Integration', ro: 'Integrare' },
     items: [
       { kind: 'guide', slug: 'server-to-server', icon: Server, label: { ru: 'Server-to-server', en: 'Server-to-server', ro: 'Server-to-server' } },
+      { kind: 'guide', slug: 'sdk', icon: Package, label: { ru: 'SDK (PHP, Node.js)', en: 'SDK (PHP, Node.js)', ro: 'SDK (PHP, Node.js)' } },
       { kind: 'guide', slug: 'hosted-checkout', icon: Code, label: { ru: 'Hosted checkout', en: 'Hosted checkout', ro: 'Hosted checkout' } },
+      { kind: 'guide', slug: 'mobile-apps', icon: Smartphone, label: { ru: 'Мобильные приложения', en: 'Mobile apps', ro: 'Aplicații mobile' } },
       { kind: 'guide', slug: 'notifications', icon: Bell, label: { ru: 'Уведомления', en: 'Notifications', ro: 'Notificări' } },
       { kind: 'guide', slug: 'signatures', icon: KeyRound, label: { ru: 'Подписи', en: 'Signatures', ro: 'Semnături' } },
       { kind: 'guide', slug: 'saved-cards', icon: CreditCard, label: { ru: 'Сохранённые карты', en: 'Saved cards', ro: 'Carduri salvate' } },

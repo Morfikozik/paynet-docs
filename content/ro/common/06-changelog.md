@@ -1,5 +1,12 @@
 # Jurnalul modificărilor
 
+## Documentația v3.2 — 10.11.2026
+
+- **SDK-uri oficiale pentru PHP și Node.js** (versiunea 1.0.0, licență MIT): autorizare, comenzi, statusuri, rambursări cu verificarea regulilor, carduri salvate, extrase, notificări, formularul hosted checkout, erori. Verificate în mediul de test. Vezi [SDK](#/guides/sdk).
+- **Aplicații mobile**: cum acceptă o aplicație plăți prin serverul dvs. și pagina Paynet. Vezi [Aplicații mobile](#/guides/mobile-apps).
+- **Căutarea plăților:** `from`/`to` sunt în ora Chișinăului; o perioadă goală dă `404 NOT_FOUND_RECORD`. Colecția Postman a fost corectată.
+- `Quantity` produsului este în sutimi (`100` = 1 buc.).
+
 ## Documentația v3.1 — 10.11.2026
 
 - **Colecție Postman nouă** cu mediile TEST și PRODUCTION: tokenul se obține automat, fiecare comandă este unică, datele se transmit între cereri. Verificată printr-o rulare în mediul de test. Vezi [Testare → Postman](#/guides/testing).

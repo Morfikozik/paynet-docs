@@ -44,6 +44,7 @@ jobs:
         run: |
           node scripts/build-ai-docs.mjs
           node scripts/build-postman.mjs
+          node scripts/build-sdk-zips.mjs
 
       - name: Type check
         run: npx tsc --noEmit -p tsconfig.app.json

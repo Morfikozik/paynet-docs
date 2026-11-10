@@ -1,5 +1,12 @@
 # Changelog
 
+## Documentation v3.2 — 10.11.2026
+
+- **Official SDKs for PHP and Node.js** (version 1.0.0, MIT license): authorization, orders, statuses, refunds with rule checks, saved cards, statements, notifications, hosted checkout form, errors. Checked on the test environment. See [SDK](#/guides/sdk).
+- **Mobile apps**: how an app takes payments through your server and the Paynet page. See [Mobile apps](#/guides/mobile-apps).
+- **Payment search:** `from`/`to` are Chișinău time; an empty period gives `404 NOT_FOUND_RECORD`. The Postman collection is fixed.
+- Product `Quantity` is in hundredths (`100` = 1 pc).
+
 ## Documentation v3.1 — 10.11.2026
 
 - **New Postman collection** with TEST and PRODUCTION environments: the token is obtained automatically, every order is unique, data is passed between requests. Checked by a run on the test environment. See [Testing → Postman](#/guides/testing).
