@@ -353,7 +353,7 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
                   required: !!param.required,
                   description: translateOpenApiDescription(param.description, language) || '',
                 }))}
-                labels={{ required: t.common.required, optional: t.common.optional }}
+                labels={{ required: t.common.required, optional: t.common.optional, name: t.common.name, description: t.common.description }}
               />
             </div>
           )}
@@ -371,7 +371,7 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
                   required: !!param.required,
                   description: param.description,
                 }))}
-                labels={{ required: t.common.required, optional: t.common.optional }}
+                labels={{ required: t.common.required, optional: t.common.optional, name: t.common.name, description: t.common.description }}
               />
             </div>
           )}
@@ -450,7 +450,7 @@ export const EndpointDetails: React.FC<EndpointDetailsProps> = ({ endpoint, base
               return (
                 <div key={contentType} className="mb-4">
                   <span className="text-sm font-medium text-paynet-gray-600 block mb-3">Schema Properties:</span>
-                  <ParamList items={schemaItems(content.schema)} labels={{ required: t.common.required, optional: t.common.optional }} />
+                  <ParamList items={schemaItems(content.schema)} labels={{ required: t.common.required, optional: t.common.optional, name: t.common.name, description: t.common.description }} />
                 </div>
               );
             }

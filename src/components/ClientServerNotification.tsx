@@ -723,7 +723,7 @@ function verifyNotificationHash(notification, secretKey, headerHash) {
                   required: !!row.required,
                   description: String(getLocalizedParameterDescription(row.name, row.description) ?? ''),
                 }))}
-                labels={{ required: 'Required', optional: 'Optional' }}
+                labels={{ required: 'Required', optional: 'Optional', name: 'Name', description: 'Description' }}
               />
                 </div>
 
