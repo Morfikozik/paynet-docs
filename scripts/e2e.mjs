@@ -9,6 +9,9 @@ const [stage = 'explore', outDir = 'e2e-out'] = process.argv.slice(2);
 fs.mkdirSync(outDir, { recursive: true });
 const API = 'https://ecom-api-test.paynet.md';
 const SALE_AREA = 'onlidocumentation_md';
+// Published site under test: SITE_URL if given (e.g. docs.paynet.md/api/ after the move), otherwise the GitHub Pages copy.
+const SITE = (process.env.SITE_URL || 'https://paynet-business.github.io/paynet-docs/').replace(/\/?$/, '/');
+const SITE_HOST = new URL(SITE).host;
 const CARD = { number: '4111111111111111', month: '12', year: '27', cvv: '777' };
 const log = [];
 const note = (step, data) => {
@@ -43,8 +46,8 @@ const customer = { Code: 'e2e-docs-customer-1', NameFirst: 'Docs', NameLast: 'Ch
 const orderBody = (order, amount, extra = {}) => ({
   Order: order,
   SaleAreaCode: SALE_AREA,
-  LinkUrlSuccess: 'https://morfikozik.github.io/paynet-docs/#/e2e/success',
-  LinkUrlCancel: 'https://morfikozik.github.io/paynet-docs/#/e2e/cancel',
+  LinkUrlSuccess: SITE + '#/e2e/success',
+  LinkUrlCancel: SITE + '#/e2e/cancel',
   Customer: customer,
   Currency: 498,
   ExpiryDate: expiry(),
@@ -230,7 +233,7 @@ const cardsStage = async (token) => {
       note(`cards:checkbox-${moneyType}`, { checkbox });
       if (moneyType === 'All') {
         await fillAndPay(p, 'cards-pay');
-        await p.waitForURL(/morfikozik\.github\.io/, { timeout: 90000 }).catch(() => {});
+        await p.waitForURL((u) => u.host === SITE_HOST, { timeout: 90000 }).catch(() => {});
         await snap(p, 'cards-after-pay');
         let paid = await getPayment(order);
         for (let i = 0; i < 20 && paid.status !== 4; i++) { await new Promise((r) => setTimeout(r, 3000)); paid = await getPayment(order); }
@@ -280,7 +283,6 @@ const cardsStage = async (token) => {
 // Portal check on the published site: an order created with "Test API Request" in one tab
 // is pre-filled in the notification simulator opened in another tab.
 const portalStage = async () => {
-  const SITE = 'https://morfikozik.github.io/paynet-docs/';
   const browser = await chromium.launch();
   try {
     const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
@@ -555,7 +557,6 @@ const searchProbeStage = async (token) => {
 // Full site audit of the PUBLISHED site: every route × 3 languages × desktop/mobile, links, files,
 // search, language switch, mobile menu, bundle secrets scan, npm audit. Writes site-audit.md + site-audit.json.
 const siteAuditStage = async () => {
-  const SITE = 'https://morfikozik.github.io/paynet-docs/';
   const { execFileSync } = await import('node:child_process');
   const LANGS = ['en', 'ru', 'ro'];
   const results = { routes: [], links: {}, files: [], interactions: [], bundle: {}, npm: {}, timing: {} };
@@ -768,7 +769,6 @@ const siteAuditStage = async () => {
 
 // Language switch through the UI (standalone check).
 const langSwitchStage = async () => {
-  const SITE = 'https://morfikozik.github.io/paynet-docs/';
   const browser = await chromium.launch();
   try {
     const context = await browser.newContext({ viewport: { width: 1366, height: 900 } });
@@ -892,7 +892,7 @@ const main = async () => {
     await p.click('#submit-default');
     for (let i = 0; i < 30; i++) {
       await p.waitForTimeout(2000);
-      if (p.url().includes('morfikozik.github.io')) break;
+      if (p.url().includes(SITE_HOST)) break;
     }
     await snap(p, `${name}-after-pay`);
     note(`${name}:final-url`, { url: p.url() });

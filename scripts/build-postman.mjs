@@ -13,7 +13,8 @@ const spec = JSON.parse(fs.readFileSync('src/openapi/openapi.json', 'utf8'));
 const outDir = 'public/postman';
 fs.mkdirSync(outDir, { recursive: true });
 
-const SITE = 'https://morfikozik.github.io/paynet-docs/';
+// Site address for the "Docs" links: SITE_URL from the build (CI), otherwise the GitHub Pages copy.
+const SITE = (process.env.SITE_URL || 'https://paynet-business.github.io/paynet-docs/').replace(/\/?$/, '/');
 const op = (p, m) => spec.paths[p][m];
 const describe = (p, m, extra = '') => {
   const o = op(p, m);

@@ -2,7 +2,7 @@
 
 Official Paynet SDK, version 1.0.0. PHP 7.4+ with `curl` and `json` extensions, no other dependencies. License: MIT.
 
-Documentation: https://morfikozik.github.io/paynet-docs/#/guides/sdk
+Documentation: https://paynet-business.github.io/paynet-docs/#/guides/sdk
 
 ## What it does for you
 

@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SITE_URL: https://morfikozik.github.io/paynet-docs/
+  SITE_URL: https://paynet-business.github.io/paynet-docs/
 
 jobs:
   build:
@@ -34,6 +34,9 @@ jobs:
 
       - name: Check documentation (signature vectors, samples, links, translations)
         run: node scripts/check-docs.mjs
+
+      - name: No old site addresses in the sources
+        run: node scripts/check-urls.mjs
 
       - name: SDK unit tests (Node.js and PHP, offline)
         run: |
@@ -59,6 +62,9 @@ jobs:
           npm ci --no-audit --no-fund
           npx vite build --base ./ --outDir "$GITHUB_WORKSPACE/dist/legacy" --emptyOutDir
           cp src/openapi/openapi.json "$GITHUB_WORKSPACE/dist/legacy/openapi.json"
+
+      - name: No old site addresses in the built site (pages, AI files, Postman, SDK archives)
+        run: node scripts/check-urls.mjs dist
 
       - name: Screenshots for review
         continue-on-error: true

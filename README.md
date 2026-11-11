@@ -2,7 +2,7 @@
 
 Портал разработчика Paynet: каталог продуктов (сейчас E-commerce; позже Payouts, Cashout, Marketplace и др.), руководства на трёх языках (EN/RU/RO), справочник API с онлайн-тестером, полнотекстовый поиск и документация для ИИ-ассистентов.
 
-Превью: https://morfikozik.github.io/paynet-docs/ · предыдущая версия: https://morfikozik.github.io/paynet-docs/legacy/
+Превью: https://paynet-business.github.io/paynet-docs/ · предыдущая версия: https://paynet-business.github.io/paynet-docs/legacy/
 
 ## Где что лежит
 

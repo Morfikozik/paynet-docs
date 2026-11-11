@@ -1,5 +1,5 @@
 // Paynet e-commerce SDK for Node.js 18+ (no dependencies).
-// Official Paynet SDK. Documentation: https://morfikozik.github.io/paynet-docs/
+// Official Paynet SDK. Documentation: https://paynet-business.github.io/paynet-docs/
 export { PaynetClient, Environment } from './client.js';
 export { PaynetError, ErrorKind } from './errors.js';
 export { PaymentStatus, isFinalStatus, describeStatus } from './status.js';

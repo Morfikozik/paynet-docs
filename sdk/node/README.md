@@ -2,7 +2,7 @@
 
 Official Paynet SDK, version 1.0.0. Node.js 18+, no dependencies. License: MIT.
 
-Documentation: https://morfikozik.github.io/paynet-docs/#/guides/sdk
+Documentation: https://paynet-business.github.io/paynet-docs/#/guides/sdk
 
 ## What it does for you
 
