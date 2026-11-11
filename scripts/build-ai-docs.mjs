@@ -195,6 +195,7 @@ const rules = `## Rules for AI assistants
 - \`ExpiryDate\` must be in the future, format \`YYYY-MM-DDTHH:mm:ss\`, Chișinău local time (\`Europe/Chisinau\`).
 - Amounts are integers in minor units (100 = 1.00 MDL). \`Currency\` is ISO 4217 numeric (\`498\` = MDL).
 - Signatures: \`Base64(MD5(UTF8(stringToSign + secretKey)))\`; Base64 of the raw 16-byte digest. Reproduce the test vectors in "Signatures" in unit tests.
+- Hosted checkout form values: RFC 3986 including \`! ' ( ) *\` (PHP \`rawurlencode\`, not \`urlencode\`; JS \`encodeURIComponent\` plus those five); no line breaks, HTML tags or HTML entities in values (checked on the test environment).
 - The hosted checkout secret key and the notification secret key are different. Secrets never go to browser code.
 - Notifications are sent only for paid payments (\`EventType\` = \`PAID\`); a failed payment only redirects the customer to \`LinkUrlCancel\`. Notification keys are \`Payment.Id\` and \`Payment.ExternalId\` (case-sensitive).
 - \`PaidAmount\` must equal \`Amount\` unless the merchant has an agreed promotion with Paynet; otherwise do not fulfil the order automatically.

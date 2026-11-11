@@ -43,7 +43,7 @@ In this model the customer's browser sends the order to Paynet as a signed HTML 
 
 1. Take the **signed** fields from the table above that you actually send (skip fields you do not send).
 2. Sort them by field name, A → Z.
-3. Percent-encode each **value** with RFC 3986 (`encodeURIComponent` plus `! ' ( ) *`), using UTF-8 (also for Cyrillic and Romanian diacritics).
+3. Percent-encode each **value** with RFC 3986 (`encodeURIComponent` plus `! ' ( ) *`), using UTF-8 (also for Cyrillic and Romanian diacritics). Correct functions for PHP, JavaScript, Python, C#, Java and the rules for special characters: [Signatures](#/guides/signatures).
 4. Concatenate the encoded values without separators → `RawData`.
 5. `Signature = Base64( MD5( RawData + SecretKey ) )` — Base64 of the raw 16-byte MD5 digest, not of the hex string.
 
@@ -76,7 +76,7 @@ A complete worked example with expected output is on the [Signatures](#/guides/s
 <script>document.getElementById('paynet').submit();</script>
 ```
 
-The `Signature` above is correct for these exact values and the test secret key. Values in HTML attributes must be HTML-escaped (`&` → `&amp;`); the browser sends the original value, which is what you sign.
+The `Signature` above is correct for these exact values and the test secret key. Values in HTML attributes must be HTML-escaped (`&` → `&amp;`); the browser sends the original value, which is what you sign. Do not put line breaks, HTML tags (`<b>`) or HTML entities (`&#039;`) in values: see [Signatures](#/guides/signatures).
 
 ## Example: Node.js signature
 

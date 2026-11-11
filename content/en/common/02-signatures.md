@@ -94,6 +94,69 @@ Expected `Hash`:
 lq3+OCn0J/zSyNF5iAoShg==
 ```
 
+## Test vector 3: special characters
+
+Same secret key as vector 1. The values contain `'`, `&`, `!`, `(`, `)`, `*`, Cyrillic and Romanian letters. The test environment accepted this exact form (11.11.2026).
+
+```json
+{
+  "Order": 1762444800003,
+  "Currency": "498",
+  "Merchant": "265505",
+  "SaleAreaCode": "onlidocumentation_md",
+  "Amount": "1235",
+  "Description": "Mary's Cake & Co! (1)*",
+  "CustomerCode": "5555",
+  "CustomerNameFirst": "Мария",
+  "CustomerNameLast": "Țurcan",
+  "ExpiryDate": "2026-12-31T23:59:59",
+  "LinkUrlCancel": "https://test.oplta.md/cancel",
+  "LinkUrlSuccess": "https://test.oplta.md/ok",
+  "Lang": "ro",
+  "MoneyType": "Card"
+}
+```
+
+Expected `RawData`:
+
+```text
+12354985555%D0%9C%D0%B0%D1%80%D0%B8%D1%8F%C8%9AurcanMary%27s%20Cake%20%26%20Co%21%20%281%29%2A2026-12-31T23%3A59%3A59rohttps%3A%2F%2Ftest.oplta.md%2Fcancelhttps%3A%2F%2Ftest.oplta.md%2Fok265505Card1762444800003onlidocumentation_md
+```
+
+Expected `Signature`:
+
+```text
+fm47qWzVzqPQQ+huHgWVZw==
+```
+
+## Special characters
+
+Results of real form submissions to the test environment:
+
+| The value contains | Result |
+|---|---|
+| `" ' & < > # ; % + = ? / \`, `’`, emoji, Cyrillic, Romanian letters | Works if every value is RFC 3986-encoded (table below). |
+| A line break (multi-line `Description`) | The signature fails. Replace line breaks with a space before signing. |
+| An HTML tag (`<b>`) or an HTML entity (`&#039;`) | Paynet rejects the form before checking the signature: the customer sees the Paynet home page instead of the payment page. Remove tags and turn entities into plain characters before signing. |
+
+Encoding function by language:
+
+| Language | Correct | Wrong (breaks on some characters) |
+|---|---|---|
+| PHP | `rawurlencode($v)` | `urlencode($v)`: space becomes `+`, `~` becomes `%7E` |
+| JavaScript / Node.js | `encodeURIComponent(v).replace(/[!'()*]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase())` | `encodeURIComponent(v)` alone: leaves `! ' ( ) *` |
+| Python | `urllib.parse.quote(v, safe="~")` | `quote(v)` (leaves `/`), `quote_plus(v)` (space becomes `+`) |
+| C# | `Uri.EscapeDataString(v)` (.NET Core / .NET 5+) | `HttpUtility.UrlEncode`, `WebUtility.UrlEncode`: space becomes `+` |
+| Java | `URLEncoder.encode(v, StandardCharsets.UTF_8).replace("+", "%20").replace("*", "%2A").replace("%7E", "~")` | `URLEncoder.encode` alone: space becomes `+`, `*` is left |
+
+Rules:
+
+- Sign the original values: exactly what the browser will send. Do not sign HTML-escaped text (`&amp;`, `&#039;`).
+- Escape values for HTML only once, when you write them into the form (`&` → `&amp;`, `"` → `&quot;`). An unescaped `"` cuts the value off inside `value="…"`.
+- Do not change values after signing (trimming, replacing characters, shortening).
+- Serve the page in UTF-8 (`<meta charset="utf-8">`) and add `accept-charset="UTF-8"` to the form.
+- If your CMS gives you product names with HTML entities (`Mary&#039;s`), decode them (`Mary's`) before you build the form.
+
 ## Check your implementation
 
 Python:
@@ -153,3 +216,6 @@ static string CheckoutSignature(IDictionary<string, string?> fields, string secr
 | Notification hash never matches | Wrong secret key (checkout and notification keys are different), fields in the wrong order, or the code reads `Payment.ID` / `Payment.ExternalID` instead of `Payment.Id` / `Payment.ExternalId` (keys are case-sensitive). |
 | Hash differs only for Cyrillic/Romanian names | The string was not encoded as UTF-8 before hashing. |
 | Signature fails after you added a field | A signed field was added to the form but not to `RawData` (or the other way round). |
+| Fails only when a value contains `'`, `!`, `(`, `)` or `*` | `encodeURIComponent` (or another function) that does not encode these five characters. See "Special characters" above. |
+| After the form is sent, the Paynet home page opens instead of the payment page | A value contains an HTML tag (`<b>`) or an HTML entity (`&#039;`). See "Special characters" above. |
+| Fails when `Description` has several lines | A line break in a value. Replace it with a space before signing. |

@@ -7,6 +7,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { checkoutRawData, checkoutSignature, notificationPreparedString, notificationHash } from './lib/signatures.mjs';
 
@@ -73,7 +74,7 @@ for (const lang of languages) {
     continue;
   }
   const source = read(lang, file);
-  const [checkoutInput, notificationInput] = codeBlocks(source, 'json').map((block) => JSON.parse(block));
+  const [checkoutInput, notificationInput, specialInput] = codeBlocks(source, 'json').map((block) => JSON.parse(block));
   const texts = codeBlocks(source, 'text');
   const expect = (label, value) => {
     if (!texts.includes(value)) fail(`content/${lang}/${file}: ${label} should be "${value}"`);
@@ -82,12 +83,20 @@ for (const lang of languages) {
   expect('checkout Signature', checkoutSignature(checkoutInput, CHECKOUT_KEY));
   expect('notification PreparedString', notificationPreparedString(notificationInput));
   expect('notification Hash', notificationHash(notificationInput, NOTIFICATION_KEY));
+  // Vector 3 (special characters) was accepted by the real test environment on 11.11.2026.
+  if (!specialInput) fail(`content/${lang}/${file}: test vector 3 (special characters) missing`);
+  else {
+    expect('vector 3 RawData', checkoutRawData(specialInput));
+    expect('vector 3 Signature', checkoutSignature(specialInput, CHECKOUT_KEY));
+    if (checkoutSignature(specialInput, CHECKOUT_KEY) !== 'fm47qWzVzqPQQ+huHgWVZw==') fail('vector 3: reference algorithm no longer gives the signature accepted by the test environment');
+  }
 }
 
 // 4. Sample code in the guides reproduces the vectors.
 const signaturesSource = read('en', files.en.find((f) => f.endsWith('-signatures.md')));
-const [checkoutInput, notificationInput] = codeBlocks(signaturesSource, 'json').map((block) => JSON.parse(block));
+const [checkoutInput, notificationInput, specialInput] = codeBlocks(signaturesSource, 'json').map((block) => JSON.parse(block));
 const expectedCheckout = checkoutSignature(checkoutInput, CHECKOUT_KEY);
+const expectedSpecial = checkoutSignature(specialInput, CHECKOUT_KEY);
 const expectedNotification = notificationHash(notificationInput, NOTIFICATION_KEY);
 
 for (const lang of languages) {
@@ -102,7 +111,28 @@ for (const lang of languages) {
   const mod = await import(pathToFileURL(tmp).href);
   const actual = mod.checkoutSignature(checkoutInput, CHECKOUT_KEY);
   if (actual !== expectedCheckout) fail(`content/${lang}/${checkoutFile}: Node.js sample gives ${actual}, expected ${expectedCheckout}`);
+  const actualSpecial = mod.checkoutSignature(specialInput, CHECKOUT_KEY);
+  if (actualSpecial !== expectedSpecial) fail(`content/${lang}/${checkoutFile}: Node.js sample gives ${actualSpecial} for vector 3, expected ${expectedSpecial}`);
   fs.rmSync(tmp);
+
+  // PHP and Python samples must reproduce vectors 1 and 3 too (skipped if the interpreter is missing).
+  const runSample = (cmd, code, label) => {
+    const file = path.join(os.tmpdir(), `paynet-sample-${lang}-${process.pid}.${cmd === 'php' ? 'php' : 'py'}`);
+    fs.writeFileSync(file, code);
+    try {
+      const out = execFileSync(cmd, [file], { encoding: 'utf8' }).trim().split('\n');
+      if (out[0] !== expectedCheckout || out[1] !== expectedSpecial) fail(`${label}: gives ${out.join(' / ')}, expected ${expectedCheckout} / ${expectedSpecial}`);
+    } catch (e) {
+      if (e.code === 'ENOENT') console.log(`  (skipped: ${cmd} not installed)`);
+      else fail(`${label}: ${String(e.message).split('\n')[0]}`);
+    } finally { fs.rmSync(file, { force: true }); }
+  };
+  const phpSample = (read(lang, checkoutFile).match(/```php\n([\s\S]*?)```/) || [])[1];
+  if (!phpSample || !phpSample.includes('function checkoutSignature')) fail(`content/${lang}/${checkoutFile}: PHP checkoutSignature sample not found`);
+  else runSample('php', phpSample + `\necho checkoutSignature(json_decode(${JSON.stringify(JSON.stringify(checkoutInput))}, true), '${CHECKOUT_KEY}'), "\\n", checkoutSignature(json_decode(${JSON.stringify(JSON.stringify(specialInput))}, true), '${CHECKOUT_KEY}'), "\\n";\n`, `content/${lang}/${checkoutFile}: PHP sample`);
+  const pySample = codeBlocks(read(lang, files[lang].find((f) => f.endsWith('-signatures.md'))), 'python')[0];
+  if (!pySample) fail(`content/${lang}: Python signature sample not found`);
+  else runSample('python3', pySample + `\nimport json\nprint(checkout_signature(json.loads(${JSON.stringify(JSON.stringify(checkoutInput))}), '${CHECKOUT_KEY}'))\nprint(checkout_signature(json.loads(${JSON.stringify(JSON.stringify(specialInput))}), '${CHECKOUT_KEY}'))\n`, `content/${lang}: Python sample in signatures`);
 
   // HTML form example must carry the signature that matches its own fields.
   const html = codeBlocks(read(lang, checkoutFile), 'html')[0] || '';
@@ -118,7 +148,6 @@ for (const lang of languages) {
 }
 
 // 4b. Every JavaScript sample must at least parse.
-const { execFileSync } = await import('node:child_process');
 for (const lang of languages) {
   for (const file of files[lang]) {
     codeBlocks(read(lang, file), 'javascript').forEach((code, index) => {

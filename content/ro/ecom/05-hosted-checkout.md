@@ -43,7 +43,7 @@
 
 1. Luați câmpurile **semnate** din tabelul de mai sus pe care le trimiteți efectiv (omiteți câmpurile pe care nu le trimiteți).
 2. Sortați-le după numele câmpului, A → Z.
-3. Codificați fiecare **valoare** conform RFC 3986 (`encodeURIComponent` plus `! ' ( ) *`), în UTF-8 (inclusiv chirilice și diacritice românești).
+3. Codificați fiecare **valoare** conform RFC 3986 (`encodeURIComponent` plus `! ' ( ) *`), în UTF-8 (inclusiv chirilice și diacritice românești). Funcțiile corecte pentru PHP, JavaScript, Python, C#, Java și regulile pentru caractere speciale: [Semnături](#/guides/signatures).
 4. Concatenați valorile codificate fără separatori → `RawData`.
 5. `Signature = Base64( MD5( RawData + SecretKey ) )` — Base64 din digestul MD5 brut de 16 octeți, nu din șirul hex.
 
@@ -76,7 +76,7 @@ Un exemplu complet cu rezultatul așteptat se află pe pagina [Semnături](#/gui
 <script>document.getElementById('paynet').submit();</script>
 ```
 
-`Signature` de mai sus este corectă exact pentru aceste valori și cheia de test. Valorile din atributele HTML trebuie escapate (`&` → `&amp;`); browserul trimite valoarea originală, iar aceasta se semnează.
+`Signature` de mai sus este corectă exact pentru aceste valori și cheia de test. Valorile din atributele HTML trebuie escapate (`&` → `&amp;`); browserul trimite valoarea originală, iar aceasta se semnează. Nu folosiți în valori rânduri noi, taguri HTML (`<b>`) sau entități HTML (`&#039;`): vezi [Semnături](#/guides/signatures).
 
 ## Exemplu: semnătura în Node.js
 

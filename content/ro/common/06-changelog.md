@@ -1,5 +1,9 @@
 # Jurnalul modificărilor
 
+## Documentația v3.4 — 11.11.2026
+
+- **Caractere speciale în semnătura hosted checkout** (verificat prin trimiteri reale ale formularului în mediul de test): funcții de codificare corecte și greșite pentru PHP, JavaScript, Python, C#, Java; rândul nou strică semnătura; tagurile și entitățile HTML fac ca Paynet să respingă formularul înainte de verificarea semnăturii. Vector de test 3 nou cu `' & ! ( ) *`, litere chirilice și românești. Vezi [Semnături](#/guides/signatures).
+
 ## Documentația v3.3 — 10.11.2026
 
 Clarificări în urma unui test în care un dezvoltator nou în Paynet a făcut integrarea folosind doar această documentație.
