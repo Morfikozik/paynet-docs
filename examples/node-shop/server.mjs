@@ -43,7 +43,7 @@ body{font-family:Inter,system-ui,sans-serif;max-width:720px;margin:40px auto;pad
 h1{color:#406C6F}a,button{color:#fff;background:#6AB4B8;border:0;border-radius:6px;padding:10px 16px;text-decoration:none;cursor:pointer;display:inline-block}
 a.secondary{background:#559094}.box{border:1px solid #e2e8f0;border-radius:6px;padding:16px;margin:16px 0}
 input{padding:8px;border:1px solid #cbd5e1;border-radius:6px}table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #e2e8f0;padding:6px;text-align:left;font-size:14px}
-.ok{color:#00a050}.warn{color:#cc7a00}.err{color:#cc0000}</style></head><body>${body}
+.hint{background:#f1f5f9;border-left:3px solid #6AB4B8;padding:10px 12px;font-size:14px}code{background:#f1f5f9;padding:2px 4px;border-radius:4px;font-size:13px}.ok{color:#00a050}.warn{color:#cc7a00}.err{color:#cc0000}</style></head><body>${body}
 <p style="margin-top:40px;font-size:13px"><a class="secondary" href="/">Shop</a> <a class="secondary" href="/orders">Orders</a></p></body></html>`;
 
 const readBody = (req) => new Promise((resolve, reject) => {
@@ -83,6 +83,9 @@ async function createPaynetOrder({ customerCode, useSavedCard }) {
 }
 
 // ---------------------------------------------------------------- what to show after the customer returns
+// Shown while an order waits for the notification (local runs never receive real ones).
+const notifyHint = (order) => `<p class="hint">Waiting for the Paynet notification. Running the shop on your computer? Paynet cannot reach <code>localhost</code>, so send the notification yourself from a second command line in the <code>node-shop</code> folder:<br><code>node tools/send-test-notification.mjs ${order}</code></p>`;
+
 async function returnPage(orderNumber, from) {
   const order = store.getOrder(orderNumber);
   if (!order) return page('Unknown order', `<h1>Unknown order</h1>`);
@@ -94,7 +97,8 @@ async function returnPage(orderNumber, from) {
     case 4:
       return page('Paid', `<h1 class="ok">Payment received</h1>
         <p>Order <b>${orderNumber}</b>, paid ${money(payment.amount?.paidAmount)}.</p>
-        <p>${order.state === 'paid' ? 'The order is confirmed by the Paynet notification and fulfilled.' : 'Waiting for the Paynet notification to fulfil the order…'}</p>`,
+        <p>${order.state === 'paid' ? 'The order is confirmed by the Paynet notification and fulfilled.' : 'Waiting for the Paynet notification to fulfil the order…'}</p>
+        ${order.state === 'paid' ? '' : notifyHint(orderNumber)}`,
         order.state === 'paid' ? 0 : 5);
     case 3:
       return page('Processing', `<h1 class="warn">Payment is being processed</h1><p>The bank has not answered yet. This page refreshes automatically. Do not pay again.</p>`, 5);
@@ -174,8 +178,10 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/orders') {
       const rows = store.listOrders().map((o) => `<tr><td>${o.order}</td><td>${money(o.amount)}</td><td>${escapeHtml(o.state)}</td>
         <td>${o.state === 'paid' ? `<form method="post" action="/orders/refund"><input type="hidden" name="order" value="${o.order}">
-        <input name="amount" placeholder="all" size="5"> <button>Refund</button></form>` : ''}</td></tr>`).join('');
-      return send(res, 200, page('Orders', `<h1>Orders</h1><table><tr><th>Order</th><th>Amount</th><th>State</th><th></th></tr>${rows}</table>
+        <input name="amount" placeholder="all" size="5"> <button>Refund</button></form>` : o.state === 'pending' ? `<code>node tools/send-test-notification.mjs ${o.order}</code>` : ''}</td></tr>`).join('');
+      const pendingHint = store.listOrders().some((o) => o.state === 'pending')
+        ? '<p class="hint"><b>pending</b> = waiting for the Paynet notification. Paynet cannot reach <code>localhost</code>: open a second command line in the <code>node-shop</code> folder and run the command shown next to the order.</p>' : '';
+      return send(res, 200, page('Orders', `<h1>Orders</h1>${pendingHint}<table><tr><th>Order</th><th>Amount</th><th>State</th><th></th></tr>${rows}</table>
         <h2>Manual review</h2><pre>${escapeHtml(JSON.stringify(store.reviewList(), null, 2))}</pre>`));
     }
 

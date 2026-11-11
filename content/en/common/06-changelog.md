@@ -1,5 +1,9 @@
 # Changelog
 
+## Documentation v3.5 — 11.11.2026
+
+- **Example shop: step-by-step start for Windows, macOS and Linux** (found by running the example as a newcomer): checking Node.js, `tar -xf` instead of `unzip` (works on Windows 10/11), why an order stays `pending` and how to send the test notification, a troubleshooting table. The shop's Orders page and return page now show the ready command for sending the notification. See [Example shop](#/guides/example-shop).
+
 ## Documentation v3.4 — 11.11.2026
 
 - **Special characters in the hosted checkout signature** (checked by real form submissions to the test environment): correct and wrong encoding functions for PHP, JavaScript, Python, C#, Java; line breaks break the signature; HTML tags and HTML entities make Paynet reject the form before the signature check. New test vector 3 with `' & ! ( ) *`, Cyrillic and Romanian letters. See [Signatures](#/guides/signatures).

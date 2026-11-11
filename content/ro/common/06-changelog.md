@@ -1,5 +1,9 @@
 # Jurnalul modificărilor
 
+## Documentația v3.5 — 11.11.2026
+
+- **Exemplu de magazin: pornire pas cu pas pentru Windows, macOS și Linux** (găsit la rularea exemplului „ca un începător”): verificarea Node.js, `tar -xf` în loc de `unzip` (funcționează în Windows 10/11), de ce comanda rămâne `pending` și cum se trimite notificarea de test, tabel de depanare. Pagina comenzilor și pagina de revenire din magazin afișează acum comanda gata de folosit pentru trimiterea notificării. Vezi [Exemplu de magazin](#/guides/example-shop).
+
 ## Documentația v3.4 — 11.11.2026
 
 - **Caractere speciale în semnătura hosted checkout** (verificat prin trimiteri reale ale formularului în mediul de test): funcții de codificare corecte și greșite pentru PHP, JavaScript, Python, C#, Java; rândul nou strică semnătura; tagurile și entitățile HTML fac ca Paynet să respingă formularul înainte de verificarea semnăturii. Vector de test 3 nou cu `' & ! ( ) *`, litere chirilice și românești. Vezi [Semnături](#/guides/signatures).

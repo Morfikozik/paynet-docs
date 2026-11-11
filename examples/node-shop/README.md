@@ -12,18 +12,28 @@ A complete, minimal server-to-server integration with no dependencies (Node.js 1
 
 ## Run
 
-```bash
+Requires Node.js 18 or newer (`node --version`). In a command line (Windows: Win+R → `cmd`; macOS/Linux: Terminal), from the folder with the downloaded archive:
+
+```
+cd Downloads
+tar -xf paynet-example-shop-node.zip
+cd node-shop
 node server.mjs
-# open http://localhost:3000, click Buy, pay with 4111 1111 1111 1111, 12/27, CVV 777
 ```
 
-Paynet sends real notifications to the callback URL registered for your merchant, which cannot reach `localhost`. While developing, send the notification yourself:
+On Linux use `unzip paynet-example-shop-node.zip` instead of `tar -xf` (GNU tar does not open `.zip`).
 
-```bash
+Open http://localhost:3000, click **Buy**, pay with `4111 1111 1111 1111`, `12/27`, CVV `777`. Keep the window open while the shop runs (Ctrl+C stops it).
+
+The order stays `pending` until the Paynet notification arrives. Paynet sends real notifications to the callback URL registered for your merchant, which cannot reach `localhost`. While developing, send it yourself from a **second** command line in the `node-shop` folder (the Orders page shows the ready command for each pending order):
+
+```
 node tools/send-test-notification.mjs <Order>
 ```
 
-Then open http://localhost:3000/orders: the order is `paid`, and you can try a refund.
+Then refresh http://localhost:3000/orders: the order is `paid`, and you can try a refund.
+
+Step-by-step guide with troubleshooting: the "Example shop" page of the Paynet documentation.
 
 ## Configuration
 
