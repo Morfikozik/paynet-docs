@@ -3,6 +3,8 @@
 ## Documentația v3.4 — 11.11.2026
 
 - **Caractere speciale în semnătura hosted checkout** (verificat prin trimiteri reale ale formularului în mediul de test): funcții de codificare corecte și greșite pentru PHP, JavaScript, Python, C#, Java; rândul nou strică semnătura; tagurile și entitățile HTML fac ca Paynet să respingă formularul înainte de verificarea semnăturii. Vector de test 3 nou cu `' & ! ( ) *`, litere chirilice și românești. Vezi [Semnături](#/guides/signatures).
+- Linkul „Previous portal version” deschide documentația anterioară https://docs.paynet.md/psp/.
+- Împreună cu portalul se publică `robots.txt` și `sitemap.xml`.
 
 ## Documentația v3.3 — 10.11.2026
 

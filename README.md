@@ -2,7 +2,7 @@
 
 Портал разработчика Paynet: каталог продуктов (сейчас E-commerce; позже Payouts, Cashout, Marketplace и др.), руководства на трёх языках (EN/RU/RO), справочник API с онлайн-тестером, полнотекстовый поиск и документация для ИИ-ассистентов.
 
-Превью: https://paynet-business.github.io/paynet-docs/ · предыдущая версия: https://paynet-business.github.io/paynet-docs/legacy/
+Площадка для проверки: https://paynet-business.github.io/paynet-docs/ · основной адрес (после размещения ИТ): https://docs.paynet.md/api/ · предыдущая версия документации: https://docs.paynet.md/psp/
 
 ## Где что лежит
 
@@ -38,7 +38,7 @@ npm run dev
 
 ## Откат
 
-- Исходная версия, полученная в архиве, сохранена в ветке `backup/v1-original` и всегда доступна по адресу `/legacy/`.
+- Исходная версия, полученная в архиве, сохранена в ветке `backup/v1-original` (в сборку больше не входит; предыдущая документация — https://docs.paynet.md/psp/).
 - Вернуть сайт целиком к исходной версии: `git checkout main && git reset --hard backup/v1-original && git push --force` (потребуется вернуть и `.github/workflows/deploy.yml` из `main`, чтобы публикация продолжала работать). Проще — попросить Claude выполнить откат.
 - Откатить отдельное изменение: `git revert <commit>`.
 

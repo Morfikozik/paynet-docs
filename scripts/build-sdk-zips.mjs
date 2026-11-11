@@ -11,6 +11,21 @@ const version = JSON.parse(fs.readFileSync(path.join(root, 'sdk/node/package.jso
 const outDir = path.join(root, 'public', 'sdk');
 fs.mkdirSync(outDir, { recursive: true });
 
+// The docs address inside the archives follows SITE_URL (GitHub Pages copy or docs.paynet.md/api/).
+const DEFAULT_DOCS = 'https://paynet-business.github.io/paynet-docs/';
+const siteUrl = process.env.SITE_URL ? process.env.SITE_URL.replace(/\/?$/, '/') : DEFAULT_DOCS;
+const TEXT = /\.(md|js|mjs|ts|php|json|txt)$/i;
+const setDocsUrl = (dir) => {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) setDocsUrl(full);
+    else if (TEXT.test(entry.name)) {
+      const text = fs.readFileSync(full, 'utf8');
+      if (text.includes(DEFAULT_DOCS)) fs.writeFileSync(full, text.split(DEFAULT_DOCS).join(siteUrl));
+    }
+  }
+};
+
 const packages = {
   node: ['src', 'test', 'package.json', 'README.md', 'LICENSE'],
   php: ['src', 'tests', 'autoload.php', 'composer.json', 'README.md', 'LICENSE'],
@@ -21,6 +36,7 @@ for (const [lang, entries] of Object.entries(packages)) {
   const target = path.join(stage, 'paynet-ecom-sdk');
   fs.mkdirSync(target);
   for (const entry of entries) fs.cpSync(path.join(root, 'sdk', lang, entry), path.join(target, entry), { recursive: true });
+  setDocsUrl(target);
   const zip = path.join(outDir, `paynet-ecom-sdk-${lang}-${version}.zip`);
   fs.rmSync(zip, { force: true });
   execFileSync('zip', ['-qr', zip, 'paynet-ecom-sdk'], { cwd: stage });
@@ -35,6 +51,7 @@ for (const [lang, entries] of Object.entries(packages)) {
     recursive: true,
     filter: (src) => !/[\\/](node_modules|data|\.orders\.json)$/.test(src),
   });
+  setDocsUrl(path.join(stage, 'node-shop'));
   const zip = path.join(outDir, 'paynet-example-shop-node.zip');
   fs.rmSync(zip, { force: true });
   execFileSync('zip', ['-qr', zip, 'node-shop'], { cwd: stage });

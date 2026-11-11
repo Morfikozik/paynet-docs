@@ -43,28 +43,24 @@ jobs:
           node --test sdk/node/test/unit.test.js
           php sdk/php/tests/run.php
 
-      - name: Generate AI documentation (llms.txt, llms-full.txt, docs/*.md)
-        run: |
-          node scripts/build-ai-docs.mjs
-          node scripts/build-postman.mjs
-          node scripts/build-sdk-zips.mjs
+      - name: Build the site for GitHub Pages (review copy)
+        run: node scripts/build-site.mjs --site-url "$SITE_URL" --out dist
 
       - name: Type check
         run: npx tsc --noEmit -p tsconfig.app.json
 
-      - name: Build portal
-        run: npx vite build
+      - name: Build the site for docs.paynet.md/api/ (archive for Paynet IT, strict address check)
+        run: node scripts/build-site.mjs --site-url https://docs.paynet.md/api/ --out dist-it --strict
 
-      - name: Build previous version into /legacy (for comparison and rollback)
+      - name: Release archive for Paynet IT (ci/release branch)
         run: |
-          git worktree add /tmp/legacy origin/backup/v1-original
-          cd /tmp/legacy
-          npm ci --no-audit --no-fund
-          npx vite build --base ./ --outDir "$GITHUB_WORKSPACE/dist/legacy" --emptyOutDir
-          cp src/openapi/openapi.json "$GITHUB_WORKSPACE/dist/legacy/openapi.json"
-
-      - name: No old site addresses in the built site (pages, AI files, Postman, SDK archives)
-        run: node scripts/check-urls.mjs dist
+          node scripts/build-release.mjs --dir dist-it --out /tmp/release
+          cd /tmp/release
+          git init -q
+          git checkout -q -b ci/release
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com add -A
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -q -m "Release archive for ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" ci/release
 
       - name: Screenshots for review
         continue-on-error: true

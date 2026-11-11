@@ -1,5 +1,20 @@
 # Команды для создания продакшн релиза
 
+## Сборка портала для адреса (как в CI)
+
+```bash
+npm ci
+node scripts/check-docs.mjs
+# площадка для проверки (GitHub Pages)
+node scripts/build-site.mjs --site-url https://paynet-business.github.io/paynet-docs/ --out dist
+# основной сайт docs.paynet.md/api/ (строгая проверка: нет ссылок на GitHub Pages)
+node scripts/build-site.mjs --site-url https://docs.paynet.md/api/ --out dist-it --strict
+# архив для ИТ + README-IT.txt
+node scripts/build-release.mjs --dir dist-it --out release
+```
+
+При каждом пуше в `main` GitHub Actions делает обе сборки из одного коммита; архив для ИТ кладётся в ветку `ci/release`.
+
 ## Основные команды
 
 ### 1. Стандартная сборка

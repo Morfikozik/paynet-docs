@@ -9,6 +9,10 @@ on:
         description: 'explore | full | shop | contract | cards | portal | probe-errors | postman | quantity | sdk | search-probe | site-audit | suite | lang-switch'
         required: true
         default: 'explore'
+      site_url:
+        description: 'Site to check (empty = GitHub Pages copy), e.g. https://docs.paynet.md/api/'
+        required: false
+        default: ''
 
 permissions:
   contents: write   # to publish results to the ci/e2e branch
@@ -26,6 +30,8 @@ jobs:
           npm install --no-save --no-audit --no-fund playwright@1.49.1 newman@6
           npx playwright install --with-deps chromium
       - name: Run
+        env:
+          SITE_URL: ${{ github.event.inputs.site_url }}
         run: node scripts/e2e.mjs "${{ github.event.inputs.stage }}" e2e-out || echo "E2E_FAILED=1" >> $GITHUB_ENV
       - name: Publish results to ci/e2e
         run: |

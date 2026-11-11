@@ -3,6 +3,8 @@
 ## Documentation v3.4 — 11.11.2026
 
 - **Special characters in the hosted checkout signature** (checked by real form submissions to the test environment): correct and wrong encoding functions for PHP, JavaScript, Python, C#, Java; line breaks break the signature; HTML tags and HTML entities make Paynet reject the form before the signature check. New test vector 3 with `' & ! ( ) *`, Cyrillic and Romanian letters. See [Signatures](#/guides/signatures).
+- The "Previous portal version" link opens the previous documentation at https://docs.paynet.md/psp/.
+- `robots.txt` and `sitemap.xml` are published with the portal.
 
 ## Documentation v3.3 — 10.11.2026
 

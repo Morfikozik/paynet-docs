@@ -18,7 +18,7 @@ export const Footer: React.FC<FooterProps> = ({ author, version }) => {
             Documentation v3
           </a>
           {' • '}
-          <a href="legacy/" className="text-paynet-gray-500 hover:text-paynet-primary underline underline-offset-2">
+          <a href="https://docs.paynet.md/psp/" target="_blank" rel="noopener noreferrer" className="text-paynet-gray-500 hover:text-paynet-primary underline underline-offset-2">
             Previous portal version
           </a>
         </p>
