@@ -1,0 +1,13 @@
+[
+  {
+    "step": "site-audit",
+    "time": "2026-11-11T17:04:13.351Z",
+    "routeChecks": 174,
+    "failedRoutes": 0,
+    "internalLinks": 50,
+    "externalLinks": 8,
+    "linkProblems": 0,
+    "interactionsFailed": 0,
+    "problems": 0
+  }
+]

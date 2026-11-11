@@ -1,0 +1,2298 @@
+{
+  "routes": [
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/",
+      "ms": 507,
+      "h1": "Paynet for developers",
+      "textLength": 1492,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/notifications",
+      "ms": 506,
+      "h1": "Notifications (webhooks)",
+      "textLength": 20989,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/signatures",
+      "ms": 504,
+      "h1": "Signatures",
+      "textLength": 9621,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/errors-and-statuses",
+      "ms": 504,
+      "h1": "Errors and statuses",
+      "textLength": 13337,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/ai-assistants",
+      "ms": 504,
+      "h1": "Integrate with an AI assistant",
+      "textLength": 5985,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/faq",
+      "ms": 504,
+      "h1": "FAQ",
+      "textLength": 3849,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/changelog",
+      "ms": 504,
+      "h1": "Changelog",
+      "textLength": 6108,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/integration-options",
+      "ms": 504,
+      "h1": "E-commerce: integration options",
+      "textLength": 4094,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/getting-started",
+      "ms": 503,
+      "h1": "Quick start",
+      "textLength": 4420,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/server-to-server",
+      "ms": 505,
+      "h1": "Server-to-server integration",
+      "textLength": 10702,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/saved-cards",
+      "ms": 504,
+      "h1": "Saved cards",
+      "textLength": 5890,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/hosted-checkout",
+      "ms": 503,
+      "h1": "Hosted checkout (client-server)",
+      "textLength": 7252,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/testing",
+      "ms": 503,
+      "h1": "Testing",
+      "textLength": 7204,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/example-shop",
+      "ms": 503,
+      "h1": "Example shop (Node.js)",
+      "textLength": 7109,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/go-live",
+      "ms": 503,
+      "h1": "Go-live checklist",
+      "textLength": 2978,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/sdk",
+      "ms": 505,
+      "h1": "SDK for PHP and Node.js",
+      "textLength": 14504,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/guides/mobile-apps",
+      "ms": 503,
+      "h1": "Mobile apps",
+      "textLength": 6368,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/page/plugins",
+      "ms": 504,
+      "h1": "Plugins",
+      "textLength": 956,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/page/checkout-form",
+      "ms": 503,
+      "h1": "Hosted checkout form",
+      "textLength": 5682,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/page/notification-simulator",
+      "ms": 504,
+      "h1": "Notification simulator",
+      "textLength": 6278,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/api/post-api-linked-cards-unlink",
+      "ms": 904,
+      "h1": "Delete linked card",
+      "textLength": 2571,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/api/post-api-order",
+      "ms": 904,
+      "h1": "Create an order",
+      "textLength": 7010,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/api/get-api-order-id-",
+      "ms": 904,
+      "h1": "Get a payment info by payment id",
+      "textLength": 3290,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/api/get-api-order-merchant-id-",
+      "ms": 905,
+      "h1": "Get a payment info by merchant order id",
+      "textLength": 3046,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/api/get-api-order-search",
+      "ms": 905,
+      "h1": "Get transaction list",
+      "textLength": 2151,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/api/post-api-order-refund",
+      "ms": 903,
+      "h1": "Refund a payment",
+      "textLength": 3099,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/api/get-api-statement",
+      "ms": 903,
+      "h1": "Get statement",
+      "textLength": 1876,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/api/get-api-statement-download",
+      "ms": 904,
+      "h1": "Download statement",
+      "textLength": 1656,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "en",
+      "hash": "#/api/post-auth",
+      "ms": 903,
+      "h1": "Authentication and authorization.",
+      "textLength": 2067,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/",
+      "ms": 505,
+      "h1": "Paynet для разработчиков",
+      "textLength": 1576,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/notifications",
+      "ms": 503,
+      "h1": "Уведомления (webhooks)",
+      "textLength": 21058,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/signatures",
+      "ms": 503,
+      "h1": "Подписи",
+      "textLength": 9762,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/errors-and-statuses",
+      "ms": 502,
+      "h1": "Ошибки и статусы",
+      "textLength": 13303,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/ai-assistants",
+      "ms": 504,
+      "h1": "Интеграция с помощью ИИ",
+      "textLength": 6081,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/faq",
+      "ms": 502,
+      "h1": "Частые вопросы",
+      "textLength": 3850,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/changelog",
+      "ms": 506,
+      "h1": "Журнал изменений",
+      "textLength": 6118,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/integration-options",
+      "ms": 506,
+      "h1": "E-commerce: варианты интеграции",
+      "textLength": 4160,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/getting-started",
+      "ms": 503,
+      "h1": "Быстрый старт",
+      "textLength": 4474,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/server-to-server",
+      "ms": 503,
+      "h1": "Server-to-server интеграция",
+      "textLength": 10783,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/saved-cards",
+      "ms": 503,
+      "h1": "Сохранение карт",
+      "textLength": 5897,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/hosted-checkout",
+      "ms": 504,
+      "h1": "Hosted checkout (client-server)",
+      "textLength": 7380,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/testing",
+      "ms": 506,
+      "h1": "Тестирование",
+      "textLength": 7359,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/example-shop",
+      "ms": 504,
+      "h1": "Пример магазина (Node.js)",
+      "textLength": 7087,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/go-live",
+      "ms": 503,
+      "h1": "Чек-лист запуска",
+      "textLength": 3075,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/sdk",
+      "ms": 503,
+      "h1": "SDK для PHP и Node.js",
+      "textLength": 14408,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/guides/mobile-apps",
+      "ms": 502,
+      "h1": "Мобильные приложения",
+      "textLength": 6383,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/page/plugins",
+      "ms": 504,
+      "h1": "Plugins",
+      "textLength": 1028,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/page/checkout-form",
+      "ms": 502,
+      "h1": "Форма hosted checkout",
+      "textLength": 5775,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/page/notification-simulator",
+      "ms": 502,
+      "h1": "Симулятор уведомлений",
+      "textLength": 6509,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/api/post-api-linked-cards-unlink",
+      "ms": 902,
+      "h1": "Удаление токена карты",
+      "textLength": 2693,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/api/post-api-order",
+      "ms": 904,
+      "h1": "Создание операции",
+      "textLength": 7134,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/api/get-api-order-id-",
+      "ms": 903,
+      "h1": "Получить операцию по ID платежа.",
+      "textLength": 3356,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/api/get-api-order-merchant-id-",
+      "ms": 903,
+      "h1": "Получить операцию по номеру заказа мерчанта",
+      "textLength": 3119,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/api/get-api-order-search",
+      "ms": 905,
+      "h1": "Список операций за период",
+      "textLength": 2207,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/api/post-api-order-refund",
+      "ms": 903,
+      "h1": "Отмена операции",
+      "textLength": 3106,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/api/get-api-statement",
+      "ms": 906,
+      "h1": "Получить список операций",
+      "textLength": 1949,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/api/get-api-statement-download",
+      "ms": 901,
+      "h1": "Скачать выписку",
+      "textLength": 1711,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ru",
+      "hash": "#/api/post-auth",
+      "ms": 903,
+      "h1": "Аутентификация и авторизация.",
+      "textLength": 2138,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/",
+      "ms": 505,
+      "h1": "Paynet pentru dezvoltatori",
+      "textLength": 1669,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/notifications",
+      "ms": 503,
+      "h1": "Notificări (webhooks)",
+      "textLength": 21301,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/signatures",
+      "ms": 503,
+      "h1": "Semnături",
+      "textLength": 10097,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/errors-and-statuses",
+      "ms": 503,
+      "h1": "Erori și statusuri",
+      "textLength": 13963,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/ai-assistants",
+      "ms": 505,
+      "h1": "Integrare cu un asistent AI",
+      "textLength": 6288,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/faq",
+      "ms": 503,
+      "h1": "Întrebări frecvente",
+      "textLength": 4121,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/changelog",
+      "ms": 503,
+      "h1": "Jurnalul modificărilor",
+      "textLength": 6556,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/integration-options",
+      "ms": 503,
+      "h1": "E-commerce: opțiuni de integrare",
+      "textLength": 4317,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/getting-started",
+      "ms": 503,
+      "h1": "Primii pași",
+      "textLength": 4703,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/server-to-server",
+      "ms": 503,
+      "h1": "Integrare server-to-server",
+      "textLength": 11006,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/saved-cards",
+      "ms": 503,
+      "h1": "Salvarea cardurilor",
+      "textLength": 6059,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/hosted-checkout",
+      "ms": 503,
+      "h1": "Hosted checkout (client-server)",
+      "textLength": 7521,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/testing",
+      "ms": 503,
+      "h1": "Testare",
+      "textLength": 7666,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/example-shop",
+      "ms": 503,
+      "h1": "Exemplu de magazin (Node.js)",
+      "textLength": 7429,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/go-live",
+      "ms": 503,
+      "h1": "Lista de verificare pentru lansare",
+      "textLength": 3249,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/sdk",
+      "ms": 503,
+      "h1": "SDK pentru PHP și Node.js",
+      "textLength": 15080,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/guides/mobile-apps",
+      "ms": 503,
+      "h1": "Aplicații mobile",
+      "textLength": 6604,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/page/plugins",
+      "ms": 503,
+      "h1": "Plugins",
+      "textLength": 1075,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/page/checkout-form",
+      "ms": 503,
+      "h1": "Formular hosted checkout",
+      "textLength": 6001,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/page/notification-simulator",
+      "ms": 505,
+      "h1": "Simulator notificări",
+      "textLength": 6727,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/api/post-api-linked-cards-unlink",
+      "ms": 903,
+      "h1": "Deconectați un card atașat",
+      "textLength": 2768,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/api/post-api-order",
+      "ms": 903,
+      "h1": "Creați o plată.",
+      "textLength": 7229,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/api/get-api-order-id-",
+      "ms": 903,
+      "h1": "Obține informații despre o tranzacție prin ID-ul de plată.",
+      "textLength": 3487,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/api/get-api-order-merchant-id-",
+      "ms": 903,
+      "h1": "Obține informații despre plată după numărul comenzii comerciantului",
+      "textLength": 3194,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/api/get-api-order-search",
+      "ms": 902,
+      "h1": "Obține lista tranzacțiilor",
+      "textLength": 2335,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/api/post-api-order-refund",
+      "ms": 903,
+      "h1": "Returnarea  plații.",
+      "textLength": 3280,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/api/get-api-statement",
+      "ms": 903,
+      "h1": "Obține extras",
+      "textLength": 2034,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/api/get-api-statement-download",
+      "ms": 904,
+      "h1": "Descărcați extrasul",
+      "textLength": 1824,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "desktop",
+      "lang": "ro",
+      "hash": "#/api/post-auth",
+      "ms": 902,
+      "h1": "Autentificare și autorizare.",
+      "textLength": 2213,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/",
+      "ms": 505,
+      "h1": "Paynet for developers",
+      "textLength": 1447,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/notifications",
+      "ms": 504,
+      "h1": "Notifications (webhooks)",
+      "textLength": 21333,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/signatures",
+      "ms": 503,
+      "h1": "Signatures",
+      "textLength": 9784,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/errors-and-statuses",
+      "ms": 504,
+      "h1": "Errors and statuses",
+      "textLength": 14452,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/ai-assistants",
+      "ms": 503,
+      "h1": "Integrate with an AI assistant",
+      "textLength": 6157,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/faq",
+      "ms": 505,
+      "h1": "FAQ",
+      "textLength": 3804,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/changelog",
+      "ms": 503,
+      "h1": "Changelog",
+      "textLength": 6063,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/integration-options",
+      "ms": 503,
+      "h1": "E-commerce: integration options",
+      "textLength": 4315,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/getting-started",
+      "ms": 504,
+      "h1": "Quick start",
+      "textLength": 4506,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/server-to-server",
+      "ms": 503,
+      "h1": "Server-to-server integration",
+      "textLength": 11127,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/saved-cards",
+      "ms": 503,
+      "h1": "Saved cards",
+      "textLength": 5954,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/hosted-checkout",
+      "ms": 503,
+      "h1": "Hosted checkout (client-server)",
+      "textLength": 7672,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/testing",
+      "ms": 504,
+      "h1": "Testing",
+      "textLength": 7851,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/example-shop",
+      "ms": 504,
+      "h1": "Example shop (Node.js)",
+      "textLength": 7497,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/go-live",
+      "ms": 506,
+      "h1": "Go-live checklist",
+      "textLength": 2933,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/sdk",
+      "ms": 504,
+      "h1": "SDK for PHP and Node.js",
+      "textLength": 14962,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/guides/mobile-apps",
+      "ms": 504,
+      "h1": "Mobile apps",
+      "textLength": 6413,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/page/plugins",
+      "ms": 503,
+      "h1": "Plugins",
+      "textLength": 911,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/page/checkout-form",
+      "ms": 504,
+      "h1": "Hosted checkout form",
+      "textLength": 5637,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/page/notification-simulator",
+      "ms": 504,
+      "h1": "Notification simulator",
+      "textLength": 6233,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/api/post-api-linked-cards-unlink",
+      "ms": 903,
+      "h1": "Delete linked card",
+      "textLength": 2526,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/api/post-api-order",
+      "ms": 904,
+      "h1": "Create an order",
+      "textLength": 6965,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/api/get-api-order-id-",
+      "ms": 903,
+      "h1": "Get a payment info by payment id",
+      "textLength": 3245,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/api/get-api-order-merchant-id-",
+      "ms": 902,
+      "h1": "Get a payment info by merchant order id",
+      "textLength": 3001,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/api/get-api-order-search",
+      "ms": 903,
+      "h1": "Get transaction list",
+      "textLength": 2106,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/api/post-api-order-refund",
+      "ms": 903,
+      "h1": "Refund a payment",
+      "textLength": 3054,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/api/get-api-statement",
+      "ms": 904,
+      "h1": "Get statement",
+      "textLength": 1831,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/api/get-api-statement-download",
+      "ms": 902,
+      "h1": "Download statement",
+      "textLength": 1611,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "en",
+      "hash": "#/api/post-auth",
+      "ms": 902,
+      "h1": "Authentication and authorization.",
+      "textLength": 2022,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/",
+      "ms": 504,
+      "h1": "Paynet для разработчиков",
+      "textLength": 1524,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/notifications",
+      "ms": 503,
+      "h1": "Уведомления (webhooks)",
+      "textLength": 21295,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/signatures",
+      "ms": 503,
+      "h1": "Подписи",
+      "textLength": 9993,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/errors-and-statuses",
+      "ms": 503,
+      "h1": "Ошибки и статусы",
+      "textLength": 14266,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/ai-assistants",
+      "ms": 502,
+      "h1": "Интеграция с помощью ИИ",
+      "textLength": 6242,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/faq",
+      "ms": 504,
+      "h1": "Частые вопросы",
+      "textLength": 3798,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/changelog",
+      "ms": 503,
+      "h1": "Журнал изменений",
+      "textLength": 6066,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/integration-options",
+      "ms": 502,
+      "h1": "E-commerce: варианты интеграции",
+      "textLength": 4365,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/getting-started",
+      "ms": 504,
+      "h1": "Быстрый старт",
+      "textLength": 4538,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/server-to-server",
+      "ms": 503,
+      "h1": "Server-to-server интеграция",
+      "textLength": 11217,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/saved-cards",
+      "ms": 503,
+      "h1": "Сохранение карт",
+      "textLength": 5972,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/hosted-checkout",
+      "ms": 503,
+      "h1": "Hosted checkout (client-server)",
+      "textLength": 7851,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/testing",
+      "ms": 502,
+      "h1": "Тестирование",
+      "textLength": 8076,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/example-shop",
+      "ms": 503,
+      "h1": "Пример магазина (Node.js)",
+      "textLength": 7492,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/go-live",
+      "ms": 503,
+      "h1": "Чек-лист запуска",
+      "textLength": 3023,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/sdk",
+      "ms": 506,
+      "h1": "SDK для PHP и Node.js",
+      "textLength": 14768,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/guides/mobile-apps",
+      "ms": 503,
+      "h1": "Мобильные приложения",
+      "textLength": 6422,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/page/plugins",
+      "ms": 503,
+      "h1": "Plugins",
+      "textLength": 976,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/page/checkout-form",
+      "ms": 503,
+      "h1": "Форма hosted checkout",
+      "textLength": 5723,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/page/notification-simulator",
+      "ms": 503,
+      "h1": "Симулятор уведомлений",
+      "textLength": 6457,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/api/post-api-linked-cards-unlink",
+      "ms": 902,
+      "h1": "Удаление токена карты",
+      "textLength": 2641,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/api/post-api-order",
+      "ms": 903,
+      "h1": "Создание операции",
+      "textLength": 7082,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/api/get-api-order-id-",
+      "ms": 902,
+      "h1": "Получить операцию по ID платежа.",
+      "textLength": 3304,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/api/get-api-order-merchant-id-",
+      "ms": 903,
+      "h1": "Получить операцию по номеру заказа мерчанта",
+      "textLength": 3067,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/api/get-api-order-search",
+      "ms": 903,
+      "h1": "Список операций за период",
+      "textLength": 2155,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/api/post-api-order-refund",
+      "ms": 903,
+      "h1": "Отмена операции",
+      "textLength": 3054,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/api/get-api-statement",
+      "ms": 903,
+      "h1": "Получить список операций",
+      "textLength": 1897,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/api/get-api-statement-download",
+      "ms": 901,
+      "h1": "Скачать выписку",
+      "textLength": 1659,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ru",
+      "hash": "#/api/post-auth",
+      "ms": 903,
+      "h1": "Аутентификация и авторизация.",
+      "textLength": 2086,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/",
+      "ms": 505,
+      "h1": "Paynet pentru dezvoltatori",
+      "textLength": 1612,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/notifications",
+      "ms": 504,
+      "h1": "Notificări (webhooks)",
+      "textLength": 21566,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/signatures",
+      "ms": 503,
+      "h1": "Semnături",
+      "textLength": 10285,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/errors-and-statuses",
+      "ms": 503,
+      "h1": "Erori și statusuri",
+      "textLength": 15037,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/ai-assistants",
+      "ms": 502,
+      "h1": "Integrare cu un asistent AI",
+      "textLength": 6433,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/faq",
+      "ms": 503,
+      "h1": "Întrebări frecvente",
+      "textLength": 4064,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/changelog",
+      "ms": 503,
+      "h1": "Jurnalul modificărilor",
+      "textLength": 6499,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/integration-options",
+      "ms": 502,
+      "h1": "E-commerce: opțiuni de integrare",
+      "textLength": 4535,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/getting-started",
+      "ms": 506,
+      "h1": "Primii pași",
+      "textLength": 4760,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/server-to-server",
+      "ms": 506,
+      "h1": "Integrare server-to-server",
+      "textLength": 11412,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/saved-cards",
+      "ms": 503,
+      "h1": "Salvarea cardurilor",
+      "textLength": 6134,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/hosted-checkout",
+      "ms": 504,
+      "h1": "Hosted checkout (client-server)",
+      "textLength": 7966,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/testing",
+      "ms": 503,
+      "h1": "Testare",
+      "textLength": 8528,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/example-shop",
+      "ms": 502,
+      "h1": "Exemplu de magazin (Node.js)",
+      "textLength": 7769,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/go-live",
+      "ms": 503,
+      "h1": "Lista de verificare pentru lansare",
+      "textLength": 3192,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/sdk",
+      "ms": 504,
+      "h1": "SDK pentru PHP și Node.js",
+      "textLength": 15441,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/guides/mobile-apps",
+      "ms": 504,
+      "h1": "Aplicații mobile",
+      "textLength": 6643,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/page/plugins",
+      "ms": 502,
+      "h1": "Plugins",
+      "textLength": 1018,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/page/checkout-form",
+      "ms": 506,
+      "h1": "Formular hosted checkout",
+      "textLength": 5944,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/page/notification-simulator",
+      "ms": 503,
+      "h1": "Simulator notificări",
+      "textLength": 6670,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/api/post-api-linked-cards-unlink",
+      "ms": 902,
+      "h1": "Deconectați un card atașat",
+      "textLength": 2711,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/api/post-api-order",
+      "ms": 903,
+      "h1": "Creați o plată.",
+      "textLength": 7172,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/api/get-api-order-id-",
+      "ms": 903,
+      "h1": "Obține informații despre o tranzacție prin ID-ul de plată.",
+      "textLength": 3430,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/api/get-api-order-merchant-id-",
+      "ms": 902,
+      "h1": "Obține informații despre plată după numărul comenzii comerciantului",
+      "textLength": 3137,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/api/get-api-order-search",
+      "ms": 902,
+      "h1": "Obține lista tranzacțiilor",
+      "textLength": 2278,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/api/post-api-order-refund",
+      "ms": 903,
+      "h1": "Returnarea  plații.",
+      "textLength": 3223,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/api/get-api-statement",
+      "ms": 902,
+      "h1": "Obține extras",
+      "textLength": 1977,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/api/get-api-statement-download",
+      "ms": 903,
+      "h1": "Descărcați extrasul",
+      "textLength": 1767,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    },
+    {
+      "device": "mobile",
+      "lang": "ro",
+      "hash": "#/api/post-auth",
+      "ms": 904,
+      "h1": "Autentificare și autorizare.",
+      "textLength": 2156,
+      "overflow": 0,
+      "errors": [],
+      "issues": []
+    }
+  ],
+  "links": {
+    "https://merchant.paynet.md": {
+      "status": 200,
+      "from": "en #/"
+    },
+    "https://docs.paynet.md/psp/": {
+      "status": 200,
+      "from": "en #/"
+    },
+    "https://developer.cybersource.com/technology-partners/Shopify_Managed.html": {
+      "status": 200,
+      "from": "en #/page/plugins"
+    },
+    "https://info.paynet.md/plugin/cms-wordpress.zip": {
+      "status": 200,
+      "from": "en #/page/plugins"
+    },
+    "https://info.paynet.md/plugin/cms-opencart.zip": {
+      "status": 200,
+      "from": "en #/page/plugins"
+    },
+    "https://info.paynet.md/plugin/cms-cscart.zip": {
+      "status": 200,
+      "from": "en #/page/plugins"
+    },
+    "https://info.paynet.md/plugin/cms-prestashop.zip": {
+      "status": 200,
+      "from": "en #/page/plugins"
+    },
+    "https://info.paynet.md/plugin/cms-magento.zip": {
+      "status": 200,
+      "from": "en #/page/plugins"
+    }
+  },
+  "files": [
+    {
+      "href": "llms-full.txt",
+      "status": 200,
+      "from": "en #/"
+    },
+    {
+      "href": "./postman/paynet-ecom.postman_collection.json",
+      "status": 200,
+      "from": "en #/"
+    },
+    {
+      "href": "./postman/paynet-test.postman_environment.json",
+      "status": 200,
+      "from": "en #/"
+    },
+    {
+      "href": "./postman/paynet-production.postman_environment.json",
+      "status": 200,
+      "from": "en #/"
+    },
+    {
+      "href": "llms-ecom.txt",
+      "status": 200,
+      "from": "en #/guides/ai-assistants"
+    },
+    {
+      "href": "llms.txt",
+      "status": 200,
+      "from": "en #/guides/ai-assistants"
+    },
+    {
+      "href": "openapi.json",
+      "status": 200,
+      "from": "en #/guides/ai-assistants"
+    },
+    {
+      "href": "mocks/index.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "mocks/payment-status-3.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "mocks/payment-status-5-declined.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "mocks/payment-status-5-refunded.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "mocks/payment-status-6.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "mocks/refund-400-amount-or-second.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "mocks/refund-404-unpaid.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "mocks/order-500-repeated-order.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "mocks/order-400-errorinfo.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "mocks/error-401-token.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "mocks/notification-paid.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "mocks/notification-paid-wrong-hash.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "mocks/notification-paid-tampered-paidamount.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "postman/paynet-ecom.postman_collection.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "postman/paynet-test.postman_environment.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "postman/paynet-production.postman_environment.json",
+      "status": 200,
+      "from": "en #/guides/testing"
+    },
+    {
+      "href": "sdk/paynet-example-shop-node.zip",
+      "status": 200,
+      "from": "en #/guides/example-shop"
+    },
+    {
+      "href": "sdk/paynet-ecom-sdk-php-1.0.0.zip",
+      "status": 200,
+      "from": "en #/guides/sdk"
+    },
+    {
+      "href": "sdk/paynet-ecom-sdk-node-1.0.0.zip",
+      "status": 200,
+      "from": "en #/guides/sdk"
+    },
+    {
+      "href": "llms.txt",
+      "status": 200,
+      "bytes": 10956
+    },
+    {
+      "href": "llms-full.txt",
+      "status": 200,
+      "bytes": 178853
+    },
+    {
+      "href": "llms-ecom.txt",
+      "status": 200,
+      "bytes": 178841
+    },
+    {
+      "href": "openapi.json",
+      "status": 200,
+      "bytes": 66990
+    },
+    {
+      "href": "postman/paynet-ecom.postman_collection.json",
+      "status": 200,
+      "bytes": 34345
+    },
+    {
+      "href": "postman/paynet-test.postman_environment.json",
+      "status": 200,
+      "bytes": 808
+    },
+    {
+      "href": "postman/paynet-production.postman_environment.json",
+      "status": 200,
+      "bytes": 755
+    },
+    {
+      "href": "sdk/paynet-ecom-sdk-php-1.0.0.zip",
+      "status": 200,
+      "bytes": 20378
+    },
+    {
+      "href": "sdk/paynet-ecom-sdk-node-1.0.0.zip",
+      "status": 200,
+      "bytes": 21570
+    },
+    {
+      "href": "sdk/paynet-example-shop-node.zip",
+      "status": 200,
+      "bytes": 12995
+    },
+    {
+      "href": "mocks/index.json",
+      "status": 200,
+      "bytes": 3336
+    },
+    {
+      "href": "docs/sdk.md",
+      "status": 200,
+      "bytes": 15049
+    },
+    {
+      "href": "docs/ru/sdk.md",
+      "status": 200,
+      "bytes": 19360
+    },
+    {
+      "href": "docs/ro/mobile-apps.md",
+      "status": 200,
+      "bytes": 6389
+    },
+    {
+      "href": "docs/api/post-api-order.md",
+      "status": 200,
+      "bytes": 7567
+    }
+  ],
+  "interactions": [
+    {
+      "name": "legacy redirect #/page/ecommerce",
+      "ok": true,
+      "detail": "#/guides/integration-options"
+    },
+    {
+      "name": "legacy redirect #/page/order-request-v06",
+      "ok": true,
+      "detail": "#/page/checkout-form"
+    },
+    {
+      "name": "legacy redirect #/page/notifications",
+      "ok": true,
+      "detail": "#/page/notification-simulator"
+    },
+    {
+      "name": "search \"refund\" (en)",
+      "ok": true,
+      "detail": "results visible: true, items 0"
+    },
+    {
+      "name": "search \"refund\" (ru)",
+      "ok": true,
+      "detail": "results visible: true, items 0"
+    },
+    {
+      "name": "search \"refund\" (ro)",
+      "ok": true,
+      "detail": "results visible: true, items 0"
+    },
+    {
+      "name": "mobile menu (en)",
+      "ok": true,
+      "detail": "opened and closed"
+    },
+    {
+      "name": "mobile menu (ru)",
+      "ok": true,
+      "detail": "opened and closed"
+    },
+    {
+      "name": "mobile menu (ro)",
+      "ok": true,
+      "detail": "opened and closed"
+    },
+    {
+      "name": "language switch EN → RU",
+      "ok": true,
+      "detail": "Notifications (webhooks) → Уведомления (webhooks)"
+    }
+  ],
+  "bundle": {
+    "bytes": 955137,
+    "knownPublicTestValues": {
+      "771064": true,
+      "sLgMnGWJ": true,
+      "F90D6485-9CCC-458B-96A3-8958AF9B4458": true,
+      "D9873689-E5F8-4272-A67F-0D8BA3F9BAA7": true
+    },
+    "suspicious": []
+  },
+  "npm": {
+    "all": {
+      "counts": {
+        "info": 0,
+        "low": 2,
+        "moderate": 7,
+        "high": 14,
+        "critical": 4,
+        "total": 27
+      },
+      "packages": [
+        "@babel/core (low)",
+        "@babel/helpers (moderate)",
+        "@eslint/plugin-kit (low)",
+        "@humanfs/node (moderate)",
+        "@isaacs/brace-expansion (high)",
+        "ajv (moderate)",
+        "brace-expansion (high)",
+        "browserslist (high)",
+        "esbuild (moderate)",
+        "fast-uri (high)",
+        "fast-xml-parser (critical)",
+        "flatted (high)",
+        "form-data (critical)",
+        "glob (high, direct)",
+        "httpsnippet (critical)",
+        "js-yaml (high, direct)",
+        "minimatch (high)",
+        "nanoid (high)",
+        "openapi-sampler (moderate)",
+        "openapi-snippet (critical, direct)",
+        "picomatch (high)",
+        "postcss (high, direct)",
+        "postcss-selector-parser (moderate)",
+        "rollup (high)",
+        "source-map-js (high)",
+        "vite (high, direct)",
+        "yaml (moderate)"
+      ]
+    },
+    "runtimeOnly": {
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 2,
+        "high": 5,
+        "critical": 4,
+        "total": 11
+      },
+      "packages": [
+        "@isaacs/brace-expansion (high)",
+        "ajv (moderate)",
+        "fast-uri (high)",
+        "fast-xml-parser (critical)",
+        "form-data (critical)",
+        "glob (high, direct)",
+        "httpsnippet (critical)",
+        "js-yaml (high, direct)",
+        "minimatch (high)",
+        "openapi-sampler (moderate)",
+        "openapi-snippet (critical, direct)"
+      ]
+    }
+  },
+  "timing": {
+    "firstLoadMs": 746
+  },
+  "linkProblems": [],
+  "summary": {
+    "routeChecks": 174,
+    "failedRoutes": 0,
+    "internalLinks": 50,
+    "externalLinks": 8,
+    "linkProblems": 0,
+    "interactionsFailed": 0,
+    "problems": 0
+  }
+}
