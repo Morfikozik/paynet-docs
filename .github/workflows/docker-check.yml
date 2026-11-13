@@ -1,5 +1,5 @@
 name: Docker / GitLab build check
-# Repeats deploy/gitlab-ci.yml (build into dist in node:22-bookworm) and checks the Docker image from the Dockerfile.
+# Repeats .gitlab-ci.yml (build into dist in node:22-bookworm) and checks the Docker image from the Dockerfile.
 on:
   push:
     branches: [main]

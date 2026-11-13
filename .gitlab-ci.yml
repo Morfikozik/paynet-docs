@@ -1,27 +1,19 @@
-# Paynet API documentation portal — GitLab CI (build into dist, then pack dist into a Docker image).
-#
-# In the GitLab project the portal lives in the sub-folder paynet-psp/. Add this ONE line file
-# at the root of the GitLab project as .gitlab-ci.yml (once):
-#
-#   include:
-#     - local: 'paynet-psp/deploy/gitlab-ci.yml'
-#
-# After that every update of paynet-psp/ brings its own build rules.
+# Paynet API documentation portal — GitLab CI (project paynet-docs/paynet-psp).
+# docs-build: all documentation checks + build into dist; docs-docker: Docker image from dist (template, manual).
+# The file comes from GitHub with every update ("send to GitLab"), so changes to the build travel with the docs.
 
 variables:
-  DOCS_DIR: paynet-psp                         # folder of the portal in the GitLab project
   DOCS_SITE_URL: https://docs.paynet.md/api/   # address the site is built for (set another one for a test site)
 
 stages:
   - build
   - package
 
-# 1. Checks + build into paynet-psp/dist. Fails if any documentation check fails.
+# 1. Checks + build into dist. Fails if any documentation check fails.
 docs-build:
   stage: build
   image: node:22-bookworm
   before_script:
-    - cd "$DOCS_DIR"
     - apt-get update -qq && apt-get install -y -qq zip > /dev/null   # zip is used for the SDK archives
     - npm ci --no-audit --no-fund
   script:
@@ -32,7 +24,7 @@ docs-build:
   artifacts:
     name: "paynet-docs-dist-$CI_COMMIT_SHORT_SHA"
     paths:
-      - paynet-psp/dist                           # keep in sync with DOCS_DIR
+      - dist
     expire_in: 30 days
 
 # 2. Docker image from dist (template: adjust to your registry / builder; started manually).
@@ -44,7 +36,6 @@ docs-docker:
   needs: [docs-build]
   when: manual
   script:
-    - cd "$DOCS_DIR"
     - docker build -t "$CI_REGISTRY_IMAGE/docs:$CI_COMMIT_SHORT_SHA" .
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     - docker push "$CI_REGISTRY_IMAGE/docs:$CI_COMMIT_SHORT_SHA"

@@ -116,12 +116,10 @@ ${changes}
 6. СБОРКА В GITLAB И DOCKER
 --------------------------
 В репозитории есть всё для сборки в GitLab и запуска в контейнере:
-  deploy/gitlab-ci.yml  — задачи GitLab CI: docs-build (проверки + сборка в dist), docs-docker (образ, запуск вручную)
+  .gitlab-ci.yml        — задачи GitLab CI: docs-build (проверки + сборка в dist), docs-docker (образ, запуск вручную)
   Dockerfile            — nginx + готовая папка dist, сайт по пути /api/ (/ → /api/)
   deploy/nginx.conf     — типы файлов (UTF-8), gzip, кэш
-Подключение (один раз): в корне проекта GitLab файл .gitlab-ci.yml со строками
-    include:
-      - local: 'paynet-psp/deploy/gitlab-ci.yml'
+GitLab подхватывает .gitlab-ci.yml из корня проекта сам — ничего подключать не нужно.
 Адрес сборки — переменная DOCS_SITE_URL (по умолчанию ${SITE}; для тестовой площадки задайте свой).
 Раннеру нужен интернет (npm, репозитории Debian для утилиты zip) или внутренние зеркала.
 Вручную:

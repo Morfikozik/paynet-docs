@@ -1,0 +1,56 @@
+name: Send to Paynet IT (GitLab dev)
+# Manual: copies the current main into the GitLab project paynet-docs/paynet-psp, branch dev, as ONE commit,
+# and marks the version on GitHub as release/v<version>. Token: repository secret GITLAB_TOKEN (project access token).
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'GitLab branch'
+        default: 'dev'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    env:
+      GL_REPO: git-space.paypoint.md/paynet-docs/paynet-psp.git
+      GL_WEB: https://git-space.paypoint.md/paynet-docs/paynet-psp
+      TARGET: ${{ github.event.inputs.target_branch }}
+      T: ${{ secrets.GITLAB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main, path: src }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Documentation checks (nothing is sent if they fail)
+        working-directory: src
+        run: node scripts/check-docs.mjs && node scripts/check-urls.mjs
+      - name: Copy the version into GitLab
+        run: |
+          [ -n "$T" ] || { echo "Secret GITLAB_TOKEN is missing"; exit 1; }
+          VERSION=$(grep -m1 -oP '^## Documentation v\K[\d.]+' src/content/en/common/06-changelog.md)
+          SHA=$(git -C src rev-parse HEAD); SHORT=${SHA:0:7}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV; echo "SHA=$SHA" >> $GITHUB_ENV
+          git clone -q --depth 1 -b "$TARGET" "https://oauth2:$T@$GL_REPO" gl
+          MSG=$(printf 'Документация v%s — из GitHub, коммит %s\n\nhttps://github.com/%s/commit/%s' "$VERSION" "$SHORT" "$GITHUB_REPOSITORY" "$SHA")
+          RESULT=$(src/scripts/sync-to-gitlab.sh src gl "$MSG")
+          if [ "$RESULT" = "NO_CHANGES" ]; then
+            echo "GitLab $TARGET already has v$VERSION ($SHORT) — nothing to send."
+          else
+            echo "Changes: $RESULT"
+            git -C gl push -q origin "HEAD:$TARGET"
+            echo "Sent to GitLab $TARGET: $(git -C gl rev-parse --short HEAD)"
+          fi
+          {
+            echo "### v$VERSION → GitLab \`$TARGET\`"
+            echo ""
+            echo "GitHub commit: \`$SHORT\` · result: ${RESULT}"
+            echo ""
+            echo "Merge Request for IT: $GL_WEB/-/merge_requests/new?merge_request%5Bsource_branch%5D=$TARGET&merge_request%5Btarget_branch%5D=main"
+          } >> $GITHUB_STEP_SUMMARY
+      - name: Mark the version on GitHub (release/v<version>)
+        working-directory: src
+        run: git push -q -f origin "HEAD:refs/heads/release/v$VERSION"

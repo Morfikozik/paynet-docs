@@ -15,7 +15,8 @@ node scripts/build-release.mjs --dir dist-it --out release
 
 ## GitLab CI и Docker (для ИТ Paynet)
 
-- `deploy/gitlab-ci.yml` — сборка в GitLab: проверки + `dist` под `DOCS_SITE_URL` (по умолчанию https://docs.paynet.md/api/); подключается из корня проекта GitLab: `include: - local: 'paynet-psp/deploy/gitlab-ci.yml'`.
+- `.gitlab-ci.yml` — сборка в GitLab (проект `paynet-docs/paynet-psp`): проверки + `dist` под `DOCS_SITE_URL` (по умолчанию https://docs.paynet.md/api/).
+- `.github/workflows/send-to-gitlab.yml` — «передать в ИТ»: текущая версия одним коммитом в ветку `dev` GitLab (без `.github` и `.bolt`), отметка `release/v<версия>` на GitHub. Токен — секрет `GITLAB_TOKEN`.
 - `Dockerfile` + `deploy/nginx.conf` — образ nginx с готовой папкой `dist`, сайт по пути `/api/`: `docker build -t paynet-docs . && docker run -d -p 8080:80 paynet-docs`.
 - `.github/workflows/docker-check.yml` повторяет сборку GitLab в том же образе `node:22-bookworm` и проверяет контейнер (типы файлов, gzip, кэш, site-audit).
 
