@@ -1,0 +1,4 @@
+# Only the built site and the server config go into the image.
+*
+!dist/
+!deploy/nginx.conf

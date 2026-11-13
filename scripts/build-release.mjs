@@ -113,6 +113,23 @@ ${changes}
   node scripts/build-site.mjs --site-url ${SITE} --out dist-it --strict
 Результат — папка dist-it (то же содержимое, что в архиве).
 
+6. СБОРКА В GITLAB И DOCKER
+--------------------------
+В репозитории есть всё для сборки в GitLab и запуска в контейнере:
+  deploy/gitlab-ci.yml  — задачи GitLab CI: docs-build (проверки + сборка в dist), docs-docker (образ, запуск вручную)
+  Dockerfile            — nginx + готовая папка dist, сайт по пути /api/ (/ → /api/)
+  deploy/nginx.conf     — типы файлов (UTF-8), gzip, кэш
+Подключение (один раз): в корне проекта GitLab файл .gitlab-ci.yml со строками
+    include:
+      - local: 'paynet-psp/deploy/gitlab-ci.yml'
+Адрес сборки — переменная DOCS_SITE_URL (по умолчанию ${SITE}; для тестовой площадки задайте свой).
+Раннеру нужен интернет (npm, репозитории Debian для утилиты zip) или внутренние зеркала.
+Вручную:
+  node scripts/build-site.mjs --site-url ${SITE} --out dist --strict
+  docker build -t paynet-docs .
+  docker run -d -p 8080:80 paynet-docs      → http://<сервер>:8080/api/
+Перед контейнером — ваш прокси с HTTPS для https://docs.paynet.md/api/ (на путь /api/ контейнера).
+
 Вопросы по содержанию документации — владельцу проекта (Paynet, B2B-продукты).
 `;
 fs.writeFileSync(path.join(out, 'README-IT.txt'), readme);

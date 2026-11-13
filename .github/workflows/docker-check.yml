@@ -1,0 +1,68 @@
+name: Docker / GitLab build check
+# Repeats deploy/gitlab-ci.yml (build into dist in node:22-bookworm) and checks the Docker image from the Dockerfile.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  gitlab-build:
+    name: Build into dist (same steps as GitLab docs-build)
+    runs-on: ubuntu-latest
+    container: node:22-bookworm
+    steps:
+      - uses: actions/checkout@v4
+      - run: apt-get update -qq && apt-get install -y -qq zip > /dev/null
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/check-docs.mjs
+      - run: node scripts/check-urls.mjs
+      - run: npx tsc --noEmit -p tsconfig.app.json
+      - run: node scripts/build-site.mjs --site-url https://docs.paynet.md/api/ --out dist --strict
+      - uses: actions/upload-artifact@v4
+        with: { name: dist, path: dist, retention-days: 3 }
+
+  docker:
+    name: Docker image + checks
+    needs: gitlab-build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - name: Build and start the container
+        run: |
+          docker build -t paynet-docs:check .
+          docker run -d --name docs -p 8080:80 paynet-docs:check
+          sleep 3
+          docker image ls paynet-docs:check --format 'Image size: {{.Size}}'
+      - name: HTTP checks (status, Content-Type, gzip, cache)
+        run: |
+          fail=0
+          check() { # url expected-status header-regex
+            out=$(curl -s -o /dev/null -D - -H 'Accept-Encoding: gzip' "http://localhost:8080$1")
+            code=$(echo "$out" | head -1 | awk '{print $2}')
+            if [ "$code" = "$2" ] && echo "$out" | grep -qiE "$3"; then echo "✓ $1 → $code ($3)"; else echo "✗ $1 → $code, expected $2 and /$3/"; echo "$out"; fail=1; fi
+          }
+          check /                                       301 '^location: /api/'
+          check /api                                    301 '^location: /api/'
+          check /api/                                   200 '^cache-control: no-cache'
+          check /api/                                   200 '^content-type: text/html; charset=utf-8'
+          check /api/llms.txt                           200 '^content-type: text/plain; charset=utf-8'
+          check /api/llms-full.txt                      200 '^content-encoding: gzip'
+          check /api/openapi.json                       200 '^content-type: application/json'
+          check /api/docs/signatures.md                 200 '^content-type: text/markdown; charset=utf-8'
+          check /api/sitemap.xml                        200 'xml'
+          check /api/robots.txt                         200 '^content-type: text/plain'
+          check /api/sdk/paynet-ecom-sdk-php-1.0.0.zip  200 '^content-type: application/zip'
+          asset=$(ls dist/assets | grep '\.js$' | head -1)
+          check "/api/assets/$asset"                    200 'max-age=31536000'
+          check /api/no-such-file.txt                   404 '.'
+          curl -s http://localhost:8080/api/llms.txt | grep -q 'https://docs.paynet.md/api/' && echo "✓ llms.txt links to docs.paynet.md/api/" || { echo "✗ llms.txt has no docs.paynet.md/api/ links"; fail=1; }
+          sleep 30; echo "Container health: $(docker inspect -f '{{.State.Health.Status}}' docs)"
+          exit $fail
+      - name: Site audit against the container
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1.49.1
+          npx playwright install --with-deps chromium > /dev/null
+          SITE_URL=http://localhost:8080/api/ node scripts/e2e.mjs site-audit e2e-out
+          sed -n 1,25p e2e-out/site-audit.md
